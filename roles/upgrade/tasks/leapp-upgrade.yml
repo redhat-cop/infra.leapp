@@ -1,0 +1,73 @@
+---
+- name: Verify no inhibitor results found during preupgrade
+  ansible.builtin.shell: |
+    set -o pipefail
+    echo 'Checking preupgrade results:' | tee -a {{ log_file }}
+    ( head -1 {{ result_filename }} | grep -v inhibitor ) 2>&1 | tee -a {{ log_file }}
+  args:
+    executable: /bin/bash
+  register: results
+  changed_when: false
+  failed_when: results.rc != 0 or results.stdout.find('fail') != -1 or results.stdout.find('error') != -1
+
+- name: Create snapshot
+  ansible.builtin.debug:
+    msg: 'FIXME: snapshot needs to happen here!'
+
+- name: Run preupgrade hooks
+  ansible.builtin.shell: |
+    set -o pipefail
+    for exe in $(find /root/preupgrade/preupgrade-scripts -type f -executable); do
+      echo "Running $exe..." | tee -a {{ log_file }}
+      ( cd ${exe%/*} && ./${exe##*/} ) 2>&1 | tee -a {{ log_file }}
+      if [[ $? -ne 0 ]]; then
+        echo "Fatal error while running preupgrade hook $exe" | tee -a {{ log_file }}
+        exit 1
+      fi
+    done
+  args:
+    executable: /bin/bash
+
+- name: Start Leapp OS upgrade
+  ansible.builtin.shell: |
+    set -o pipefail
+    modprobe -r btrfs
+    leapp upgrade {{ leapp_upgrade_opts }} 2>&1 | tee -a {{ log_file }}
+  args:
+    executable: /bin/bash
+
+- name: Reboot to continue Leapp OS upgrade
+  ansible.builtin.reboot:
+    msg: "Host is starting Leapp OS upgrade now!"
+    post_reboot_delay: 60
+    reboot_timeout: 43200
+
+- name: Wait for leapp_resume run once service to no longer exist
+  ansible.builtin.service:
+    name: leapp_resume
+    state: started
+  check_mode: true
+  register: leapp_resume_result
+  ignore_errors: true
+  until: leapp_resume_result.failed
+  retries: 360
+  delay: 10
+
+- name: Run postupgrade hooks
+  ansible.builtin.shell: |
+    set -o pipefail
+    for exe in $(find /root/preupgrade/postupgrade.d -type f -executable); do
+      echo "Running $exe..." | tee -a {{ log_file }}
+      ( cd ${exe%/*} && ./${exe##*/} ) 2>&1 | tee -a {{ log_file }}
+      if [[ $? -ne 0 ]]; then
+        echo "Fatal error while running postupgrade hook $exe" | tee -a {{ log_file }}
+        exit 1
+      fi
+    done
+  args:
+    executable: /bin/bash
+
+- name: RIPU in-place OS upgrade is done
+  ansible.builtin.debug:
+    msg: 'The in-place OS upgrade is now complete. Engage your partner teams to begin application validation.'
+...

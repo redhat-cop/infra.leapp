@@ -1,0 +1,33 @@
+---
+# tasks file for logging
+- name: Create log directory
+  ansible.builtin.file:
+    path: "{{ log_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create new log file
+  ansible.builtin.template:
+    src: templates/logfile.j2
+    dest: "{{ log_file }}"
+    owner: root
+    group: root
+    mode: 0644
+    validate: "test ! -e {{ log_file }} -a %s"
+  register: mklog
+  notify:
+    - "Archive log file"
+  failed_when: false
+
+- name: Check for duplicate playbook job
+  ansible.builtin.fail:
+    msg: "Another RIPU playbook job is already running. See {{ log_file }} for details. If the previous job was aborted, rename the log file to clear this failure and try again."
+  when: mklog is failed
+
+- name: Log job start timestamp
+  ansible.builtin.shell: "echo Job started at $(date -Is) >> {{ log_file }}"
+  notify:
+    - "Archive log file"
+...

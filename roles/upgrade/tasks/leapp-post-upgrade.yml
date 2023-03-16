@@ -1,0 +1,68 @@
+---
+# /etc/dnf/dnf.conf is an ini file and could be parsed to check if exclude has value and run this conditionally.
+- name: Remove all packages from the dnf exclude list
+  ansible.builtin.shell: dnf config-manager --save --setopt exclude=''
+
+# TODO: leapp 7 to 8 cleans up old kernels
+
+# TODO: Use ansible facts.
+- name: Search for remaining previous version rhel packages
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail;
+      rpm -qa |
+      grep -e '\.el[{{ ansible_distribution_major_version | int - 2 }}{{ ansible_distribution_major_version | int - 1 }}]' |
+      grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
+      sort
+  changed_when: false
+  register: previous_version_packages
+
+- name: Debug previous_version_packages
+  ansible.builtin.debug:
+    var: previous_version_packages
+
+- name: Remove previous_version_packages
+  ansible.builtin.package:
+    name: "{{ previous_version_packages.stdout_lines }}"
+    state: absent
+  register: result
+
+- name: Debug removal of previous_version_packages
+  ansible.builtin.debug:
+    var: result
+
+- name: Remove leapp related packages
+  ansible.builtin.package:
+    name:
+      - leapp-deps-el{{ ansible_distribution_major_version }}
+      - leapp-repository-deps-el{{ ansible_distribution_major_version }}
+      - kernel-workaround
+    state: absent
+  register: result
+
+- name: Debug removal of leapp related packages
+  ansible.builtin.debug:
+    var: result
+
+- name: Unset subscription-manager release
+  ansible.builtin.shell: subscription-manager release --unset
+  when: leapp_upgrade_type == 'disconnected'
+
+# TODO: Unset rhui release.
+
+# TODO: How to get activation key / determine if need to reregister.
+# TODO: Satellite org in variables.
+- name: "Register to new activation key"
+  ansible.builtin.shell: subscription-manager register --org="my_org" --activationkey="rhel{{ ansible_distribution_major_version }}_dev" --force
+  when: leapp_upgrade_type == 'disconnected'
+
+- name: Update all packages
+  ansible.builtin.package:
+    name: '*'
+    state: latest
+
+- name: Reboot to finalize packages updates
+  ansible.builtin.reboot:
+    reboot_timeout: 7200
+
+...

@@ -1,0 +1,20 @@
+---
+- name: Analysis
+  hosts: all
+  strategy: free
+  gather_facts: true
+  become: true
+  force_handlers: true
+  tasks:
+    - name: Initialize lock and logging
+      ansible.builtin.import_role:
+        name: logging
+      vars:
+        job_name: 'RIPU preupgrade analysis'
+
+    - name: Generate preupgrade analysis report
+      block:
+        - name: Run RIPU preupg
+          ansible.builtin.import_role:
+            name: analysis
+...

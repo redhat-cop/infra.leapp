@@ -1,0 +1,35 @@
+---
+# defaults file for analysis
+analysis_packages_el7:
+  # TODO: Seems to cause package dependency problems with post upgrade cleanup.
+  # - leapp-upgrade-el7toel8
+  # Try this instead.
+  - leapp-upgrade
+  # TODO: this should be part of LVM snapshot process.
+  # - lvm2-python-boom
+
+analysis_packages_el8:
+  # TODO: Seems to cause package dependency problems with post upgrade cleanup.
+  # - leapp-upgrade-el8toel9
+  # Try this instead.
+  - leapp-upgrade
+  # TODO: This should be part of inhibitor remediation.
+  # - vdo
+  # TODO: This should be part of LVM snapshot process.
+  # - boom-boot
+  # TODO: only w/ rhui for aws
+  # - leapp-rhui-aws
+
+analysis_repos_el7:
+  - rhel-7-server-extras-rpms
+
+# leapp_upgrade_type: connected
+leapp_upgrade_type: disconnected
+
+leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'connected' else '' }}"
+
+# leapp_metadata_url only used for disconnected leapp upgrades
+leapp_metadata_url: https://satellite.example.com/pub/leapp-data-21.tar.gz
+
+result_filename: '/var/log/leapp/leapp-report.txt'
+...

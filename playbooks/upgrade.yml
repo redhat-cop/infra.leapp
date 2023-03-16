@@ -1,0 +1,21 @@
+---
+- name: Upgrade
+  hosts: all
+  strategy: free
+  become: true
+  force_handlers: true
+  vars:
+    ansible_python_interpreter: /usr/libexec/platform-python
+  tasks:
+    - name: Initialize lock and logging
+      ansible.builtin.import_role:
+        name: logging
+      vars:
+        job_name: 'RIPU in-place OS upgrade'
+
+    - name: Perform OS upgrade
+      block:
+        - name: Leapp upgrade
+          ansible.builtin.import_role:
+            name: upgrade
+...

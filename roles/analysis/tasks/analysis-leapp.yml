@@ -1,0 +1,78 @@
+---
+- name: Ensure leapp metadata is available for disconnected Leapp upgrades
+  when: leapp_upgrade_type == 'disconnected'
+  block:
+    - name: /etc/leapp/files directory exists
+      ansible.builtin.file:
+        path: /etc/leapp/files
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Leapp utility metadata is installed
+      ansible.builtin.unarchive:
+        src: "{{ leapp_metadata_url }}"
+        dest: /etc/leapp/files
+        remote_src: true
+        owner: root
+        group: root
+
+- name: Filesystem capacity checks
+  ansible.builtin.script: check-inodes.sh
+  changed_when: false
+  when: bypass_fs_checks is not defined or (bypass_fs_checks is defined and bypass_fs_checks | lower != 'yes')
+
+- name: Install packages for preupgrade analysis on RHEL 7
+  ansible.builtin.yum:
+    name: "{{ analysis_packages_el7 }}"
+    enablerepo: "{{ analysis_repos_el7 }}"
+    state: latest
+  when: ansible_distribution_major_version|int == 7
+
+- name: Install packages for preupgrade analysis on RHEL 8
+  ansible.builtin.yum:
+    name: "{{ analysis_packages_el8 }}"
+    state: latest
+  when: ansible_distribution_major_version|int == 8
+
+- name: Leapp preupgrade report
+  ansible.builtin.shell: |
+    set -o pipefail
+    leapp preupgrade {{ leapp_preupg_opts }} 2>&1 | tee -a {{ log_file }}
+  async: 43200
+  poll: 60
+  register: leapp
+  args:
+    executable: /bin/bash
+  ignore_errors: true
+
+- name: Result file status
+  ansible.builtin.stat:
+    path: "{{ result_filename }}"
+  register: result
+
+- name: Check that result file exists
+  ansible.builtin.assert:
+    that: result.stat.exists
+    msg: "The preupgrade analysis report file {{ result_filename }} was not created."
+
+- name: Verify no inhibitor results found during preupgrade
+  ansible.builtin.shell: |
+    set -o pipefail
+    echo 'Checking preupgrade results:' | tee -a {{ log_file }}
+    ( head -1 {{ result_filename }} | grep -v inhibitor ) 2>&1 | tee -a {{ log_file }}
+  args:
+    executable: /bin/bash
+  register: results
+  changed_when: false
+  ignore_errors: true
+
+- name: Preupgrade analysis report is done
+  ansible.builtin.debug:
+    msg: >-
+      The preupgrade analysis report generation is now complete.
+      {{ 'WARNING: Inhibitors' if results.rc != 0 or results.stdout.find('fail') != -1 or
+      results.stdout.find('error') != -1 else 'SUCCESS: No inhibitors' }} found.
+      Review the result file at {{ result_filename }}.
+...

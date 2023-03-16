@@ -1,0 +1,15 @@
+---
+# TODO
+- name: "Snapshot is {{ snapshot_state }}"
+  community.vmware.vmware_guest_snapshot:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ datacenter_name }}"
+    folder: "/{{ datacenter_name }}/vm/"
+    name: "{{ ansible_hostname }}"
+    state: "{{ snapshot_state }}"
+    snapshot_name: pre_upgrade
+  delegate_to: localhost
+
+...
