@@ -22,6 +22,6 @@
 
 - name: Import vcenter tasks
   ansible.builtin.import_tasks: vcenter.yml
-  when: snapshot is match('vcneter')
+  when: snapshot is match('vcenter')
 
 ...
