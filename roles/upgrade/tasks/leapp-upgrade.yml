@@ -29,10 +29,13 @@
     executable: /bin/bash
 
 - name: Start Leapp OS upgrade
-  ansible.builtin.shell: |
-    set -o pipefail
-    modprobe -r btrfs
-    leapp upgrade {{ leapp_upgrade_opts }} 2>&1 | tee -a {{ log_file }}
+  ansible.builtin.shell: >
+    set -o pipefail;
+    modprobe -r btrfs;
+    leapp upgrade
+    {{ leapp_upgrade_opts }}
+    {{ leapp_enable_repos_args }}
+    2>&1 | tee -a {{ log_file }}
   args:
     executable: /bin/bash
 

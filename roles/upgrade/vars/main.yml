@@ -1,3 +1,4 @@
 ---
 # vars file for upgrade
+leapp_enable_repos_args: "{{ ('--enablerepo ' + leapp_repos_enabled | default([], true) | join(' --enablerepo ')) if leapp_repos_enabled | length > 0 else '' }}"
 ...

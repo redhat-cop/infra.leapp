@@ -37,15 +37,18 @@
   when: ansible_distribution_major_version|int == 8
 
 - name: Leapp preupgrade report
-  ansible.builtin.shell: |
-    set -o pipefail
-    leapp preupgrade {{ leapp_preupg_opts }} 2>&1 | tee -a {{ log_file }}
+  ansible.builtin.shell: >
+    set -o pipefail;
+    leapp preupgrade
+    {{ leapp_preupg_opts }}
+    {{ leapp_enable_repos_args }}
+    2>&1 | tee -a {{ log_file }}
   async: 43200
   poll: 60
   register: leapp
   args:
     executable: /bin/bash
-  ignore_errors: true
+  failed_when: "'report has been generated' not in leapp.stdout"
 
 - name: Result file status
   ansible.builtin.stat:
