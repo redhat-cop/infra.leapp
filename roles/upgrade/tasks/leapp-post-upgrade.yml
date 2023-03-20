@@ -4,33 +4,33 @@
   ansible.builtin.shell: dnf config-manager --save --setopt exclude=''
 
 # leapp 7 to 8 documentation cleans up old kernels
-- name: block for RHEL 7 kernel cleanup
+- name: Block for RHEL 7 kernel cleanup
   when: "previous_distribution_major_version | int == 7"
   block:
     - name: Find old kernels
-      shell: |
+      ansible.builtin.shell: |
         set -o pipefail
         cd /lib/modules && /usr/bin/ls -d *.el7*
       register: old_kernels
 
     - name: Remove weak modules from old kernels
-      shell: |
+      ansible.builtin.shell: |
         set -o pipefail
         [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item }}
       loop: "{{ old_kernels.stdout_lines }}"
-      ignore_errors: true
+      failed_when: false
 
     - name: Remove the old kernels from the boot loader entry
-      shell: |
+      ansible.builtin.shell: |
         set -o pipefail
         /bin/kernel-install remove {{ item }} /lib/modules/{{ item }}/vmlinuz
       loop: "{{ old_kernels.stdout_lines }}"
 
     - name: Remove any remaining old kernel module directories
-      shell:
+      ansible.builtin.shell:
         set -o pipefail
         rm -r /lib/modules/*el7*
-      ignore_errors: true
+      failed_when: false
 
 # TODO: Use ansible facts.
 - name: Search for remaining previous version rhel packages
