@@ -1,6 +1,8 @@
-# Leapp Collection for Ansible
+# Ansible Leapp Collection
 <!-- Add CI and code coverage badges here. Samples included below. -->
-[![CI](https://github.com/oamg/ansible-leapp/workflows/CI/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![Codecov](https://img.shields.io/codecov/c/github/oamg/ansible-leapp)](https://codecov.io/gh/oamg/ansible-leapp)
+[![CI](https://github.com/oamg/ansible-leapp/workflows/CI/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![Lint](https://github.com/oamg/ansible-leapp/workflows/Yaml%20and%20Ansible%20Lint/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions)
+
+<!-- [![Codecov](https://img.shields.io/codecov/c/github/oamg/ansible-leapp)](https://codecov.io/gh/oamg/ansible-leapp) -->
 
 <!-- Describe the collection and why a user would want to use it. What does the collection do? -->
 
