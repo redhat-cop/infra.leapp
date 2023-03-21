@@ -1,0 +1,27 @@
+---
+- name: Ensure there are no SELinux denials
+  ansible.builtin.shell: >
+    ausearch -m AVC,USER_AVC -ts boot 2>&1
+  register: ausearch_results
+  changed_when: false
+  failed_when: ausearch_results.stdout != "<no matches>"
+
+- name: SELinux mode is set to {{ selinux_mode }}
+  ansible.posix.selinux:
+    policy: targeted
+    state: "{{ selinux_mode }}"
+  register: selinux_results
+
+- name: Reboot when required for SELinux change
+  ansible.builtin.reboot:
+    reboot_timeout: 7200
+  when: selinux_results.reboot_required
+
+- name: Verify SELinux is set to {{ selinux_mode }}
+  ansible.posix.selinux:
+    policy: targeted
+    state: "{{ selinux_mode }}"
+  check_mode: true
+  register: selinux_check_results
+  failed_when: selinux_check_results.changed
+...
