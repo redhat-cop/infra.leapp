@@ -93,4 +93,13 @@
     reboot_timeout: 7200
 
 # TODO: Validate RHEL OS versions again?
+
+# Only found in RHEL 7 to 8 documentation
+- name:  Old kernels have been removed from the bootloader entry for RHEL 7 to 8
+  ansible.builtin.shell: |
+    grubby --info=ALL | grep "\.el7" || echo "Old kernels are not present in the bootloader."
+  register: grubby_check
+  when: previous_distribution_major_version | int == 7
+  changed_when: false
+  failed_when: grubby_check.stdout != 'Old kernels are not present in the bootloader.'
 ...
