@@ -28,5 +28,5 @@ build_ignore:
   - changelogs/.plugin-cache.yaml
 dependencies:
   "ansible.posix": ">=1.5.1"
-  "redhat.rhel_system_roles": '>=1.21.0'
+  "fedora.linux_system_roles": '>=1.21.0'
 ...
