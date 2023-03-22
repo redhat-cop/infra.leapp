@@ -1,15 +1,52 @@
 ---
-# TODO
-- name: "Snapshot is {{ snapshot_state }}"
-  community.vmware.vmware_guest_snapshot:
-    hostname: "{{ vcenter_hostname }}"
-    username: "{{ vcenter_username }}"
-    password: "{{ vcenter_password }}"
-    datacenter: "{{ datacenter_name }}"
-    folder: "/{{ datacenter_name }}/vm/"
-    name: "{{ ansible_hostname }}"
-    state: "{{ snapshot_state }}"
-    snapshot_name: pre_upgrade
-  delegate_to: localhost
+# each snapshot_state has it's own block to allow controls for 
+# each state.
+tasks: 
+# to do: check for existing, exit? Use more informative name?
+  - name: "Snapshot manager action {{ snapshot_state }}"
+    delegate_to: localhost
+    become: true
+    when: "{{ snapshot_state }}" == "present"
+    block: 
+    community.vmware.vmware_guest_snapshot:
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      datacenter: "{{ datacenter_name }}"
+      folder: "/{{ datacenter_name }}/vm/"
+      name: "{{ ansible_hostname }}"
+      state: "{{ snapshot_state }}"
+      snapshot_name: pre_upgrade
 
-...
+  - name: Remove all snapshots
+    delegate_to: localhost
+    become: true
+    when: "{{ snapshot_state }}" == "remove_all"
+    block:
+    community.vmware.vmware_guest_snapshot:
+       hostname: "{{ vcenter_hostname }}"
+       username: "{{ vcenter_username }}"
+       password: "{{ vcenter_password }}"
+       datacenter: "{{ datacenter_name }}"
+       folder: "/{{ datacenter_name }}/vm/"
+       name: "{{ ansible_hostname }}"
+       state: "{{ snapshot_state }}"
+       snapshot_name: pre_upgrade
+
+  - name: Revert to a snapshot
+    delegate_to: localhost
+    become: true
+    when: "{{ snapshot_state }}" == "revert"
+
+    block:
+    community.vmware.vmware_guest_snapshot:
+       hostname: "{{ vcenter_hostname }}"
+       username: "{{ vcenter_username }}"
+       password: "{{ vcenter_password }}"
+       datacenter: "{{ datacenter_name }}"
+       folder: "/{{ datacenter_name }}/vm/"
+       name: "{{ ansible_hostname }}"
+       state: "{{ snapshot_state }}"
+       snapshot_name: pre_upgrade
+
+# status?
