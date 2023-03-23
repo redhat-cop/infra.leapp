@@ -7,6 +7,11 @@
   check_mode: true
   register: updates_available
 
+- name: Capture current ansible_facts for validation after upgrade
+  ansible.builtin.copy:
+    content: "{{ ansible_facts | ansible.builtin.combine({'ansible_local': {}}) }}"
+    dest: /etc/ansible/facts.d/pre_ripu.fact
+
 - name: Assert that no updates are available
   ansible.builtin.assert:
     that: "not updates_available.changed"
