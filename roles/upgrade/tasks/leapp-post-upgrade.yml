@@ -5,13 +5,14 @@
 
 # leapp 7 to 8 documentation cleans up old kernels
 - name: Block for RHEL 7 kernel cleanup
-  when: "previous_distribution_major_version | int == 7"
+  when: "ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7"
   block:
     - name: Find old kernels
       ansible.builtin.shell: |
         set -o pipefail
         cd /lib/modules && /usr/bin/ls -d *.el7*
       register: old_kernels
+      changed_when: false
 
     - name: Remove weak modules from old kernels
       ansible.builtin.shell: |
@@ -99,7 +100,7 @@
   ansible.builtin.shell: |
     grubby --info=ALL | grep "\.el7" || echo "Old kernels are not present in the bootloader."
   register: grubby_check
-  when: previous_distribution_major_version | int == 7
+  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
   changed_when: false
   failed_when: grubby_check.stdout != 'Old kernels are not present in the bootloader.'
 ...
