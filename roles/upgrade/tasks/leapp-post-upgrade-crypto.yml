@@ -1,0 +1,7 @@
+---
+- name: Include rhel_system_roles.crypto_policies role
+  ansible.builtin.include_role:
+    name: fedora.linux_system_roles.crypto_policies
+  vars:
+    crypto_policies_policy: "{{ crypto_policy }}"
+...
