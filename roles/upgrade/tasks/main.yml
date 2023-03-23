@@ -14,9 +14,15 @@
 
 - name: Include tasks for leapp post upgrade
   ansible.builtin.include_tasks: leapp-post-upgrade.yml
-  when: ansible_distribution_major_version|int >= 7
+  when: previous_distribution_major_version|int >= 7
 
 - name: Include tasks for leapp post upgrade selinux
   ansible.builtin.include_tasks: leapp-post-upgrade-selinux.yml
-  when: ansible_distribution_major_version|int >= 7
+  when: previous_distribution_major_version|int >= 7
+
+- name: Include tasks for leapp post upgrade crypto policies
+  ansible.builtin.include_tasks: leapp-post-upgrade-crypto.yml
+  when:
+    - previous_distribution_major_version|int >= 7
+    - set_crypto_policies
 ...

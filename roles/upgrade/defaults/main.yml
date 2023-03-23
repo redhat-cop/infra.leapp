@@ -22,4 +22,11 @@ leapp_repos_enabled:
 selinux_mode: enforcing
 # selinux_mode: permissive
 # selinux_mode: disabled
+
+# System-wide cryptographic policies
+# set_crypto_policies: false
+set_crypto_policies: true
+# crypto_policy: DEFAULT
+crypto_policy: FUTURE
+# crypto_policy: DEFAULT:SHA1
 ...
