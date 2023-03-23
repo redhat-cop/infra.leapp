@@ -1,10 +1,11 @@
 ---
-- name: Ensure there are no SELinux denials
-  ansible.builtin.shell: >
-    ausearch -m AVC,USER_AVC -ts boot 2>&1
-  register: ausearch_results
-  changed_when: false
-  failed_when: ausearch_results.stdout != "<no matches>"
+# TODO: Relocate to validation and compare to previous selinux state.
+# - name: Ensure there are no SELinux denials
+#   ansible.builtin.shell: >
+#     ausearch -m AVC,USER_AVC -ts boot 2>&1
+#   register: ausearch_results
+#   changed_when: false
+#   failed_when: ausearch_results.stdout != "<no matches>"
 
 - name: SELinux mode is set to {{ selinux_mode }}
   ansible.posix.selinux:
