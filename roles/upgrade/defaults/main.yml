@@ -18,6 +18,9 @@ leapp_repos_enabled:
   - codeready-builder-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
 
+satellite_organization: Example
+satellite_activation_key_post_leapp: rhel{{ ansible_distribution_major_version }}_prod
+
 # Desired selinux mode post Leapp upgrade.
 selinux_mode: enforcing
 # selinux_mode: permissive
