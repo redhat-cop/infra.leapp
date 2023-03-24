@@ -3,7 +3,7 @@
 - name: Verify basic info
   ansible.builtin.assert:
     that:
-      - ((previous_distribution_major_version | int) +1) == ansible_distribution_major_version
+      - ansible_facts.local_facts.pre_ripu.distribution_major_version | int + 1 == ansible_distribution_major_version
       # TODO add more useful checks here
 
 - name: Verify SElinux is clean
@@ -52,5 +52,5 @@
       - "{{ prior_rpms_list }}"
   when: (prior_rpms_list | length) is 0
   vars:
-    prior_rpms_list: installed_packages | regex_search('.*\.el{{ previous_distribution_major_version }}')
+    prior_rpms_list: installed_packages | regex_search('.*\.el{{ ansible_facts.local_facts.pre_ripu.distribution_major_version }}')
 ...
