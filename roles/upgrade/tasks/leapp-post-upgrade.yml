@@ -78,10 +78,12 @@
 
 # TODO: Unset rhui release.
 
-# TODO: How to get activation key / determine if need to reregister.
-# TODO: Satellite org in variables.
-- name: "Register to new activation key"
-  ansible.builtin.shell: subscription-manager register --org="my_org" --activationkey="rhel{{ ansible_distribution_major_version }}_dev" --force
+- name: "Register to post leapp activation key"
+  community.general.redhat_subscription:
+    state: present
+    activationkey: "{{ satellite_activation_key_post_leapp }}"
+    org_id: "{{ satellite_organization }}"
+    force_register: true
   when: leapp_upgrade_type == 'disconnected'
 
 - name: Update all packages
