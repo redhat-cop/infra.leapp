@@ -49,13 +49,14 @@
   ansible.builtin.debug:
     var: previous_version_packages
 
-- name: Remove previous_version_packages
+- name: Test remove previous_version_packages
   ansible.builtin.package:
     name: "{{ previous_version_packages.stdout_lines }}"
     state: absent
+  check_mode: true
   register: result
 
-- name: Debug removal of previous_version_packages
+- name: Report previous_version_packages that would be removed
   ansible.builtin.debug:
     var: result
 
@@ -68,7 +69,7 @@
     state: absent
   register: result
 
-- name: Debug removal of leapp related packages
+- name: Report leapp related packages that were removed
   ansible.builtin.debug:
     var: result
 
