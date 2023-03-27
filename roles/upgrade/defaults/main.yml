@@ -22,9 +22,11 @@ satellite_organization: Example
 satellite_activation_key_post_leapp: rhel{{ ansible_distribution_major_version }}_prod
 
 # Desired selinux mode post Leapp upgrade.
-selinux_mode: enforcing
+# selinux_mode: enforcing
 # selinux_mode: permissive
 # selinux_mode: disabled
+# Default selinux_mode to what was found during the pre-upgrade analysis automation.
+selinux_mode: "{{ ansible_facts.ansible_local.pre_ripu.selinux.config_mode }}"
 
 # System-wide cryptographic policies
 # set_crypto_policies: false
