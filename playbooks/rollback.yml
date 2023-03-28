@@ -7,11 +7,11 @@
   tasks:
     - name: Initialize lock and logging
       ansible.builtin.import_role:
-        name: logging
+        name: infra.leapp.logging
       vars:
         job_name: 'RIPU snapshot rollback'
 
     - name: Perform snapshot rollback
       ansible.builtin.import_role:
-        name: rollback
+        name: infra.leapp.rollback
 ...

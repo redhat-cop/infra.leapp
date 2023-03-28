@@ -9,11 +9,11 @@
   tasks:
     - name: Initialize lock and logging
       ansible.builtin.import_role:
-        name: logging
+        name: infra.leapp.logging
       vars:
         job_name: 'RIPU in-place OS upgrade'
 
     - name: Perform OS upgrade
       ansible.builtin.import_role:
-        name: upgrade
+        name: infra.leapp.upgrade
 ...
