@@ -13,8 +13,6 @@
         job_name: 'RIPU preupgrade analysis'
 
     - name: Generate preupgrade analysis report
-      block:
-        - name: Run RIPU preupg
-          ansible.builtin.import_role:
-            name: analysis
+      ansible.builtin.import_role:
+        name: analysis
 ...
