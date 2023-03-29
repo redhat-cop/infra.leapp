@@ -12,7 +12,6 @@ rhel_8_upgrade_dest_version: '9.0'
 
 # leapp_repos_enabled: []
 leapp_repos_enabled:
-  - codeready-builder-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
 
 satellite_organization: Example
