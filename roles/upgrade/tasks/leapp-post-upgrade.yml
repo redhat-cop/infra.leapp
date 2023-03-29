@@ -8,30 +8,31 @@
   when: "ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7"
   block:
     - name: Find old kernels
-      ansible.builtin.shell: |
-        set -o pipefail
-        cd /lib/modules && /usr/bin/ls -d *.el7*
+      ansible.builtin.find:
+        paths:
+          - /lib/modules
+        patterns: '*.el7*'
+        file_type: directory
       register: old_kernels
-      changed_when: false
 
     - name: Remove weak modules from old kernels
       ansible.builtin.shell: |
         set -o pipefail
-        [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item }}
-      loop: "{{ old_kernels.stdout_lines }}"
+        [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item.path | basename }}
+      loop: "{{ old_kernels.files }}"
       failed_when: false
 
     - name: Remove the old kernels from the boot loader entry
       ansible.builtin.shell: |
         set -o pipefail
-        /bin/kernel-install remove {{ item }} /lib/modules/{{ item }}/vmlinuz
-      loop: "{{ old_kernels.stdout_lines }}"
+        /bin/kernel-install remove {{ item.path | basename }} {{ item.path }}/vmlinuz
+      loop: "{{ old_kernels.files }}"
 
     - name: Remove any remaining old kernel module directories
-      ansible.builtin.shell:
-        set -o pipefail
-        rm -r /lib/modules/*el7*
-      failed_when: false
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_kernels.files }}"
 
 # TODO: Use ansible facts.
 - name: Search for remaining previous version rhel packages
@@ -106,4 +107,11 @@
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
   changed_when: false
   failed_when: grubby_check.stdout != 'Old kernels are not present in the bootloader.'
+
+- name: Include tasks for leapp post upgrade selinux
+  ansible.builtin.include_tasks: leapp-post-upgrade-selinux.yml
+
+- name: Include tasks for leapp post upgrade crypto policies
+  ansible.builtin.include_tasks: leapp-post-upgrade-crypto.yml
+  when: set_crypto_policies
 ...

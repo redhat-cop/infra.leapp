@@ -38,7 +38,7 @@
       when: ausearch_results.stdout != "<no matches>"
 
 - name: Get a list of all installed packages
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     list: installed
     name: '*'
   changed_when: false
