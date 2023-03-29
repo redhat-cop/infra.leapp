@@ -5,32 +5,34 @@
 
 # leapp 7 to 8 documentation cleans up old kernels
 - name: Block for RHEL 7 kernel cleanup
-  when: "previous_distribution_major_version | int == 7"
+  when: "ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7"
   block:
     - name: Find old kernels
-      ansible.builtin.shell: |
-        set -o pipefail
-        cd /lib/modules && /usr/bin/ls -d *.el7*
+      ansible.builtin.find:
+        paths:
+          - /lib/modules
+        patterns: '*.el7*'
+        file_type: directory
       register: old_kernels
 
     - name: Remove weak modules from old kernels
       ansible.builtin.shell: |
         set -o pipefail
-        [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item }}
-      loop: "{{ old_kernels.stdout_lines }}"
+        [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item.path | basename }}
+      loop: "{{ old_kernels.files }}"
       failed_when: false
 
     - name: Remove the old kernels from the boot loader entry
       ansible.builtin.shell: |
         set -o pipefail
-        /bin/kernel-install remove {{ item }} /lib/modules/{{ item }}/vmlinuz
-      loop: "{{ old_kernels.stdout_lines }}"
+        /bin/kernel-install remove {{ item.path | basename }} {{ item.path }}/vmlinuz
+      loop: "{{ old_kernels.files }}"
 
     - name: Remove any remaining old kernel module directories
-      ansible.builtin.shell:
-        set -o pipefail
-        rm -r /lib/modules/*el7*
-      failed_when: false
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ old_kernels.files }}"
 
 # TODO: Use ansible facts.
 - name: Search for remaining previous version rhel packages
@@ -48,13 +50,14 @@
   ansible.builtin.debug:
     var: previous_version_packages
 
-- name: Remove previous_version_packages
+- name: Test remove previous_version_packages
   ansible.builtin.package:
     name: "{{ previous_version_packages.stdout_lines }}"
     state: absent
+  check_mode: true
   register: result
 
-- name: Debug removal of previous_version_packages
+- name: Report previous_version_packages that would be removed
   ansible.builtin.debug:
     var: result
 
@@ -67,7 +70,7 @@
     state: absent
   register: result
 
-- name: Debug removal of leapp related packages
+- name: Report leapp related packages that were removed
   ansible.builtin.debug:
     var: result
 
@@ -77,10 +80,12 @@
 
 # TODO: Unset rhui release.
 
-# TODO: How to get activation key / determine if need to reregister.
-# TODO: Satellite org in variables.
-- name: "Register to new activation key"
-  ansible.builtin.shell: subscription-manager register --org="my_org" --activationkey="rhel{{ ansible_distribution_major_version }}_dev" --force
+- name: "Register to post leapp activation key"
+  community.general.redhat_subscription:
+    state: present
+    activationkey: "{{ satellite_activation_key_post_leapp }}"
+    org_id: "{{ satellite_organization }}"
+    force_register: true
   when: leapp_upgrade_type == 'disconnected'
 
 - name: Update all packages
@@ -99,7 +104,14 @@
   ansible.builtin.shell: |
     grubby --info=ALL | grep "\.el7" || echo "Old kernels are not present in the bootloader."
   register: grubby_check
-  when: previous_distribution_major_version | int == 7
+  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
   changed_when: false
   failed_when: grubby_check.stdout != 'Old kernels are not present in the bootloader.'
+
+- name: Include tasks for leapp post upgrade selinux
+  ansible.builtin.include_tasks: leapp-post-upgrade-selinux.yml
+
+- name: Include tasks for leapp post upgrade crypto policies
+  ansible.builtin.include_tasks: leapp-post-upgrade-crypto.yml
+  when: set_crypto_policies
 ...

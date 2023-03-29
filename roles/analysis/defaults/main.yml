@@ -28,8 +28,14 @@ leapp_upgrade_type: disconnected
 
 leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'connected' else '' }}"
 
-# leapp_metadata_url only used for disconnected leapp upgrades
+# leapp_metadata_url only used for disconnected leapp upgrades including Satellite
+# https://access.redhat.com/articles/3664871
+# Download and host the leapp-data file somewhere in the environment.
+# Note that there is a different leapp data file for RHEL 7.6 for IBM POWER 9 (little endian) or IBM Z (structure A) architectures.
 leapp_metadata_url: https://satellite.example.com/pub/leapp-data-21.tar.gz
+
+satellite_organization: Example
+satellite_activation_key_leapp: rhel{{ ansible_distribution_major_version }}_leapp
 
 # leapp_repos_enabled: []
 leapp_repos_enabled:
