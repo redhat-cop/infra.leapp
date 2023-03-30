@@ -1,0 +1,7 @@
+---
+# TODO: For RHEL 6 to 7 Upgrade Analysis
+- name: Filesystem capacity checks
+  ansible.builtin.script: check-inodes.sh
+  changed_when: false
+  when: bypass_fs_checks is not defined or (bypass_fs_checks is defined and bypass_fs_checks | lower != 'yes')
+...

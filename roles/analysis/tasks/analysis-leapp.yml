@@ -26,11 +26,6 @@
         owner: root
         group: root
 
-- name: Filesystem capacity checks
-  ansible.builtin.script: check-inodes.sh
-  changed_when: false
-  when: bypass_fs_checks is not defined or (bypass_fs_checks is defined and bypass_fs_checks | lower != 'yes')
-
 - name: Install packages for preupgrade analysis on RHEL 7
   ansible.builtin.package:
     name: "{{ analysis_packages_el7 }}"
