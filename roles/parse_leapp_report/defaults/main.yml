@@ -1,0 +1,5 @@
+---
+# defaults file for parse_leapp_report
+result_filename_prefix: /var/log/leapp/leapp-report
+result_filename_json: "{{ result_filename_prefix }}.json"
+...

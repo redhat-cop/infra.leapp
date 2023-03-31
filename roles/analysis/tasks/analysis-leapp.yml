@@ -26,11 +26,6 @@
         owner: root
         group: root
 
-- name: Filesystem capacity checks
-  ansible.builtin.script: check-inodes.sh
-  changed_when: false
-  when: bypass_fs_checks is not defined or (bypass_fs_checks is defined and bypass_fs_checks | lower != 'yes')
-
 - name: Install packages for preupgrade analysis on RHEL 7
   ansible.builtin.package:
     name: "{{ analysis_packages_el7 }}"
@@ -68,22 +63,14 @@
     that: result.stat.exists
     msg: "The preupgrade analysis report file {{ result_filename }} was not created."
 
-- name: Verify no inhibitor results found during preupgrade
-  ansible.builtin.shell: |
-    set -o pipefail
-    echo 'Checking preupgrade results:' | tee -a {{ log_file }}
-    ( head -1 {{ result_filename }} | grep -v inhibitor ) 2>&1 | tee -a {{ log_file }}
-  args:
-    executable: /bin/bash
-  register: results
-  changed_when: false
-  ignore_errors: true
+- name: Include the parse_leapp_report role to check for inhibitors
+  ansible.builtin.include_role:
+    name: infra.leapp.parse_leapp_report
 
 - name: Preupgrade analysis report is done
   ansible.builtin.debug:
     msg: >-
       The preupgrade analysis report generation is now complete.
-      {{ 'WARNING: Inhibitors' if results.rc != 0 or results.stdout.find('fail') != -1 or
-      results.stdout.find('error') != -1 else 'SUCCESS: No inhibitors' }} found.
+      {{ 'WARNING: Inhibitors' if upgrade_inhibited else 'SUCCESS: No inhibitors' }} found.
       Review the result file at {{ result_filename }}.
 ...
