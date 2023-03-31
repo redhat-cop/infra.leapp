@@ -177,10 +177,10 @@ createsnaps)
        lvcreate -s -L $SIZE -n pre_upgrade_$SNAPNAME $LV
      done
 
-     COUNT=`rpm -qa | grep rsync | wc - l`
-     if [[ $COUNT -eq 0 ]]; then
+     COUNT=`rpm -q rsync`
+     if [[ $? -ne 0 ]]; then
 	     yum install -y rsync
-	     echo "Rsync Installed for /boot backup"
+	     echo "Rsync installed for /boot backup"
      fi
 
      # Modify /etc/lvm/lvm.conf
