@@ -1,0 +1,20 @@
+---
+- name: Default upgrade_inhibited to false
+  ansible.builtin.set_fact:
+    upgrade_inhibited: false
+
+- name: Collect report results
+  ansible.builtin.slurp:
+    src: "{{ result_filename_json }}"
+  register: results
+
+- name: Parse report results
+  ansible.builtin.set_fact:
+    leapp_report_json: "{{ results.content | b64decode | from_json }}"
+
+- name: Check for inhibitors
+  ansible.builtin.set_fact:
+    upgrade_inhibited: true
+  when: "'inhibitor' in item.flags"
+  loop: "{{ leapp_report_json.entries }}"
+...
