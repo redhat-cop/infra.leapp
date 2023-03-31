@@ -162,11 +162,6 @@ createsnaps)
      echo -e "Skip List  : \n$SKIPFS"
      echo -e "LVs to snap: \n$ROOTLVSREAL"
 
-     # Save copy of /boot
-     [[ ! -d /root/boot-safe/ ]] && mkdir /root/boot-safe
-     echo "Saving copy of the files in /boot"
-     rsync -Wa /boot/ /root/boot-safe  --delete
-     
      # SIZE is used to collect the criteria for snapshot size. 
      # Define LVPERCENT or accept 100% as default LV snapshot SIZE
      for LV in $ROOTLVSREAL; do
@@ -181,6 +176,22 @@ createsnaps)
        echo "  Creating snapshot of $LV with size $SIZE"
        lvcreate -s -L $SIZE -n pre_upgrade_$SNAPNAME $LV
      done
+
+     COUNT=`rpm -qa | grep rsync | wc - l`
+     if [[ $COUNT -eq 0 ]]; then
+	     yum install -y rsync
+	     echo "Rsync Installed for /boot backup"
+     fi
+
+     # Modify /etc/lvm/lvm.conf
+
+     # Save copy of /boot
+     [[ ! -d /root/boot-safe/ ]] && mkdir /root/boot-safe
+     echo "Saving copy of the files in /boot"
+     rsync -Wa /boot/ /root/boot-safe  --delete
+
+
+
      ;;
 
 status)
