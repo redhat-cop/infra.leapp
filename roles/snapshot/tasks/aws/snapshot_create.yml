@@ -1,0 +1,26 @@
+---
+- name: Take snapshot
+  amazon.aws.ec2_snapshot:
+    volume_id: "{{ item.1.ebs.volume_id }}"
+    snapshot_tags:
+      Name: "snap-{{ item.0 }}"
+      Student: "{{ item.4 }}"
+      Instance_name: "{{ item.0 }}"
+      Instance_id: "{{ item.5 }}"
+      Environment: leapp
+      root_device_type: "{{ item.2 }}"
+      root_device_name: "{{ item.3 }}"
+      Workshop: "{{ item.6 }}"
+      guid: "{{ item.6 }}"
+    description: "{{ item.0 }} pre leapp snapshot"
+    region: "{{ ec2_region }}"
+    wait: yes
+  with_together:
+    - "{{ instances_details.instances | map(attribute='tags.Name') | list }}"
+    - "{{ instances_details.instances | map(attribute='block_device_mappings') | list }}"
+    - "{{ instances_details.instances | map(attribute='root_device_type') | list }}"
+    - "{{ instances_details.instances | map(attribute='root_device_name') | list }}"
+    - "{{ instances_details.instances | map(attribute='tags.Student') | list }}"
+    - "{{ instances_details.instances | map(attribute='instance_id') | list }}"
+    - "{{ instances_details.instances | map(attribute='tags.Workshop') | list }}"
+...
