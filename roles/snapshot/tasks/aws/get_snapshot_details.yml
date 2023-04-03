@@ -1,0 +1,15 @@
+---
+- name: Format snapshot selection tags for ec2_snapshot_info
+  ansible.builtin.script: build_tags_dict.py "{{snapshots.tags}}"
+  delegate_to: localhost
+  connection: local
+  register: ec2_snapshot_tags
+
+- name: Get snapshot info
+  amazon.aws.ec2_snapshot_info:
+    filters: "{{ec2_snapshot_tags.stdout}}"
+    region: "{{ ec2_region }}"
+  delegate_to: localhost
+  connection: local
+  register: snapshots_details
+...

@@ -1,3 +1,41 @@
 ---
-# TODO
+# Gather info
+- name: Get instance details
+  ansible.builtin.include_tasks: aws/get_instance_details.yml
+  when: |
+    ec2_instance_action == "start" or
+    ec2_instance_action == "stop" or
+    ec2_instance_action == "snapshot_create" or
+    ec2_instance_action == "snapshot_revert"
+
+# Actions
+- name: Start instance
+  ansible.builtin.include_tasks: aws/start_instances.yml
+  when: ec2_instance_action == "start"
+
+- name: Stop instance
+  ansible.builtin.include_tasks: aws/stop_instances.yml
+  when: ec2_instance_action == "stop"
+
+- name: Create instance snapshot
+  block:
+  - ansible.builtin.include_tasks: aws/stop_instances.yml
+  - ansible.builtin.include_tasks: aws/snapshot_create.yml
+  - ansible.builtin.include_tasks: aws/start_instances.yml
+  delegate_to: localhost
+  when: ec2_instance_action == "snapshot_create"
+
+- name: Delete instance snapshot
+  ansible.builtin.include_tasks: aws/snapshot_delete.yml
+  when: ec2_instance_action == "snapshot_delete"
+
+- name: Revert instance snapshot
+  block:
+  - ansible.builtin.include_tasks: aws/get_snapshot_details.yml
+  - ansible.builtin.include_tasks: aws/stop_instances.yml
+  - ansible.builtin.include_tasks: aws/detach_volume.yml
+  - ansible.builtin.include_tasks: aws/new_volume_and_attach.yml
+  - ansible.builtin.include_tasks: aws/start_instances.yml
+  delegate_to: localhost
+  when: ec2_instance_action == "snapshot_revert"
 ...
