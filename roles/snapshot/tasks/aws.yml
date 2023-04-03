@@ -18,12 +18,12 @@
   when: ec2_instance_action == "stop"
 
 - name: Create instance snapshot
-  block:
-  - ansible.builtin.include_tasks: aws/stop_instances.yml
-  - ansible.builtin.include_tasks: aws/snapshot_create.yml
-  - ansible.builtin.include_tasks: aws/start_instances.yml
   delegate_to: localhost
   when: ec2_instance_action == "snapshot_create"
+  block:
+    - ansible.builtin.include_tasks: aws/stop_instances.yml
+    - ansible.builtin.include_tasks: aws/snapshot_create.yml
+    - ansible.builtin.include_tasks: aws/start_instances.yml
 
 - name: Delete instance snapshot
   ansible.builtin.include_tasks: aws/snapshot_delete.yml
