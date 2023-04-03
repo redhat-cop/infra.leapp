@@ -9,7 +9,7 @@
   delegate_to: localhost
   connection: local
 
-- name: Ensure host is down via ssh port probe 
+- name: Ensure host is down via ssh port probe
   ansible.builtin.wait_for:
     host: "{{ item.0 }}"
     port: 22
