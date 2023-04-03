@@ -1,0 +1,14 @@
+---
+- name: Detach current EBS volume from instance
+  amazon.aws.ec2_vol:
+    id: "{{ item.1.ebs.volume_id }}"
+    instance: None
+    region: "{{ ec2_region }}"
+  with_together:
+    - "{{ instances_details.instances | map(attribute='tags.Name') | list }}"
+    - "{{ instances_details.instances | map(attribute='block_device_mappings') | list }}"
+    - "{{ instances_details.instances | map(attribute='root_device_type') | list }}"
+    - "{{ instances_details.instances | map(attribute='root_device_name') | list }}"
+    - "{{ instances_details.instances | map(attribute='tags.Student') | list }}"
+    - "{{ instances_details.instances | map(attribute='instance_id') | list }}"
+...

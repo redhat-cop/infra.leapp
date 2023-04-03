@@ -1,0 +1,22 @@
+---
+- name: Stop instances
+  amazon.aws.ec2_instance:
+    instance_ids: "{{ instances_details.instances | map(attribute='instance_id') | list | unique }}"
+    # vpc_subnet_id: "{{ item.1 }}"
+    state: stopped
+    filters: "{{ ec2_remote_tags.stdout }}"
+    region: "{{ ec2_region }}"
+  delegate_to: localhost
+  connection: local
+
+- name: Ensure host is down via ssh port probe
+  ansible.builtin.wait_for:
+    host: "{{ item.0 }}"
+    port: 22
+    delay: 10
+    state: stopped
+    timeout: 60
+  delegate_to: localhost
+  connection: local
+  loop: "{{ instances_details.instances | map(attribute='private_ip_address') | list | unique }}"
+...
