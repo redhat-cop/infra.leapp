@@ -7,6 +7,19 @@
     force_register: true
   when: leapp_upgrade_type == 'disconnected'
 
+- name: Install packages for preupgrade analysis on RHEL 7
+  ansible.builtin.package:
+    name: "{{ analysis_packages_el7 }}"
+    enablerepo: "{{ analysis_repos_el7 }}"
+    state: latest
+  when: ansible_distribution_major_version|int == 7
+
+- name: Install packages for preupgrade analysis on RHEL 8
+  ansible.builtin.package:
+    name: "{{ analysis_packages_el8 }}"
+    state: latest
+  when: ansible_distribution_major_version|int == 8
+
 - name: Ensure leapp metadata is available for disconnected Leapp upgrades
   when: leapp_upgrade_type == 'disconnected'
   block:
@@ -25,19 +38,6 @@
         remote_src: true
         owner: root
         group: root
-
-- name: Install packages for preupgrade analysis on RHEL 7
-  ansible.builtin.package:
-    name: "{{ analysis_packages_el7 }}"
-    enablerepo: "{{ analysis_repos_el7 }}"
-    state: latest
-  when: ansible_distribution_major_version|int == 7
-
-- name: Install packages for preupgrade analysis on RHEL 8
-  ansible.builtin.package:
-    name: "{{ analysis_packages_el8 }}"
-    state: latest
-  when: ansible_distribution_major_version|int == 8
 
 - name: Leapp preupgrade report
   ansible.builtin.shell: >
