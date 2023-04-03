@@ -14,7 +14,7 @@
       guid: "{{ item.6 }}"
     description: "{{ item.0 }} pre leapp snapshot"
     region: "{{ ec2_region }}"
-    wait: yes
+    wait: true
   with_together:
     - "{{ instances_details.instances | map(attribute='tags.Name') | list }}"
     - "{{ instances_details.instances | map(attribute='block_device_mappings') | list }}"

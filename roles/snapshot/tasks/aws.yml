@@ -21,21 +21,29 @@
   delegate_to: localhost
   when: ec2_instance_action == "snapshot_create"
   block:
-    - ansible.builtin.include_tasks: aws/stop_instances.yml
-    - ansible.builtin.include_tasks: aws/snapshot_create.yml
-    - ansible.builtin.include_tasks: aws/start_instances.yml
+    - name: Stop instance
+      ansible.builtin.include_tasks: aws/stop_instances.yml
+    - name: Create snapshot
+      ansible.builtin.include_tasks: aws/snapshot_create.yml
+    - name: Start instance
+      ansible.builtin.include_tasks: aws/start_instances.yml
 
 - name: Delete instance snapshot
   ansible.builtin.include_tasks: aws/snapshot_delete.yml
   when: ec2_instance_action == "snapshot_delete"
 
 - name: Revert instance snapshot
-  block:
-  - ansible.builtin.include_tasks: aws/get_snapshot_details.yml
-  - ansible.builtin.include_tasks: aws/stop_instances.yml
-  - ansible.builtin.include_tasks: aws/detach_volume.yml
-  - ansible.builtin.include_tasks: aws/new_volume_and_attach.yml
-  - ansible.builtin.include_tasks: aws/start_instances.yml
   delegate_to: localhost
   when: ec2_instance_action == "snapshot_revert"
+  block:
+    - name: Get snapshot details
+      ansible.builtin.include_tasks: aws/get_snapshot_details.yml
+    - name: Stop instance
+      ansible.builtin.include_tasks: aws/stop_instances.yml
+    - name: Detach EBS volume
+      ansible.builtin.include_tasks: aws/detach_volume.yml
+    - name: Create new EBS volume from snapshot and attach to instance
+      ansible.builtin.include_tasks: aws/new_volume_and_attach.yml
+    - name: Start instance
+      ansible.builtin.include_tasks: aws/start_instances.yml
 ...

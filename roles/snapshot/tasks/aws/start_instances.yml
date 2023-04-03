@@ -1,11 +1,11 @@
 ---
 - name: Start instances
   amazon.aws.ec2_instance:
-    instance_ids: "{{ instances_details.instances|map(attribute='instance_id')|list|unique }}"
-#    vpc_subnet_id: "{{ item.1 }}"
+    instance_ids: "{{ instances_details.instances | map(attribute='instance_id') | list | unique }}"
+    #vpc_subnet_id: "{{ item.1 }}"
     # https://github.com/ansible-collections/amazon.aws/pull/481  regarding state: <status>
     state: running
-    filters: "{{ec2_remote_tags.stdout}}"
+    filters: "{{ ec2_remote_tags.stdout }}"
     region: "{{ ec2_region }}"
   delegate_to: localhost
   connection: local
