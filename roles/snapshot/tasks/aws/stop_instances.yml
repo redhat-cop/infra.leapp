@@ -12,7 +12,7 @@
 - name: Ensure host is down via ssh port probe 
   ansible.builtin.wait_for:
     host: "{{ item.0 }}"
-    port: 22 
+    port: 22
     delay: 10
     state: stopped
     timeout: 60
