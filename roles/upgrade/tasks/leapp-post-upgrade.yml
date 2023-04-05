@@ -40,7 +40,7 @@
     cmd: >-
       set -o pipefail;
       rpm -qa |
-      grep -e '\.el[{{ ansible_distribution_major_version | int - 2 }}{{ ansible_distribution_major_version | int - 1 }}]' |
+      grep -ve '\.el{{ ansible_distribution_major_version }}' |
       grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
       sort
   changed_when: false
