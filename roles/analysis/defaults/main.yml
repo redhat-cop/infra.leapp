@@ -23,6 +23,11 @@ analysis_packages_el8:
 analysis_repos_el7:
   - rhel-7-server-extras-rpms
 
+# If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.
+# leapp_answerfile: |
+#   [remove_pam_pkcs11_module_check]
+#   confirm = True
+
 # leapp_upgrade_type: connected
 leapp_upgrade_type: disconnected
 
