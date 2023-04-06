@@ -66,6 +66,8 @@
   register: leapp
   args:
     executable: /bin/bash
+  async: 43200
+  poll: 60
   failed_when: "'report has been generated' not in leapp.stdout"
 
 - name: Result file status
