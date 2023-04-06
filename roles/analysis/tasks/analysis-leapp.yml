@@ -39,6 +39,23 @@
         owner: root
         group: root
 
+- name: Ensure leapp log directory exists
+  ansible.builtin.file:
+    path: /var/log/leapp
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Populate leapp_answers file
+  ansible.builtin.copy:
+    content: "{{ leapp_answerfile }}"
+    dest: /var/log/leapp/answerfile
+    owner: root
+    group: root
+    mode: '0644'
+  when: leapp_answerfile is defined
+
 - name: Leapp preupgrade report
   ansible.builtin.shell: >
     set -o pipefail;
