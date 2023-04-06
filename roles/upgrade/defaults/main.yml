@@ -27,7 +27,7 @@ selinux_mode: "{{ ansible_facts.ansible_local.pre_ripu.selinux.config_mode }}"
 # System-wide cryptographic policies
 # set_crypto_policies: false
 set_crypto_policies: true
-# crypto_policy: DEFAULT
-crypto_policy: FUTURE
+crypto_policy: DEFAULT
+# crypto_policy: FUTURE
 # crypto_policy: DEFAULT:SHA1
 ...
