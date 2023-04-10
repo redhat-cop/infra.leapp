@@ -10,7 +10,7 @@
 
 - name: Parse human readable report results
   ansible.builtin.set_fact:
-    leapp_report_txt: "{{ results.content | b64decode }}"
+    leapp_report_txt: "{{ results.content | b64decode | split('\n') }}"
 
 - name: Collect JSON report results
   ansible.builtin.slurp:
