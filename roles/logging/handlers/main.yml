@@ -9,6 +9,17 @@
     mode: '0644'
   listen: Archive log file
 
+- name: Slurp ripu.log file
+  ansible.builtin.slurp:
+    src: "{{ log_file }}"
+  register: ripu_log_file_slurp
+  listen: Archive log file
+
+- name: Decode ripu.log file
+  ansible.builtin.set_fact:
+    ripu_log_file: "{{ ripu_log_file_slurp.content | b64decode | split('\n') }}"
+  listen: Archive log file
+
 - name: Rename log file
   ansible.builtin.shell: |
     mv {{ log_file }} {{ log_file }}-{{ ansible_date_time.iso8601_basic_short }}
