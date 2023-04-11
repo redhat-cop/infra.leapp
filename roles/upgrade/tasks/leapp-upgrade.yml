@@ -12,6 +12,26 @@
   ansible.builtin.debug:
     msg: 'FIXME: snapshot needs to happen here!'
 
+- name: Register to leapp activation key
+  community.general.redhat_subscription:
+    state: present
+    activationkey: "{{ satellite_activation_key_leapp }}"
+    org_id: "{{ satellite_organization }}"
+    force_register: true
+  when: leapp_upgrade_type == 'disconnected'
+
+- name: Ensure all updates are applied
+  ansible.builtin.package:
+    name: '*'
+    state: latest
+  register: updates_available
+
+- name: Reboot when updates applied
+  ansible.builtin.reboot:
+    post_reboot_delay: 60
+    reboot_timeout: 43200
+  when: updates_available.changed # noqa: no-handler
+
 - name: Run preupgrade hooks
   ansible.builtin.shell: |
     set -o pipefail
