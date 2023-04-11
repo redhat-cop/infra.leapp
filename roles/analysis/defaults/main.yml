@@ -48,6 +48,7 @@ leapp_repos_enabled: []
 
 result_filename: '/var/log/leapp/leapp-report.txt'
 
-kernel_modules_to_unload:
-  - btrfs
+kernel_modules_to_unload: []
+# kernel_modules_to_unload:
+#  - btrfs
 ...
