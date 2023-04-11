@@ -1,12 +1,4 @@
 ---
-- name: "Register to leapp activation key"
-  community.general.redhat_subscription:
-    state: present
-    activationkey: "{{ satellite_activation_key_leapp }}"
-    org_id: "{{ satellite_organization }}"
-    force_register: true
-  when: leapp_upgrade_type == 'disconnected'
-
 - name: Install packages for preupgrade analysis on RHEL 7
   ansible.builtin.package:
     name: "{{ analysis_packages_el7 }}"

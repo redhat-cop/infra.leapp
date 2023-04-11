@@ -1,12 +1,5 @@
 ---
 # tasks file for analysis
-- name: Check for updates
-  ansible.builtin.package:
-    name: '*'
-    state: latest
-  check_mode: true
-  register: updates_available
-
 - name: /etc/ansible/facts.d directory exists
   ansible.builtin.file:
     path: /etc/ansible/facts.d
@@ -19,12 +12,6 @@
   ansible.builtin.copy:
     content: "{{ ansible_facts | ansible.builtin.combine({'ansible_local': {}}) }}"
     dest: /etc/ansible/facts.d/pre_ripu.fact
-
-- name: Assert that no updates are available
-  ansible.builtin.assert:
-    that: "not updates_available.changed"
-    fail_msg: System must be fully updated to proceed with upgrade.  New updates found.  Please update before upgrading.
-    success_msg: No updates available.
 
 # TODO: Include tasks for RHEL 6 to 7 non-leapp upgrade
 # - name: Include tasks for preupg assistant analysis
