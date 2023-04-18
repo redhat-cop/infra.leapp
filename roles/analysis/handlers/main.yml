@@ -1,3 +1,9 @@
 ---
 # handlers file for analysis
+- name: Register to pre leapp activation key
+  community.general.redhat_subscription:
+    state: present
+    activationkey: "{{ satellite_activation_key_pre_leapp }}"
+    org_id: "{{ satellite_organization }}"
+    force_register: true
 ...
