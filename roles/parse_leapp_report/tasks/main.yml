@@ -8,17 +8,14 @@
     src: "{{ result_filename }}"
   register: results
 
-- name: Parse human readable report results
-  ansible.builtin.set_fact:
-    leapp_report_txt: "{{ results.content | b64decode | split('\n') }}"
-
 - name: Collect JSON report results
   ansible.builtin.slurp:
     src: "{{ result_filename_json }}"
   register: results
 
-- name: Parse JSON report results
+- name: Parse report results
   ansible.builtin.set_fact:
+    leapp_report_txt: "{{ results.content | b64decode | split('\n') }}"
     leapp_report_json: "{{ results.content | b64decode | from_json }}"
 
 - name: Check for inhibitors
