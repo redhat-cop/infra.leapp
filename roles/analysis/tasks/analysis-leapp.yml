@@ -1,4 +1,13 @@
 ---
+- name: Register to leapp activation key
+  community.general.redhat_subscription:
+    state: present
+    activationkey: "{{ satellite_activation_key_leapp }}"
+    org_id: "{{ satellite_organization }}"
+    force_register: true
+  notify: Register to pre leapp activation key
+  when: leapp_upgrade_type == 'disconnected'
+
 - name: Install packages for preupgrade analysis on RHEL 7
   ansible.builtin.package:
     name: "{{ analysis_packages_el7 }}"
@@ -47,12 +56,6 @@
     group: root
     mode: '0644'
   when: leapp_answerfile is defined
-
-- name: Kernel modules defined by kernel_modules_to_unload are unloaded
-  community.general.modprobe:
-    name: "{{ item }}"
-    state: absent
-  loop: "{{ kernel_modules_to_unload }}"
 
 - name: Leapp preupgrade report
   ansible.builtin.shell: >
