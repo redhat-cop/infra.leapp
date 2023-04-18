@@ -40,6 +40,7 @@ leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'connected' else '' 
 leapp_metadata_url: https://satellite.example.com/pub/leapp-data-21.tar.gz
 
 satellite_organization: Example
+satellite_activation_key_pre_leapp: rhel{{ ansible_distribution_major_version }}
 satellite_activation_key_leapp: rhel{{ ansible_distribution_major_version }}_leapp
 
 leapp_repos_enabled: []
