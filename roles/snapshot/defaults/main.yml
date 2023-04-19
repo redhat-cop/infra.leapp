@@ -1,4 +1,0 @@
----
-# defaults file for snapshot
-snapshot_state: present
-...

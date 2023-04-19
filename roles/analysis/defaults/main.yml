@@ -5,8 +5,6 @@ analysis_packages_el7:
   # - leapp-upgrade-el7toel8
   # Try this instead.
   - leapp-upgrade
-  # TODO: this should be part of LVM snapshot process.
-  # - lvm2-python-boom
 
 analysis_packages_el8:
   # TODO: Seems to cause package dependency problems with post upgrade cleanup.
@@ -15,8 +13,6 @@ analysis_packages_el8:
   - leapp-upgrade
   # TODO: This should be part of inhibitor remediation.
   # - vdo
-  # TODO: This should be part of LVM snapshot process.
-  # - boom-boot
   # TODO: only w/ rhui for aws
   # - leapp-rhui-aws
 
