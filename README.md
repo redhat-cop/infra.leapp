@@ -68,7 +68,7 @@ This Ansible collection is just one building block of our larger initiative to m
 
 To learn more, contact Bob Mader <[bob@redhat.com](mailto:bob@redhat.com)>.
 
-I'm [presenting](https://red.ht/bobtalk) at Red Hat Summit, May 23-25 in Boston. Let's connect there!
+I'm [presenting](https://red.ht/bobtalk) at Red Hat Summit 2023, May 23-25 in Boston. Let's connect there!
 
 ## Licensing
 
