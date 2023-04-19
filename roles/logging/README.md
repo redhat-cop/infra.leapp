@@ -1,38 +1,21 @@
-Role Name
-=========
+# Logging
 
-A brief description of the role goes here.
+The `logging` role is used to manage local log files that may help with debugging playbooks that include the `analysis` or `upgrade` roles. This role also implements a mutex locking mechanism that protects against accidentally running simultaneous playbook jobs on the same host.
 
-Requirements
-------------
+> **TODO**: The logging capability of this role currently deals only with writing local log files, but could be later extended to support logging to an aggregator like Logstash or Splunk.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Role variables
 
-Role Variables
---------------
+| Name                    | Default value         | Description                                         |
+|-------------------------|-----------------------|-----------------------------------------------------|
+| job_name                |                       | String to describe the job run.                     |
+| log_directory           | "/var/log/ripu"       | Directory under which local log files will be written. This directory will be created is it is not already present. |
+| log_file                | "{{ log_directory }}/ripu.log" | Local log filename. When a playbook job finishes, a timestamp suffix is appended to the end of the filename. |
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Example playbook
 
-Dependencies
-------------
+This is a common role included by the `analysis` and `upgrade` roles. It does not need to be explicitly included in your playbook. 
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
+## License
 
 MIT
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
