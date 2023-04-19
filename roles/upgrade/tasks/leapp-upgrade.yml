@@ -8,10 +8,6 @@
     that: not upgrade_inhibited
     msg: Inhibitors found, please investigate and rerun analysis.
 
-- name: Create snapshot
-  ansible.builtin.debug:
-    msg: 'FIXME: snapshot needs to happen here!'
-
 - name: Register to leapp activation key
   community.general.redhat_subscription:
     state: present
