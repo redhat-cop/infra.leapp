@@ -14,7 +14,7 @@ The `logging` role is used to manage local log files that may help with debuggin
 
 ## Example playbook
 
-This is a common role included by the `analysis` and `upgrade` roles. It does not need to be explicitly included in your playbook. 
+This is a common role included by the `analysis` and `upgrade` roles. It does not need to be explicitly included in your playbook.
 
 ## License
 
