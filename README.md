@@ -1,83 +1,32 @@
 # Ansible Leapp Collection
-<!-- Add CI and code coverage badges here. Samples included below. -->
+
 [![CI](https://github.com/oamg/ansible-leapp/workflows/CI/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![Lint](https://github.com/oamg/ansible-leapp/workflows/Yaml%20and%20Ansible%20Lint/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions)
 
 <!-- [![Codecov](https://img.shields.io/codecov/c/github/oamg/ansible-leapp)](https://codecov.io/gh/oamg/ansible-leapp) -->
 
-<!-- Describe the collection and why a user would want to use it. What does the collection do? -->
+## Overview
 
-## Code of Conduct
+This collection provides Ansible roles you can use to perform RHEL in-place upgrades using the Leapp framework. Successfully executing upgrades at scale across a large RHEL estate demands a customized end-to-end automation approach tailored to meet the requirements of your enterprise environment. Use these roles as the foundation of your RHEL in-place upgrade automation solution.
 
-We follow the [Ansible Code of Conduct](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html) in all our interactions within this project.
+## Roles
 
-If you encounter abusive behavior, please refer to the [policy violations](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html#policy-violations) section of the Code for information on how to raise a complaint.
+These are the roles included in the collection. Follow the links below to see the detailed documentation and example playbooks for each role.
 
-## Communication
+- [`analysis`](./roles/analysis/) - executes the Leapp pre-upgrade phase
+- [`logging`](./roles/logging/) - used for local logging and mutex locking
+- [`parse_leapp_report`](./roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
+- [`upgrade`](./roles/upgrade/) - executes the Leapp OS upgrade
+- [`validation`](./roles/validation/) - performs post-upgrade validation checks
 
-<!--List available communication channels. In addition to channels specific to your collection, we also recommend to use the following ones.-->
+## Example playbooks
 
-We announce releases and important changes through Ansible's [The Bullhorn newsletter](https://github.com/ansible/community/wiki/News#the-bullhorn). Be sure you are [subscribed](https://eepurl.com/gZmiEP).
+Example playbooks can be found [here](./playbooks/).
 
-Join us in the `#ansible` (general use questions and support), `#ansible-community` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels).
+## Contributing
 
-We take part in the global quarterly [Ansible Contributor Summit](https://github.com/ansible/community/wiki/Contributor-Summit) virtually or in-person. Track [The Bullhorn newsletter](https://eepurl.com/gZmiEP) and join us.
+We are a fledgling community and welcome any new contributors. Get started by opening an issue or pull request. Refer to our [contribution guide](CONTRIBUTING.md) for more information.
 
-For more information about communication, refer to the [Ansible Communication guide](https://docs.ansible.com/ansible/devel/community/communication.html).
-
-## Contributing to this collection
-
-<!--Describe how the community can contribute to your collection. At a minimum, fill up and include the CONTRIBUTING.md file containing how and where users can create issues to report problems or request features for this collection. List contribution requirements, including preferred workflows and necessary testing, so you can benefit from community PRs. If you are following general Ansible contributor guidelines, you can link to - [Ansible Community Guide](https://docs.ansible.com/ansible/devel/community/index.html). List the current maintainers (contributors with write or higher access to the repository). The following can be included:-->
-
-The content of this collection is made by people like you, a community of individuals collaborating on making the world better through developing automation software.
-
-We are actively accepting new contributors.
-
-Any kind of contribution is very welcome.
-
-You don't know how to start? Refer to our [contribution guide](CONTRIBUTING.md)!
-
-We use the following guidelines:
-
-* [CONTRIBUTING.md](CONTRIBUTING.md)
-* [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md)
-* [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html)
-* [Ansible Development Guide](https://docs.ansible.com/ansible/devel/dev_guide/index.html)
-* [Ansible Collection Development Guide](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections)
-
-## Collection maintenance
-
-The current maintainers are listed in the [MAINTAINERS](MAINTAINERS) file. If you have questions or need help, feel free to mention them in the proposals.
-
-To learn how to maintain / become a maintainer of this collection, refer to the [Maintainer guidelines](MAINTAINING.md).
-
-## Governance
-
-<!--Describe how the collection is governed. Here can be the following text:-->
-
-The process of decision making in this collection is based on discussing and finding consensus among participants.
-
-Every voice is important. If you have something on your mind, create an issue or dedicated discussion and let's discuss it!
-
-## Tested with Ansible
-
-<!-- List the versions of Ansible the collection has been tested with. Must match what is in galaxy.yml. -->
-
-## External requirements
-
-<!-- List any external resources the collection depends on, for example minimum versions of an OS, libraries, or utilities. Do not list other Ansible collections here. -->
-
-### Supported connections
-<!-- Optional. If your collection supports only specific connection types (such as HTTPAPI, netconf, or others), list them here. -->
-
-## Included content
-
-<!-- Galaxy will eventually list the module docs within the UI, but until that is ready, you may need to either describe your plugins etc here, or point to an external docsite to cover that information. -->
-
-## Using this collection
-
-<!--Include some quick examples that cover the most common use cases for your collection content. It can include the following examples of installation and upgrade (change infra.leapp correspondingly):-->
-
-### Installing the Collection from Ansible Galaxy
+## Installing the collection from Ansible Galaxy
 
 Before using this collection, you need to install it with the Ansible Galaxy command-line tool:
 
@@ -105,7 +54,7 @@ You can also install a specific version of the collection, for example, if you n
 ansible-galaxy collection install infra.leapp:==1.0.0
 ```
 
-See [Ansible Using collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
+See [Using Ansible collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
 
 ## Release notes
 
@@ -113,23 +62,15 @@ See the [changelog](https://github.com/oamg/ansible-leapp/tree/main/CHANGELOG.rs
 
 ## Roadmap
 
-<!-- Optional. Include the roadmap for this collection, and the proposed release/versioning strategy so users can anticipate the upgrade/update cycle. -->
+This Ansible collection is just one building block of our larger initiative to make RHEL in-place upgrade automation that works at enterprise scale. You can review our backlog at issues.redhat.com [here](https://issues.redhat.com/secure/RapidBoard.jspa?rapidView=16989&projectKey=RIPU&view=planning&issueLimit=100).
 
 ## More information
 
-<!-- List out where the user can find additional information, such as working group meeting times, slack/IRC channels, or documentation for the product this collection automates. At a minimum, link to: -->
+To learn more, contact Bob Mader <[bob@redhat.com](mailto:bob@redhat.com)>.
 
-* [Ansible Collection overview](https://github.com/ansible-collections/overview)
-* [Ansible User guide](https://docs.ansible.com/ansible/devel/user_guide/index.html)
-* [Ansible Developer guide](https://docs.ansible.com/ansible/devel/dev_guide/index.html)
-* [Ansible Collections Checklist](https://github.com/ansible-collections/overview/blob/main/collection_requirements.rst)
-* [Ansible Community code of conduct](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html)
-* [The Bullhorn (the Ansible Contributor newsletter)](https://us19.campaign-archive.com/home/?u=56d874e027110e35dea0e03c1&id=d6635f5420)
-* [News for Maintainers](https://github.com/ansible-collections/news-for-maintainers)
+I'm [presenting](https://red.ht/bobtalk) at Red Hat Summit 2023, May 23-25 in Boston. Let's connect there!
 
 ## Licensing
-
-<!-- Include the appropriate license information here and a pointer to the full licensing details. If the collection contains modules migrated from the ansible/ansible repo, you must use the same license that existed in the ansible/ansible repo. See the GNU license example below. -->
 
 MIT
 
