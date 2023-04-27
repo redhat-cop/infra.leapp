@@ -1,6 +1,6 @@
 ---
 # /etc/dnf/dnf.conf is an ini file and could be parsed to check if exclude has value and run this conditionally.
-- name: Remove all packages from the dnf exclude list
+- name: Clean dnf exclude list
   ansible.builtin.shell: dnf config-manager --save --setopt exclude=''
 
 # leapp 7 to 8 documentation cleans up old kernels
