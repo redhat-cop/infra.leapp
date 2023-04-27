@@ -28,20 +28,6 @@
     reboot_timeout: 43200
   when: updates_available.changed # noqa: no-handler
 
-- name: Run preupgrade hooks
-  ansible.builtin.shell: |
-    set -o pipefail
-    for exe in $(find /root/preupgrade/preupgrade-scripts -type f -executable); do
-      echo "Running $exe..." | tee -a {{ log_file }}
-      ( cd ${exe%/*} && ./${exe##*/} ) 2>&1 | tee -a {{ log_file }}
-      if [[ $? -ne 0 ]]; then
-        echo "Fatal error while running preupgrade hook $exe" | tee -a {{ log_file }}
-        exit 1
-      fi
-    done
-  args:
-    executable: /bin/bash
-
 - name: Start Leapp OS upgrade
   ansible.builtin.shell: >
     set -o pipefail;
@@ -71,17 +57,4 @@
   retries: 360
   delay: 10
 
-- name: Run postupgrade hooks
-  ansible.builtin.shell: |
-    set -o pipefail
-    for exe in $(find /root/preupgrade/postupgrade.d -type f -executable); do
-      echo "Running $exe..." | tee -a {{ log_file }}
-      ( cd ${exe%/*} && ./${exe##*/} ) 2>&1 | tee -a {{ log_file }}
-      if [[ $? -ne 0 ]]; then
-        echo "Fatal error while running postupgrade hook $exe" | tee -a {{ log_file }}
-        exit 1
-      fi
-    done
-  args:
-    executable: /bin/bash
 ...
