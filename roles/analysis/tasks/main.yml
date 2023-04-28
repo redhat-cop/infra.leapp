@@ -1,5 +1,11 @@
 ---
 # tasks file for analysis
+- name: Initialize lock and logging
+  ansible.builtin.import_role:
+    name: infra.leapp.logging
+  vars:
+    job_name: 'RIPU preupgrade analysis'
+
 - name: /etc/ansible/facts.d directory exists
   ansible.builtin.file:
     path: /etc/ansible/facts.d
