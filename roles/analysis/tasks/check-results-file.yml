@@ -1,0 +1,12 @@
+---
+- name: Result file status
+  ansible.builtin.stat:
+    path: "{{ result_filename }}"
+  register: result
+
+- name: Check that result file exists
+  ansible.builtin.assert:
+    that: result.stat.exists
+    msg: "The preupgrade analysis report file {{ result_filename }} was not created."
+
+...

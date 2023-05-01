@@ -6,4 +6,10 @@
     activationkey: "{{ satellite_activation_key_pre_leapp }}"
     org_id: "{{ satellite_organization }}"
     force_register: true
+
+- name: Remove lynx package
+  ansible.builtin.package:
+    name: lynx
+    state: absent
+
 ...

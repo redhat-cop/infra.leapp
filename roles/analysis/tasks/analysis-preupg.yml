@@ -1,7 +1,53 @@
 ---
 # TODO: For RHEL 6 to 7 Upgrade Analysis
+- name: Preupgrade Assistant and Red Hat Upgrade Tool packages are latest
+  ansible.builtin.package:
+    name: "{{ analysis_packages_el6 }}"
+    enablerepo: "{{ analysis_repos_el6 }}"
+    state: latest
+
+- name: Lynx is installed for text report
+  ansible.builtin.package:
+    name: lynx
+    state: present
+  notify: Remove lynx package
+
 - name: Filesystem capacity checks
   ansible.builtin.script: check-inodes.sh
   changed_when: false
   when: bypass_fs_checks is not defined or (bypass_fs_checks is defined and bypass_fs_checks | lower != 'yes')
+
+- name: Run preupg
+  ansible.builtin.shell: >
+    set -o pipefail;
+    preupg --force --text
+    2>&1 | tee -a {{ log_file }}
+  register: preupg
+  args:
+    executable: /bin/bash
+  async: 43200
+  poll: 60
+  failed_when: false
+
+- name: Fail if preupg encountered errors
+  ansible.builtin.fail:
+    msg: "{{ preupg_return_codes[preupg.rc].msg }}"
+  when: preupg_return_codes[preupg.rc].fail
+
+- name: Include check-results-file.yml
+  ansible.builtin.include_tasks: check-results-file.yml
+
+- name: Collect human readable report results
+  ansible.builtin.slurp:
+    src: "{{ result_filename }}"
+  register: results
+
+- name: Parse report results
+  ansible.builtin.set_fact:
+    preupg_report_txt: "{{ (results.content | b64decode).split('\n') }}"
+
+- name: Check for inhibitors
+  ansible.builtin.set_fact:
+    upgrade_inhibited: "{{ preupg_return_codes[preupg.rc].inhibited }}"
+
 ...

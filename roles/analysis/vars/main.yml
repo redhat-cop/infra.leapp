@@ -1,4 +1,8 @@
 ---
 # vars file for analysis
 leapp_enable_repos_args: "{{ ('--enablerepo ' + leapp_repos_enabled | default([], true) | join(' --enablerepo ')) if leapp_repos_enabled | length > 0 else '' }}"
+
+result_filename: "{{ '/root/preupgrade/result.txt' if ansible_distribution_major_version == '6' else '/var/log/leapp/leapp-report.txt' }}"
+
+
 ...
