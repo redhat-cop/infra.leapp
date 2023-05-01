@@ -71,24 +71,11 @@
   poll: 60
   failed_when: "'report has been generated' not in leapp.stdout"
 
-- name: Result file status
-  ansible.builtin.stat:
-    path: "{{ result_filename }}"
-  register: result
-
-- name: Check that result file exists
-  ansible.builtin.assert:
-    that: result.stat.exists
-    msg: "The preupgrade analysis report file {{ result_filename }} was not created."
+- name: Include check-results-file.yml
+  ansible.builtin.include_tasks: check-results-file.yml
 
 - name: Include the parse_leapp_report role to check for inhibitors
   ansible.builtin.include_role:
     name: infra.leapp.parse_leapp_report
 
-- name: Preupgrade analysis report is done
-  ansible.builtin.debug:
-    msg: >-
-      The preupgrade analysis report generation is now complete.
-      {{ 'WARNING: Inhibitors' if upgrade_inhibited else 'SUCCESS: No inhibitors' }} found.
-      Review the result file at {{ result_filename }}.
 ...
