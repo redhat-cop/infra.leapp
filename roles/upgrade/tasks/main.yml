@@ -1,8 +1,8 @@
 ---
 # tasks file for upgrade
-- name: Initialize lock and logging
+- name: Initialize lock, logging, and common vars
   ansible.builtin.import_role:
-    name: infra.leapp.logging
+    name: infra.leapp.common
   vars:
     job_name: 'RIPU in-place OS upgrade'
 

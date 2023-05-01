@@ -1,5 +1,6 @@
 ---
-# defaults file for logging
+# defaults file for common
 log_directory: /var/log/ripu
 log_file: "{{ log_directory }}/ripu.log"
+
 ...

@@ -1,5 +1,5 @@
 ---
-# handlers file for logging
+# handlers file for common
 - name: Add end time to log file
   ansible.builtin.lineinfile:
     path: "{{ log_file }}"
