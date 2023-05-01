@@ -3,5 +3,5 @@
   hosts: localhost
   remote_user: root
   roles:
-    - logging
+    - common
 ...
