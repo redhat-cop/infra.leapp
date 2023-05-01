@@ -16,7 +16,6 @@ These are the roles included in the collection. Follow the links below to see th
 - [`logging`](./roles/logging/) - used for local logging and mutex locking
 - [`parse_leapp_report`](./roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
 - [`upgrade`](./roles/upgrade/) - executes the Leapp OS upgrade
-- [`validation`](./roles/validation/) - performs post-upgrade validation checks
 
 ## Example playbooks
 
