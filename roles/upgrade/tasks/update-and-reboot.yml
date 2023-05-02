@@ -1,0 +1,13 @@
+---
+- name: Ensure all updates are applied
+  ansible.builtin.package:
+    name: '*'
+    state: latest
+  register: updates_available
+
+- name: Reboot when updates applied
+  ansible.builtin.reboot:
+    reboot_timeout: 7200
+  when: updates_available.changed # noqa: no-handler
+
+...

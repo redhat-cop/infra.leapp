@@ -57,5 +57,9 @@ preupg_return_codes:
     msg: User aborted the assesment.
     fail: true
     inhibited: true
+  127:
+    msg: preupg command not found.  Analysis must be run first.
+    fail: true
+    inhibited: true
 
 ...
