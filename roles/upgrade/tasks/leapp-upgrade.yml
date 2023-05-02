@@ -46,6 +46,11 @@
     post_reboot_delay: 60
     reboot_timeout: 43200
 
+# Ansible discovers /usr/bin/python on RHEL 7, then on RHEL 8 it is no longer available.
+- name: Set python interpreter to /usr/bin/python3 since /usr/bin/python is no longer available
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: /usr/bin/python3
+
 - name: Wait for leapp_resume run once service to no longer exist
   ansible.builtin.service:
     name: leapp_resume
