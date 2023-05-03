@@ -1,0 +1,32 @@
+---
+# TODO: Use ansible facts.
+- name: Search for remaining previous version rhel packages
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail;
+      rpm -qa |
+      grep -ve '\.el{{ ansible_distribution_major_version }}' |
+      grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
+      sort
+  register: previous_version_packages
+  changed_when: false
+  failed_when:
+    - previous_version_packages.rc != 0
+    - previous_version_packages.stderr != ""
+
+- name: Debug previous_version_packages
+  ansible.builtin.debug:
+    var: previous_version_packages
+
+- name: Test remove previous_version_packages
+  ansible.builtin.package:
+    name: "{{ previous_version_packages.stdout_lines }}"
+    state: absent
+  check_mode: true
+  register: result
+
+- name: Report previous_version_packages that would be removed
+  ansible.builtin.debug:
+    var: result
+
+...

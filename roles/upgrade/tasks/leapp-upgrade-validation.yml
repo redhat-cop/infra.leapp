@@ -1,0 +1,26 @@
+---
+- name: Slurp /etc/migration-results
+  ansible.builtin.slurp:
+    src: /etc/migration-results
+  register: migration_results_slurp
+
+- name: Parse migration results
+  ansible.builtin.set_fact:
+    migration_results_json: "{{ migration_results_slurp.content | b64decode | from_json }}"
+
+- name: Determine Leapp upgrade FirstBoot
+  ansible.builtin.set_fact:
+    leapp_upgrade_success: >-
+      {{
+      (migration_results_json.activities |
+      selectattr('activity', 'match', 'upgrade') |
+      selectattr('target_os', 'match', 'Red Hat Enterprise Linux ' + rhel_dest_version) |
+      selectattr('env.LEAPP_CURRENT_PHASE', 'match', 'FirstBoot'))[0].success
+      }}
+
+- name: Ensure that Leapp upgrade FirstBoot was successful
+  ansible.builtin.assert:
+    that: leapp_upgrade_success
+    msg: Leapp upgrade FirstBoot failed.
+
+...

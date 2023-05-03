@@ -2,20 +2,25 @@
 - name: Collect updated facts
   ansible.builtin.setup:
 
-- name: Determine leapp_dest_version from rhel 7
+- name: Determine rhel_dest_version from rhel 6
   ansible.builtin.set_fact:
-    leapp_dest_version: "{{ rhel_7_upgrade_dest_version }}"
+    rhel_dest_version: "{{ rhel_6_upgrade_dest_version }}"
+  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version == '6'
+
+- name: Determine rhel_dest_version from rhel 7
+  ansible.builtin.set_fact:
+    rhel_dest_version: "{{ rhel_7_upgrade_dest_version }}"
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version == '7'
 
-- name: Determine leapp_dest_version from rhel 8
+- name: Determine rhel_dest_version from rhel 8
   ansible.builtin.set_fact:
-    leapp_dest_version: "{{ rhel_8_upgrade_dest_version }}"
+    rhel_dest_version: "{{ rhel_8_upgrade_dest_version }}"
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version == '8'
 
 - name: Validate current OS version
   ansible.builtin.assert:
-    that: ansible_distribution_version == leapp_dest_version
-    fail_msg: Expected leapp destination OS version {{ leapp_dest_version }} but OS version is {{ ansible_distribution_version }}.
+    that: ansible_distribution_version == rhel_dest_version
+    fail_msg: Expected leapp destination OS version {{ rhel_dest_version }} but OS version is {{ ansible_distribution_version }}.
     success_msg: Current OS version is {{ ansible_distribution_version }}.
 
 - name: Validate running kernel matches OS version
@@ -26,27 +31,8 @@
     fail_msg: Kernel version {{ ansible_kernel }} does not match expected OS version el{{ expected_distribution_major_version }}.
     success_msg: Current kernel version is {{ ansible_kernel }}.
 
-- name: Slurp /etc/migration-results
-  ansible.builtin.slurp:
-    src: /etc/migration-results
-  register: migration_results_slurp
+- name: Include leapp post upgrade validation
+  ansible.builtin.include_tasks: leapp-upgrade-validation.yml
+  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int >= 7
 
-- name: Parse migration results
-  ansible.builtin.set_fact:
-    migration_results_json: "{{ migration_results_slurp.content | b64decode | from_json }}"
-
-- name: Determine Leapp upgrade FirstBoot
-  ansible.builtin.set_fact:
-    leapp_upgrade_success: >-
-      {{
-      (migration_results_json.activities |
-      selectattr('activity', 'match', 'upgrade') |
-      selectattr('target_os', 'match', 'Red Hat Enterprise Linux ' + leapp_dest_version) |
-      selectattr('env.LEAPP_CURRENT_PHASE', 'match', 'FirstBoot'))[0].success
-      }}
-
-- name: Ensure that Leapp upgrade FirstBoot was successful
-  ansible.builtin.assert:
-    that: leapp_upgrade_success
-    msg: Leapp upgrade FirstBoot failed.
 ...
