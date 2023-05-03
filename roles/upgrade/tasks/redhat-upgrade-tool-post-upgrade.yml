@@ -13,15 +13,9 @@
 - name: Include check-for-old-packages.yml
   ansible.builtin.include_tasks: check-for-old-packages.yml
 
-# TODO: Remove enough old el6 packages that yum update can complete successfully.
-
-# TODO: Remove el6 kernels?
-
 # TODO: Update GRUB Legacy to GRUB 2.
 
 - name: Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
-
-# TODO: If Samba is installed run testparm on /etc/samba/smb.conf?
 
 ...
