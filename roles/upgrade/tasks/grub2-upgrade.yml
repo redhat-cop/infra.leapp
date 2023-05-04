@@ -1,0 +1,53 @@
+---
+- name: Grub package is absent
+  ansible.builtin.package:
+    name: grub
+    state: absent
+
+- name: Grub2 package is present
+  ansible.builtin.package:
+    name: grub2
+    state: present
+
+- name: The /etc/default/grub file is templated
+  ansible.builtin.template:
+    src: etc_default_grub.j2
+    dest: /etc/default/grub
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Determine if boot is a mount point
+  ansible.builtin.set_fact:
+    boot_mounted: "{{ ansible_mounts | selectattr('mount', 'eq', '/boot') | list | length | bool }}"
+
+- name: Get boot device dict from /boot
+  ansible.builtin.set_fact:
+    boot_device_dict: "{{ ansible_mounts | selectattr('mount', 'eq', '/boot') | list | first }}"
+  when: boot_mounted
+
+- name: Get boot device dict from /
+  ansible.builtin.set_fact:
+    boot_device_dict: "{{ ansible_mounts | selectattr('mount', 'eq', '/') | list | first }}"
+  when: not boot_mounted
+
+- name: Get boot device from boot device dict
+  ansible.builtin.set_fact:
+    boot_device: "{{ boot_device_dict.device | regex_replace('[1-9]$', '') }}"
+
+- name: Run grub2-install
+  ansible.builtin.shell: grub2-install {{ boot_device }}
+
+- name: Run grub2-mkconfig
+  ansible.builtin.shell: grub2-mkconfig -o /boot/grub2/grub.cfg
+
+- name: Old grub.conf file is absent
+  ansible.builtin.file:
+    path: /boot/grub/grub.conf
+    state: absent
+
+- name: Reboot to start using grub2
+  ansible.builtin.reboot:
+    reboot_timeout: 7200
+
+...
