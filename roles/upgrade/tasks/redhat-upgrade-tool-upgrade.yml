@@ -41,7 +41,7 @@
 
 # TODO: Add support for non-RHSM.
 
-# TODO: Remove --cleanup-post option and more selectively cleanup old packages in post.
+# --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.
 - name: Run redhat-upgrade-tool
   ansible.builtin.shell: >
     set -o pipefail;
