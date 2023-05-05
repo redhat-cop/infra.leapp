@@ -20,7 +20,9 @@
 
 - name: Include grub2-upgrade.yml
   ansible.builtin.include_tasks: grub2-upgrade.yml
-  when: ansible_architecture == 'x86_64'
+  when:
+    - ansible_architecture == 'x86_64'
+    - update_grub_to_grub_2
 
 - name: Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
