@@ -5,7 +5,7 @@
     cmd: >-
       set -o pipefail;
       rpm -qa |
-      grep -ve '\.el{{ ansible_distribution_major_version }}' |
+      grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |
       grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
       sort
   register: previous_version_packages
