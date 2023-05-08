@@ -22,4 +22,11 @@
     name: lynx
     state: absent
 
+- name: Preupgrade analysis report is done
+  ansible.builtin.debug:
+    msg: >-
+      The preupgrade analysis report generation is now complete.
+      {{ 'WARNING: Inhibitors' if upgrade_inhibited else 'SUCCESS: No inhibitors' }} found.
+      Review the result file at {{ result_filename }}.
+
 ...
