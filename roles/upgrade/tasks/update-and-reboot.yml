@@ -4,6 +4,8 @@
     name: '*'
     state: latest
   register: updates_available
+  async: 7200
+  poll: 30
 
 - name: Reboot when updates applied
   ansible.builtin.reboot:
