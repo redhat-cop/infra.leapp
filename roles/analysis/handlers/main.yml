@@ -22,6 +22,7 @@
     name: lynx
     state: absent
 
+# Keep this last so it's easy to find in the job output.
 - name: Preupgrade analysis report is done
   ansible.builtin.debug:
     msg: >-
