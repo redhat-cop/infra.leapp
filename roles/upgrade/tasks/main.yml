@@ -25,7 +25,10 @@
   ansible.builtin.include_tasks: leapp-post-upgrade.yml
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int >= 7
 
-- name: RIPU in-place OS upgrade is done
-  ansible.builtin.debug:
-    msg: 'The in-place OS upgrade is now complete. Engage your partner teams to begin application validation.'
+- name: Notify RIPU in-place OS upgrade is done handler
+  ansible.builtin.assert:
+    that: true
+    quiet: true
+  changed_when: true
+  notify: RIPU in-place OS upgrade is done
 ...
