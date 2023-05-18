@@ -1,0 +1,30 @@
+---
+# TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
+- name: Ensure redhat-upgrade-cmdline-instrepo.repo file is absent
+  ansible.builtin.file:
+    path: /etc/yum.repos.d/redhat-upgrade-cmdline-instrepo.repo
+    state: absent
+
+- name: "Register to post upgrade activation key"
+  ansible.builtin.shell: >
+    subscription-manager register
+    --org="{{ satellite_organization }}"
+    --activationkey="{{ satellite_activation_key_post_leapp }}"
+    --force
+  register: sub_man_reg
+  when: leapp_upgrade_type == 'disconnected'
+  failed_when: false
+
+- name: Include check-for-old-packages.yml
+  ansible.builtin.include_tasks: check-for-old-packages.yml
+
+- name: Include grub2-upgrade.yml
+  ansible.builtin.include_tasks: grub2-upgrade.yml
+  when:
+    - ansible_architecture == 'x86_64'
+    - update_grub_to_grub_2
+
+- name: Include update-and-reboot.yml
+  ansible.builtin.include_tasks: update-and-reboot.yml
+
+...

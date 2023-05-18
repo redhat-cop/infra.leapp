@@ -1,8 +1,8 @@
 ---
 # tasks file for analysis
-- name: Initialize lock and logging
+- name: Initialize lock, logging, and common vars
   ansible.builtin.import_role:
-    name: infra.leapp.logging
+    name: infra.leapp.common
   vars:
     job_name: 'RIPU preupgrade analysis'
 
@@ -19,12 +19,19 @@
     content: "{{ ansible_facts | ansible.builtin.combine({'ansible_local': {}}) }}"
     dest: /etc/ansible/facts.d/pre_ripu.fact
 
-# TODO: Include tasks for RHEL 6 to 7 non-leapp upgrade
-# - name: Include tasks for preupg assistant analysis
-#   ansible.builtin.include_tasks: analysis-preupg.yml
-#   when: ansible_distribution_major_version|int < 7
+- name: Include tasks for preupg assistant analysis
+  ansible.builtin.include_tasks: analysis-preupg.yml
+  when: ansible_distribution_major_version|int == 6
 
 - name: Include tasks for leapp preupgrade analysis
   ansible.builtin.include_tasks: analysis-leapp.yml
   when: ansible_distribution_major_version|int >= 7
+
+- name: Notify analysis report is done handler
+  ansible.builtin.assert:
+    that: true
+    quiet: true
+  changed_when: true
+  notify: Preupgrade analysis report is done
+
 ...

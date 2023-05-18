@@ -1,6 +1,6 @@
 # Logging
 
-The `logging` role is used to manage local log files that may help with debugging playbooks that include the `analysis` or `upgrade` roles. This role also implements a mutex locking mechanism that protects against accidentally running simultaneous playbook jobs on the same host.
+The `common` role is used to manage local log files that may help with debugging playbooks that include the `analysis` or `upgrade` roles. This role also implements a mutex locking mechanism that protects against accidentally running simultaneous playbook jobs on the same host.  Additionally this role provides common variables used by both `analysis` and `upgrade`.
 
 > **TODO**: The logging capability of this role currently deals only with writing local log files, but could be later extended to support logging to an aggregator like Logstash or Splunk.
 

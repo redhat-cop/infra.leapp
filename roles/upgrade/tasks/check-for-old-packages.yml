@@ -1,0 +1,32 @@
+---
+# TODO: Use ansible facts.
+- name: Search for old packages and packages not versioned by rhel release
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail;
+      rpm -qa |
+      grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |
+      grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
+      sort
+  register: previous_version_packages
+  changed_when: false
+  failed_when:
+    - previous_version_packages.rc != 0
+    - previous_version_packages.stderr != ""
+
+- name: Display results of search for old packages and packages not versioned by rhel release
+  ansible.builtin.debug:
+    msg: "{{ previous_version_packages.stdout_lines }}"
+
+- name: Search for packages associated with old packages and packages not versioned by rhel release
+  ansible.builtin.package:
+    name: "{{ previous_version_packages.stdout_lines }}"
+    state: absent
+  check_mode: true
+  register: search_packages_result
+
+- name: Display results of search for packages associated with old packages and packages not versioned by rhel release
+  ansible.builtin.debug:
+    msg: "{{ search_packages_result.changes.removed | default(search_packages_result.results) | default([]) | regex_replace('Removed: ', '') }}"
+
+...

@@ -4,8 +4,6 @@
   strategy: free
   become: true
   force_handlers: true
-  vars:
-    ansible_python_interpreter: /usr/libexec/platform-python
   tasks:
     - name: Perform OS upgrade
       ansible.builtin.import_role:

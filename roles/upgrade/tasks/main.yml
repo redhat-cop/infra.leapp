@@ -1,15 +1,14 @@
 ---
 # tasks file for upgrade
-- name: Initialize lock and logging
+- name: Initialize lock, logging, and common vars
   ansible.builtin.import_role:
-    name: infra.leapp.logging
+    name: infra.leapp.common
   vars:
     job_name: 'RIPU in-place OS upgrade'
 
-# TODO: Include tasks for RHEL 6 to 7 non-leapp upgrade
-# - name: Include tasks for upgrade using redhat-upgrade-tool
-#   ansible.builtin.include_tasks: upgrade-redhat-upgrade-tool.yml
-#   when: ansible_distribution_major_version|int < 7
+- name: Include tasks for upgrade using redhat-upgrade-tool
+  ansible.builtin.include_tasks: redhat-upgrade-tool-upgrade.yml
+  when: ansible_distribution_major_version|int == 6
 
 - name: Include tasks for leapp upgrade
   ansible.builtin.include_tasks: leapp-upgrade.yml
@@ -18,11 +17,18 @@
 - name: Include post upgrade validation
   ansible.builtin.include_tasks: upgrade-validation.yml
 
+- name: Include tasks for redhat-upgrade-tool post upgrade
+  ansible.builtin.include_tasks: redhat-upgrade-tool-post-upgrade.yml
+  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int == 6
+
 - name: Include tasks for leapp post upgrade
   ansible.builtin.include_tasks: leapp-post-upgrade.yml
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int >= 7
 
-- name: RIPU in-place OS upgrade is done
-  ansible.builtin.debug:
-    msg: 'The in-place OS upgrade is now complete. Engage your partner teams to begin application validation.'
+- name: Notify RIPU in-place OS upgrade is done handler
+  ansible.builtin.assert:
+    that: true
+    quiet: true
+  changed_when: true
+  notify: RIPU in-place OS upgrade is done
 ...

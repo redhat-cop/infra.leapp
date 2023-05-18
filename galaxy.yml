@@ -29,5 +29,5 @@ build_ignore:
 dependencies:
   "ansible.posix": ">=1.5.1"
   "fedora.linux_system_roles": '>=1.21.0'
-  "community.general": '>=6.4.0'
+  "community.general": '>=6.6.0'
 ...

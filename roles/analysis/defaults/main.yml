@@ -1,5 +1,12 @@
 ---
 # defaults file for analysis
+analysis_packages_el6:
+  - preupgrade-assistant
+  - preupgrade-assistant-el6toel7
+  - redhat-upgrade-tool
+  - openscap
+  - openscap-engine-sce
+
 analysis_packages_el7:
   # TODO: Seems to cause package dependency problems with post upgrade cleanup.
   # - leapp-upgrade-el7toel8
@@ -15,6 +22,10 @@ analysis_packages_el8:
   # - vdo
   # TODO: only w/ rhui for aws
   # - leapp-rhui-aws
+
+analysis_repos_el6:
+  - rhel-6-server-extras-rpms
+  - rhel-6-server-optional-rpms
 
 analysis_repos_el7:
   - rhel-7-server-extras-rpms
@@ -43,5 +54,4 @@ leapp_repos_enabled: []
 # leapp_repos_enabled:
 #   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
 
-result_filename: '/var/log/leapp/leapp-report.txt'
 ...

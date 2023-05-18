@@ -16,17 +16,8 @@
     force_register: true
   when: leapp_upgrade_type == 'disconnected'
 
-- name: Ensure all updates are applied
-  ansible.builtin.package:
-    name: '*'
-    state: latest
-  register: updates_available
-
-- name: Reboot when updates applied
-  ansible.builtin.reboot:
-    post_reboot_delay: 60
-    reboot_timeout: 43200
-  when: updates_available.changed # noqa: no-handler
+- name: Include update-and-reboot.yml
+  ansible.builtin.include_tasks: update-and-reboot.yml
 
 - name: Start Leapp OS upgrade
   ansible.builtin.shell: >
@@ -45,6 +36,11 @@
     msg: "Host is starting Leapp OS upgrade now!"
     post_reboot_delay: 60
     reboot_timeout: 43200
+
+# Ansible discovers /usr/bin/python on RHEL 7, then on RHEL 8 it is no longer available.
+- name: Set python interpreter to /usr/bin/python3 since /usr/bin/python is no longer available
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Wait for leapp_resume run once service to no longer exist
   ansible.builtin.service:

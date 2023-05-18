@@ -1,5 +1,5 @@
 ---
-# handlers file for logging
+# handlers file for common
 - name: Add end time to log file
   ansible.builtin.lineinfile:
     path: "{{ log_file }}"
@@ -17,7 +17,7 @@
 
 - name: Decode ripu.log file
   ansible.builtin.set_fact:
-    ripu_log_file: "{{ ripu_log_file_slurp.content | b64decode | split('\n') }}"
+    ripu_log_file: "{{ (ripu_log_file_slurp.content | b64decode).split('\n') }}"
   listen: Archive log file
 
 - name: Rename log file

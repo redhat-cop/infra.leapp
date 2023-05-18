@@ -1,5 +1,5 @@
 ---
-# tasks file for logging
+# tasks file for common
 - name: Log directory exists
   ansible.builtin.file:
     path: "{{ log_directory }}"

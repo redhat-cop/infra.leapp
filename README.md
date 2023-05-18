@@ -13,7 +13,7 @@ This collection provides Ansible roles you can use to perform RHEL in-place upgr
 These are the roles included in the collection. Follow the links below to see the detailed documentation and example playbooks for each role.
 
 - [`analysis`](./roles/analysis/) - executes the Leapp pre-upgrade phase
-- [`logging`](./roles/logging/) - used for local logging and mutex locking
+- [`common`](./roles/common/) - used for local logging, mutex locking, and common vars
 - [`parse_leapp_report`](./roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
 - [`upgrade`](./roles/upgrade/) - executes the Leapp OS upgrade
 

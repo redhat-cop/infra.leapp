@@ -1,0 +1,17 @@
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="nofb splash=quiet crashkernel=auto spectre_v2=retpoline {%- if ansible_proc_cmdline['rd.lvm.lv'] is defined %}
+{% if ansible_proc_cmdline['rd.lvm.lv'] is iterable and ansible_proc_cmdline['rd.lvm.lv'] is not string %}
+{% for rd_lvm_lv in ansible_proc_cmdline['rd.lvm.lv'] %}
+{%- if loop.first %} {% endif %}
+rd.lvm.lv={{ rd_lvm_lv }}
+{%- if not loop.last %} {% endif %}
+{% endfor %}
+{%- else %}
+ rd.lvm.lv={{ ansible_proc_cmdline['rd.lvm.lv'] }}{% endif %}
+{% else %}
+{% endif %} rhgp quiet"
+GRUB_DISABLE_RECOVERY="true"

@@ -1,0 +1,63 @@
+---
+- name: Run preupg --riskcheck
+  ansible.builtin.shell: preupg --riskcheck
+  register: preupg
+  changed_when: false
+  failed_when: false
+
+- name: Assert that preupg was successful
+  ansible.builtin.assert:
+    that: not preupg_return_codes[preupg.rc].inhibited
+    msg: "{{ preupg_return_codes[preupg.rc].msg }}"
+
+# TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
+- name: Register to leapp activation key
+  ansible.builtin.shell: >
+    subscription-manager register
+    --org_id: "{{ satellite_organization }}"
+    activationkey: "{{ satellite_activation_key_leapp }}"
+    force_register: true
+  register: sub_man_reg
+  when: leapp_upgrade_type == 'disconnected'
+  failed_when: false
+
+- name: Gather package facts
+  ansible.builtin.package_facts:
+
+- name: No packages are version locked
+  community.general.yum_versionlock:
+    name: '*'
+    state: absent
+  when: "'yum-plugin-versionlock' in ansible_facts.packages"
+
+- name: Include update-and-reboot.yml
+  ansible.builtin.include_tasks: update-and-reboot.yml
+
+- name: Disable RHEL 6 RHSM repos
+  community.general.rhsm_repository:
+    name: '*'
+    state: disabled
+# TODO: when: leapp_upgrade_type needs to be improved.
+
+# TODO: Add support for non-RHSM.
+
+# --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.
+- name: Run redhat-upgrade-tool
+  ansible.builtin.shell: >
+    set -o pipefail;
+    redhat-upgrade-tool --network 7.9 --instrepo {{ rhel_7_network_install_repo_url }} --force --cleanup-post
+    2>&1 | tee -a {{ log_file }}
+  register: redhat_upgrade_tool
+  args:
+    executable: /bin/bash
+  async: 43200
+  poll: 60
+  # failed_when: false
+
+- name: Reboot to continue OS upgrade
+  ansible.builtin.reboot:
+    msg: "Host is starting OS upgrade now!"
+    post_reboot_delay: 60
+    reboot_timeout: 43200
+
+...
