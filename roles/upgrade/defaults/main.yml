@@ -35,7 +35,11 @@ crypto_policy: DEFAULT
 # Whether or not to update from legacy grub to grub2 in post-upgrade steps from RHEL 6 -> 7.
 update_grub_to_grub_2: true
 
-# If grub_boot_device is not defined, the parent device of /boot will be used if present, else the parent device of / will be used.
+# Used by grub to grub2 upgrade in RHEL 6 to 7 post upgrade, and RHEL 7 to 8 post upgrade.
+# For grub to grub2 upgrade, if grub_boot_device is not defined, the parent device of /boot
+# will be used if present, else the parent device of / will be used.
+# For RHEL 7 to 8 post upgrade, used to grub2-install on a device other than the disk
+# /boot is on.
 # grub_boot_device: /dev/sda
 
 ...
