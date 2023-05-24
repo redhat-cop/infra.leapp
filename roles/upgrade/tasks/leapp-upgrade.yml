@@ -53,4 +53,14 @@
   retries: 360
   delay: 10
 
+- name: Block to handle grub_boot_device option
+  when: grub_boot_device is defined
+  block:
+    - name: Run grub2-install
+      ansible.builtin.shell: grub2-install {{ grub_boot_device }}
+
+    - name: Reboot to pickup grub update
+      ansible.builtin.reboot:
+        reboot_timeout: 7200
+
 ...
