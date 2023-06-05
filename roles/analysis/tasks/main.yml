@@ -18,6 +18,9 @@
   ansible.builtin.copy:
     content: "{{ ansible_facts | ansible.builtin.combine({'ansible_local': {}}) }}"
     dest: /etc/ansible/facts.d/pre_ripu.fact
+    mode: '0644'
+    owner: root
+    group: root
 
 - name: Include tasks for preupg assistant analysis
   ansible.builtin.include_tasks: analysis-preupg.yml
