@@ -26,5 +26,6 @@ warn_list:  # or 'skip_list' to silence them completely
   - template-instead-of-copy  # Templated files should use template instead of copy
   - command-instead-of-shell  # Use shell only when shell functionality is required.
   - no-changed-when # temp until updated all tasks
+  - sanity[cannot-ignore] # cope with shebang test bug
 
 ...
