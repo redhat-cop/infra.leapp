@@ -57,7 +57,7 @@ We are a fledgling community and welcome any new contributors. Get started by op
 
 ## Reporting issues
 
-Please open a [new issue](https://github.com/oamg/ansible-leapp/issues/new/choose) for any bugs or security vulnerabilities you may encounter. We also invite you to open an issue if you have ideas on how we can improve the solution or want to make a suggestion for enhancment. 
+Please open a [new issue](https://github.com/oamg/ansible-leapp/issues/new/choose) for any bugs or security vulnerabilities you may encounter. We also invite you to open an issue if you have ideas on how we can improve the solution or want to make a suggestion for enhancment.
 
 ## More information
 
