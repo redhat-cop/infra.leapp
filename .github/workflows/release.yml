@@ -11,16 +11,16 @@ on:
 jobs:
   pre-commit:
     uses: oamg/ansible-leapp/.github/workflows/pre-commit.yml@main
-    with:
-      collection_namespace: infra
-      collection_name: leapp
-      collection_version: ${{ vars.GITHUB_REF }}
+    # with:
+    #   collection_namespace: infra
+    #   collection_name: leapp
+    #   collection_version: ${{ vars.GITHUB_REF }}
   sanity:
     uses: oamg/ansible-leapp/.github/workflows/ansible-test.yml@main
-    with:
-      collection_namespace: infra
-      collection_name: leapp
-      collection_version: ${{ vars.GITHUB_REF }}
+    # with:
+    #   collection_namespace: infra
+    #   collection_name: leapp
+    #   collection_version: ${{ vars.GITHUB_REF }}
   prechecks:
     needs:
       - pre-commit
@@ -49,8 +49,12 @@ jobs:
         shell: bash
         working-directory: ${{ vars.GITHUB_PATH }}
 
+      - name: Get version
+        run: cat galaxy.yml | grep version | cut -d ":" -f 2
+        id: vers
+
       - name: Install collection
-        run: ansible-galaxy collection install ./infra-leapp-${{ vars.GITHUB_REF }}.tar.gz -p /home/runner/collections
+        run: ansible-galaxy collection install ./infra-leapp-${{ steps.vers.outputs }}.tar.gz -p /home/runner/collections
         shell: bash
         working-directory: ${{ vars.GITHUB_PATH }}
 
