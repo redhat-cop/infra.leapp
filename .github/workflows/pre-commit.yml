@@ -7,12 +7,28 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - name: Install Collections
-        run: |
-          sudo apt install software-properties-common
-          sudo apt-add-repository --yes --update ppa:ansible/ansible
-          sudo apt install ansible
-      - uses: pre-commit/action@v2.0.0
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Ansible
+        run: pip install --upgrade ansible-core
+
+      - name: Build collection
+        run: ansible-galaxy collection build -vvv
+        shell: bash
+        working-directory: ${{ vars.GITHUB_PATH }}
+
+      - name: Install collection
+        run: ansible-galaxy collection install ./infra-leapp-${{ vars.GITHUB_REF }}.tar.gz -p /home/runner/collections
+        shell: bash
+        working-directory: ${{ vars.GITHUB_PATH }}
+
+      - name: Get dependencies
+        run: cat galaxy.yml | grep -A100 "dependencies:" | cut -d ":" -f 1 | cut -d '"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//'
+        id: deps
+
+      - name: Install collection dependencies
+        run: ansible-galaxy collection install ${{ steps.deps.outputs }}
+      - uses: pre-commit/action@v3.0.0
 ...
