@@ -32,6 +32,9 @@ jobs:
         run: cat galaxy.yml | grep -A100 'dependencies:' | cut -d ':' -f 1 | cut -d '"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//' >> ${{ github.run_id }}.yml
         id: deps
 
+      - name: Test
+        run: cat ${{ github.run_id }}.yml
+
       - name: Install collection dependencies
         run: ansible-galaxy collection install -r ${{ github.run_id }}.yml
       - uses: pre-commit/action@v3.0.0
