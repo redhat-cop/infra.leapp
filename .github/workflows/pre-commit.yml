@@ -20,7 +20,7 @@ jobs:
         working-directory: ${{ vars.GITHUB_PATH }}
 
       - name: Get version
-        run: echo "NUM=$(cat galaxy.yml | grep version | cut -d ":" -f 2 | awk '{print $1}')"" >> $GITHUB_OUTPUT"
+        run: echo "::set-output name=NUM::$(cat galaxy.yml | grep version | cut -d ":" -f 2 | awk '{print $1}')"" >> $GITHUB_OUTPUT"
         id: vers
 
       - name: Install collection
