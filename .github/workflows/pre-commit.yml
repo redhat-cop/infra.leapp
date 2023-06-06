@@ -29,7 +29,7 @@ jobs:
         working-directory: ${{ vars.GITHUB_PATH }}
 
       - name: Get dependencies
-        run: echo "--\ncollections:" >> ${{ github.run_id }}.yml; cat galaxy.yml | grep -A100 'dependencies:' | cut -d ':' -f 1 | cut -d '"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//' | awk NF | sed 's/^/  - name:{{:dumb_space_issue:}}/' >> ${{ github.run_id }}.yml; sed -i 's/{{:dumb_space_issue:}}/ /g' ${{ github.run_id }}.yml; echo "..." >> ${{ github.run_id }}.yml
+        run: echo "---" >> ${{ github.run_id }}.yml; echo "collections:" >> ${{ github.run_id }}.yml; cat galaxy.yml | grep -A100 'dependencies:' | cut -d ':' -f 1 | cut -d '"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//' | awk NF | sed 's/^/  - name:{{:dumb_space_issue:}}/' >> ${{ github.run_id }}.yml; sed -i 's/{{:dumb_space_issue:}}/ /g' ${{ github.run_id }}.yml; echo "..." >> ${{ github.run_id }}.yml
         id: deps
 
       - name: Test
