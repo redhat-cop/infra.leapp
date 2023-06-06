@@ -64,7 +64,7 @@ jobs:
       - name: Upload files to tag
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.token }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ${{ steps.build.outputs.tar_file }}
           tag: ${{ github.ref }}
           overwrite: true
@@ -89,7 +89,7 @@ jobs:
         id: prcreate
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: Update changelog ${{ github.ref }}
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
