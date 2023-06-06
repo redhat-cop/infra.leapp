@@ -20,19 +20,19 @@ jobs:
         working-directory: ${{ vars.GITHUB_PATH }}
 
       - name: Get version
-        run: cat galaxy.yml | grep version | cut -d ":" -f 2
+        run: echo "::set_output name=vers::$(cat galaxy.yml | grep version | cut -d ":" -f 2)"
         id: vers
 
       - name: Install collection
-        run: ansible-galaxy collection install ./infra-leapp-${{ steps.vers.outputs.stdout }}.tar.gz -p /home/runner/collections
+        run: ansible-galaxy collection install ./infra-leapp-${{ steps.vers.outputs.vers }}.tar.gz -p /home/runner/collections
         shell: bash
         working-directory: ${{ vars.GITHUB_PATH }}
 
       - name: Get dependencies
-        run: cat galaxy.yml | grep -A100 "dependencies:" | cut -d ":" -f 1 | cut -d '"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//'
+        run: echo "::set_output name=deps::$(cat galaxy.yml | grep -A100 'dependencies:' | cut -d ":" -f 1 | cut -d '\"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//')"
         id: deps
 
       - name: Install collection dependencies
-        run: ansible-galaxy collection install ${{ steps.deps.outputs.stdout }}
+        run: ansible-galaxy collection install ${{ steps.deps.outputs.deps }}
       - uses: pre-commit/action@v3.0.0
 ...
