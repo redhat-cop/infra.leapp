@@ -28,12 +28,9 @@ jobs:
         shell: bash
         working-directory: ${{ vars.GITHUB_PATH }}
 
-      - name: Get dependencies
+      - name: Get dependencies # This sucks lol
         run: echo "---" >> ${{ github.run_id }}.yml; echo "collections:" >> ${{ github.run_id }}.yml; cat galaxy.yml | grep -A100 'dependencies:' | cut -d ':' -f 1 | cut -d '"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//' | awk NF | sed 's/^/  - name:{{:dumb_space_issue:}}/' >> ${{ github.run_id }}.yml; sed -i 's/{{:dumb_space_issue:}}/ /g' ${{ github.run_id }}.yml; echo "..." >> ${{ github.run_id }}.yml
         id: deps
-
-      - name: Test
-        run: cat ${{ github.run_id }}.yml
 
       - name: Install collection dependencies
         run: ansible-galaxy collection install -r ${{ github.run_id }}.yml
