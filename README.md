@@ -1,6 +1,6 @@
 # Ansible Leapp Collection
 
-[![CI](https://github.com/oamg/ansible-leapp/workflows/CI/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![Lint](https://github.com/oamg/ansible-leapp/workflows/Yaml%20and%20Ansible%20Lint/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions)
+[![CI](https://github.com/oamg/ansible-leapp/workflows/CI/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![Lint](https://github.com/oamg/ansible-leapp/workflows/Yaml%20and%20Ansible%20Lint/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7438/badge)](https://bestpractices.coreinfrastructure.org/projects/7438)
 
 <!-- [![Codecov](https://img.shields.io/codecov/c/github/oamg/ansible-leapp)](https://codecov.io/gh/oamg/ansible-leapp) -->
 
@@ -20,10 +20,6 @@ These are the roles included in the collection. Follow the links below to see th
 ## Example playbooks
 
 Example playbooks can be found [here](./playbooks/).
-
-## Contributing
-
-We are a fledgling community and welcome any new contributors. Get started by opening an issue or pull request. Refer to our [contribution guide](CONTRIBUTING.md) for more information.
 
 ## Installing the collection from Ansible Galaxy
 
@@ -55,19 +51,21 @@ ansible-galaxy collection install infra.leapp:==1.0.0
 
 See [Using Ansible collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
 
-## Release notes
+## Contributing
 
-See the [changelog](https://github.com/oamg/ansible-leapp/tree/main/CHANGELOG.rst).
+We are a fledgling community and welcome any new contributors. Get started by opening an issue or pull request. Refer to our [contribution guide](CONTRIBUTING.md) for more information.
 
-## Roadmap
+## Reporting issues
 
-This Ansible collection is just one building block of our larger initiative to make RHEL in-place upgrade automation that works at enterprise scale. You can review our backlog at issues.redhat.com [here](https://issues.redhat.com/secure/RapidBoard.jspa?rapidView=16989&projectKey=RIPU&view=planning&issueLimit=100).
+Please open a [new issue](https://github.com/oamg/ansible-leapp/issues/new/choose) for any bugs or security vulnerabilities you may encounter. We also invite you to open an issue if you have ideas on how we can improve the solution or want to make a suggestion for enhancment.
 
 ## More information
 
-To learn more, contact Bob Mader <[bob@redhat.com](mailto:bob@redhat.com)>.
+This Ansible collection is just one building block of our larger initiative to make RHEL in-place upgrade automation that works at enterprise scale. Learn more about our end-to-end approach for automating RHEL in-place upgrades at this [blog post](https://red.ht/bobblog).
 
-I'm [presenting](https://red.ht/bobtalk) at Red Hat Summit 2023, May 23-25 in Boston. Let's connect there!
+## Release notes
+
+See the [changelog](https://github.com/oamg/ansible-leapp/tree/main/CHANGELOG.rst).
 
 ## Licensing
 
