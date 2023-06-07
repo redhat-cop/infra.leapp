@@ -2,33 +2,20 @@
 - name: Collect updated facts
   ansible.builtin.setup:
 
-- name: Determine rhel_dest_version from rhel 6
+- name: Determine rhel_dest_major_version
   ansible.builtin.set_fact:
-    rhel_dest_version: "{{ rhel_6_upgrade_dest_version }}"
-  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version == '6'
+    rhel_dest_major_version: "{{ ((ansible_facts.ansible_local.pre_ripu.distribution_major_version | int) + 1) | string }}"
 
-- name: Determine rhel_dest_version from rhel 7
-  ansible.builtin.set_fact:
-    rhel_dest_version: "{{ rhel_7_upgrade_dest_version }}"
-  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version == '7'
-
-- name: Determine rhel_dest_version from rhel 8
-  ansible.builtin.set_fact:
-    rhel_dest_version: "{{ rhel_8_upgrade_dest_version }}"
-  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version == '8'
-
-- name: Validate current OS version
+- name: Validate current OS major version
   ansible.builtin.assert:
-    that: ansible_distribution_version == rhel_dest_version
-    fail_msg: Expected leapp destination OS version {{ rhel_dest_version }} but OS version is {{ ansible_distribution_version }}.
+    that: ansible_distribution_major_version == rhel_dest_major_version
+    fail_msg: Expected leapp destination OS major version {{ rhel_dest_major_version }} but OS major version is {{ ansible_distribution_major_version }}.
     success_msg: Current OS version is {{ ansible_distribution_version }}.
 
 - name: Validate running kernel matches OS version
-  vars:
-    expected_distribution_major_version: "{{ (ansible_facts.ansible_local.pre_ripu.distribution_major_version | int + 1) | string }}"
   ansible.builtin.assert:
-    that: "'el{{ expected_distribution_major_version }}' in ansible_kernel"
-    fail_msg: Kernel version {{ ansible_kernel }} does not match expected OS version el{{ expected_distribution_major_version }}.
+    that: "'el{{ rhel_dest_major_version }}' in ansible_kernel"
+    fail_msg: Kernel version {{ ansible_kernel }} does not match expected OS major version el{{ rhel_dest_major_version }}.
     success_msg: Current kernel version is {{ ansible_kernel }}.
 
 - name: Include leapp post upgrade validation
