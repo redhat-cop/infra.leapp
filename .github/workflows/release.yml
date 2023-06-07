@@ -11,16 +11,8 @@ on:
 jobs:
   pre-commit:
     uses: oamg/ansible-leapp/.github/workflows/pre-commit.yml@main
-    # with:
-    #   collection_namespace: infra
-    #   collection_name: leapp
-    #   collection_version: ${{ vars.GITHUB_REF }}
   sanity:
     uses: oamg/ansible-leapp/.github/workflows/ansible-test.yml@main
-    # with:
-    #   collection_namespace: infra
-    #   collection_name: leapp
-    #   collection_version: ${{ vars.GITHUB_REF }}
   prechecks:
     needs:
       - pre-commit
@@ -45,6 +37,9 @@ jobs:
 
       - name: Install Ansible
         run: pip install --upgrade ansible-core
+
+      - name: Update version in galaxy.yml
+        run: sed -i 's/version:/version:{{:dumb_space_issue:}}${{ github.ref }}/'; sed -i 's/{{:dumb_space_issue:}}/ /'
 
       - name: Build collection
         run: ansible-galaxy collection build -vvv
@@ -89,6 +84,9 @@ jobs:
 
       - name: Install Ansible
         run: pip install --upgrade ansible-core antsibull-changelog
+
+      - name: Update version in galaxy.yml
+        run: sed -i 's/version:/version:{{:dumb_space_issue:}}${{ github.ref }}/'; sed -i 's/{{:dumb_space_issue:}}/ /'
 
       - name: Run changelog
         run: antsibull-changelog release --verbose --version ${{ github.ref }}
