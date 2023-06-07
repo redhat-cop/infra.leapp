@@ -40,6 +40,8 @@
 - name: Remove leapp related packages
   ansible.builtin.package:
     name:
+      - leapp
+      - leapp-deps
       - leapp-deps-el{{ ansible_distribution_major_version }}
       - leapp-repository-deps-el{{ ansible_distribution_major_version }}
       - kernel-workaround
