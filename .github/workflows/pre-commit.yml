@@ -7,12 +7,32 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - name: Install Collections
-        run: |
-          sudo apt install software-properties-common
-          sudo apt-add-repository --yes --update ppa:ansible/ansible
-          sudo apt install ansible
-      - uses: pre-commit/action@v2.0.0
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Ansible
+        run: pip install --upgrade ansible-core
+
+      - name: Build collection
+        run: ansible-galaxy collection build -vvv
+        shell: bash
+        working-directory: ${{ vars.GITHUB_PATH }}
+
+      - name: Get version
+        run: echo "NUM=$(cat galaxy.yml | grep version | cut -d ':' -f 2 | awk '{print $1}')" >> $GITHUB_OUTPUT
+        id: vers
+
+      - name: Install collection
+        run: ansible-galaxy collection install ./infra-leapp-${{ steps.vers.outputs.NUM }}.tar.gz -p /home/runner/collections
+        shell: bash
+        working-directory: ${{ vars.GITHUB_PATH }}
+
+      - name: Get dependencies # This sucks lol
+        run: echo "---" >> ${{ github.run_id }}.yml; echo "collections:" >> ${{ github.run_id }}.yml; cat galaxy.yml | grep -A100 'dependencies:' | cut -d ':' -f 1 | cut -d '"' -f 2 | sed 's/dependencies//' | sed 's/\.\.\.//' | awk NF | sed 's/^/  - name:{{:dumb_space_issue:}}/' >> ${{ github.run_id }}.yml; sed -i 's/{{:dumb_space_issue:}}/ /g' ${{ github.run_id }}.yml; echo "..." >> ${{ github.run_id }}.yml
+        id: deps
+
+      - name: Install collection dependencies
+        run: ansible-galaxy collection install -r ${{ github.run_id }}.yml
+      - uses: pre-commit/action@v3.0.0
 ...
