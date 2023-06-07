@@ -14,7 +14,7 @@
       {{
       (migration_results_json.activities |
       selectattr('activity', 'match', 'upgrade') |
-      selectattr('target_os', 'match', 'Red Hat Enterprise Linux ' + rhel_dest_version) |
+      selectattr('target_os', 'match', 'Red Hat Enterprise Linux ' + ansible_distribution_major_version) |
       selectattr('env.LEAPP_CURRENT_PHASE', 'match', 'FirstBoot'))[0].success
       }}
 
