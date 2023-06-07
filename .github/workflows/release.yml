@@ -59,7 +59,7 @@ jobs:
         working-directory: ${{ vars.GITHUB_PATH }}
 
       - name: Publish to galaxy
-        run: ansible-galaxy collection publish --api-key=${{ secrets.galaxy_api_key }} ${{ steps.build.outputs.tar_file }}
+        run: ansible-galaxy collection publish --api-key=${{ secrets.GALAXY_INFRA_KEY }} ${{ steps.build.outputs.tar_file }}
 
       - name: Upload files to tag
         uses: svenstaro/upload-release-action@v2
@@ -83,7 +83,7 @@ jobs:
         run: pip install --upgrade ansible-core antsibull-changelog
 
       - name: Run changelog
-        run: antsibull-changelog release --verbose --version ${{ vars.GITHUB_REF }}
+        run: antsibull-changelog release --verbose --version ${{ github.ref }}
 
       - name: Create Pull Request
         id: prcreate
