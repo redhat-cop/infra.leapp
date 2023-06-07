@@ -39,7 +39,7 @@ jobs:
         run: pip install --upgrade ansible-core
 
       - name: Update version in galaxy.yml
-        run: sed -i 's/version:/version:{{:dumb_space_issue:}}${{ github.ref }}/'; sed -i 's/{{:dumb_space_issue:}}/ /'
+        run: sed -i 's/version:/version:{{:dumb_space_issue:}}${{ github.ref_name }}/' galaxy.yml; sed -i 's/{{:dumb_space_issue:}}/ /' galaxy.yml
 
       - name: Build collection
         run: ansible-galaxy collection build -vvv
@@ -86,7 +86,7 @@ jobs:
         run: pip install --upgrade ansible-core antsibull-changelog
 
       - name: Update version in galaxy.yml
-        run: sed -i 's/version:/version:{{:dumb_space_issue:}}${{ github.ref }}/'; sed -i 's/{{:dumb_space_issue:}}/ /'
+        run: sed -i 's/version:/version:{{:dumb_space_issue:}}${{ github.ref_name }}/' galaxy.yml; sed -i 's/{{:dumb_space_issue:}}/ /' galaxy.yml
 
       - name: Run changelog
         run: antsibull-changelog release --verbose --version ${{ github.ref }}
