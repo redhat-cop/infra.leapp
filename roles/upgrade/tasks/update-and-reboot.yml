@@ -10,7 +10,6 @@
 - name: Reboot when updates applied
   ansible.builtin.reboot:
     reboot_timeout: 7200
-  timeout: 7260
   when: updates_available.changed # noqa: no-handler
 
 ...
