@@ -59,5 +59,6 @@
     msg: "Host is starting OS upgrade now!"
     post_reboot_delay: 60
     reboot_timeout: 43200
+  timeout: 43260
 
 ...
