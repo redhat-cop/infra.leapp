@@ -45,6 +45,7 @@
       - leapp-deps-el{{ ansible_distribution_major_version }}
       - leapp-repository-deps-el{{ ansible_distribution_major_version }}
       - kernel-workaround
+      - python2-leapp
     state: absent
   register: result
 
