@@ -54,7 +54,7 @@
 
 - name: Unset subscription-manager release
   ansible.builtin.shell: subscription-manager release --unset
-  when: leapp_upgrade_type == 'disconnected'
+  when: leapp_upgrade_type == 'satellite'
 
 # TODO: Unset rhui release.
 
@@ -64,7 +64,7 @@
     activationkey: "{{ satellite_activation_key_post_leapp }}"
     org_id: "{{ satellite_organization }}"
     force_register: true
-  when: leapp_upgrade_type == 'disconnected'
+  when: leapp_upgrade_type == 'satellite'
 
 - name: Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml

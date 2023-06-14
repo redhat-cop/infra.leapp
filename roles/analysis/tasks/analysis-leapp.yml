@@ -6,7 +6,7 @@
     org_id: "{{ satellite_organization }}"
     force_register: true
   notify: Register to pre leapp activation key
-  when: leapp_upgrade_type == 'disconnected'
+  when: leapp_upgrade_type == 'satellite'
 
 - name: Install packages for preupgrade analysis on RHEL 7
   ansible.builtin.package:
@@ -22,7 +22,7 @@
   when: ansible_distribution_major_version|int == 8
 
 - name: Ensure leapp metadata is available for disconnected Leapp upgrades
-  when: leapp_upgrade_type == 'disconnected'
+  when: leapp_upgrade_type != 'cdn'
   block:
     - name: /etc/leapp/files directory exists
       ansible.builtin.file:

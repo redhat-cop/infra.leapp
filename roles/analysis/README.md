@@ -12,7 +12,7 @@ For disconnected environments including Satellite, package metadata files needs 
 
 | Name                    | Default value         | Description                                         |
 |-------------------------|-----------------------|-----------------------------------------------------|
-| leapp_upgrade_type      | "disconnected"        | Set to "connected" for hosts registered with Red Hat Subscription Manager and Red Hat CDN package repos. |
+| leapp_upgrade_type      | "satellite"           | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
 | leapp_metadata_url      |                       | See Requirements section above.                     |
 | leapp_answerfile        |                       | Optional multi-line string. If defined, this will be used as the contents of `/var/log/leapp/answerfile`. |
 | leapp_preupg_opts       |                       | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
