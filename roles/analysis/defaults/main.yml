@@ -43,7 +43,7 @@ leapp_upgrade_type: satellite
 
 leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
 
-# leapp_metadata_url only used for disconnected leapp upgrades including Satellite
+# leapp_metadata_url only used for non CDN leapp upgrades including Satellite
 # https://access.redhat.com/articles/3664871
 # Download and host the leapp-data file somewhere in the environment.
 # Note that there is a different leapp data file for RHEL 7.6 for IBM POWER 9 (little endian) or IBM Z (structure A) architectures.

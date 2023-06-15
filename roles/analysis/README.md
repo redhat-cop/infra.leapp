@@ -6,7 +6,7 @@ The role is considered minimally invasive and hopefully will fly under the radar
 
 ## Requirements
 
-For disconnected environments including Satellite, package metadata files needs to be provided. These files can be put on the host under the `/etc/leapp/files` directory before running the role. Alternatively, the `leapp_metadata_url` can be defined to tell the role where it can access the metadata tarball on the disconnected network. For more information, refer to the knowledge article [Leapp utility metadata in-place upgrades of RHEL for disconnected upgrades (including Satellite)](https://access.redhat.com/articles/3664871).
+For non-CDN environments including Satellite, package metadata files needs to be provided. These files can be put on the host under the `/etc/leapp/files` directory before running the role. Alternatively, the `leapp_metadata_url` can be defined to tell the role where it can access the metadata tarball. For more information, refer to the knowledge article [Leapp utility metadata in-place upgrades of RHEL for disconnected upgrades (including Satellite)](https://access.redhat.com/articles/3664871).
 
 ## Role variables
 

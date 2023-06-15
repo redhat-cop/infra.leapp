@@ -21,7 +21,7 @@
     state: latest
   when: ansible_distribution_major_version|int == 8
 
-- name: Ensure leapp metadata is available for disconnected Leapp upgrades
+- name: Ensure leapp metadata is available for non CDN Leapp upgrades
   when: leapp_upgrade_type != 'cdn'
   block:
     - name: /etc/leapp/files directory exists
