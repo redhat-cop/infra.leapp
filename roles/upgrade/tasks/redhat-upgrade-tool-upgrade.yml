@@ -18,7 +18,7 @@
     activationkey: "{{ satellite_activation_key_leapp }}"
     force_register: true
   register: sub_man_reg
-  when: leapp_upgrade_type == 'disconnected'
+  when: leapp_upgrade_type == 'satellite'
   failed_when: false
 
 - name: Gather package facts
@@ -37,7 +37,7 @@
   community.general.rhsm_repository:
     name: '*'
     state: disabled
-# TODO: when: leapp_upgrade_type needs to be improved.
+  when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
 
 # TODO: Add support for non-RHSM.
 
