@@ -6,7 +6,7 @@ The `upgrade` role is used to kick off the Leapp OS upgrade on the target host. 
 
 | Name                    | Default value         | Description                                         |
 |-------------------------|-----------------------|-----------------------------------------------------|
-| leapp_upgrade_type      | "disconnected"        | Set to "connected" for hosts registered with Red Hat Subscription Manager and Red Hat CDN package repos. |
+| leapp_upgrade_type      | "satellite"           | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
 | leapp_upgrade_opts      |                       | Optional string to define command line options to be passed to the `leapp` command when running the upgrade. |
 | selinux_mode            | same as before upgrade | Define this variable to the desired SELinux mode to be set after the OS upgrade, i.e., enforcing, permissive, or disabled. By default, the SELinux mode will be set to what was found during the pre-upgrade analysis. |
 | set_crypto_policies     | true                  | Boolean to define if system-wide cryptographic policies should be set after the OS upgrade |
