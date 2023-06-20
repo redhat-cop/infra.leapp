@@ -12,7 +12,10 @@
     --activationkey="{{ satellite_activation_key_post_leapp }}"
     --force
   register: sub_man_reg
-  when: leapp_upgrade_type == 'satellite'
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - satellite_organization is defined
+    - satellite_activation_key_post_leapp is defined
   failed_when: false
 
 - name: Include check-for-old-packages.yml

@@ -6,7 +6,10 @@
     org_id: "{{ satellite_organization }}"
     force_register: true
   notify: Register to pre leapp activation key
-  when: leapp_upgrade_type == 'satellite'
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - satellite_organization is defined
+    - satellite_activation_key_leapp is defined
 
 - name: Install packages for preupgrade analysis on RHEL 7
   ansible.builtin.package:
