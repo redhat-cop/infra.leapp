@@ -6,7 +6,10 @@
     --org="{{ satellite_organization }}"
     --activationkey="{{ satellite_activation_key_pre_leapp }}"
     --force
-  when: leapp_upgrade_type == 'satellite'
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - satellite_organization is defined
+    - satellite_activation_key_pre_leapp is defined
   notify: Register to pre leapp activation key RHEL 6
   register: sub_man_reg
   failed_when: false

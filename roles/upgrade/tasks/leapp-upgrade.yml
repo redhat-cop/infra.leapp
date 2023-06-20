@@ -14,7 +14,10 @@
     activationkey: "{{ satellite_activation_key_leapp }}"
     org_id: "{{ satellite_organization }}"
     force_register: true
-  when: leapp_upgrade_type == 'satellite'
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - satellite_organization is defined
+    - satellite_activation_key_leapp is defined
 
 - name: Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
