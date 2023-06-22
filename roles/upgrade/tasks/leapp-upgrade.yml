@@ -39,6 +39,7 @@
     msg: "Host is starting Leapp OS upgrade now!"
     post_reboot_delay: 60
     reboot_timeout: 43200
+    post_reboot_delay: "{{ post_reboot_delay }}"
   timeout: 43260
 
 # Ansible discovers /usr/bin/python on RHEL 7, then on RHEL 8 it is no longer available.
@@ -66,6 +67,7 @@
     - name: Reboot to pickup grub update
       ansible.builtin.reboot:
         reboot_timeout: 7200
+        post_reboot_delay: "{{ post_reboot_delay }}"
       timeout: 7260
 
 ...

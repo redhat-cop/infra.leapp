@@ -60,7 +60,7 @@
 - name: Reboot to continue OS upgrade
   ansible.builtin.reboot:
     msg: "Host is starting OS upgrade now!"
-    post_reboot_delay: 60
+    post_reboot_delay: "{{ post_reboot_delay }}"
     reboot_timeout: 43200
 
 ...

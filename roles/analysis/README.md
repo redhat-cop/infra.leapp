@@ -16,6 +16,7 @@ For non-CDN environments including Satellite, package metadata files needs to be
 | leapp_metadata_url      |                       | See Requirements section above.                     |
 | leapp_answerfile        |                       | Optional multi-line string. If defined, this will be used as the contents of `/var/log/leapp/answerfile`. |
 | leapp_preupg_opts       |                       | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
+| post_reboot_delay       | 120                   | Optional integer to pass to the reboot post_reboot_delay option. |
 
 ## Example playbook
 

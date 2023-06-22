@@ -11,6 +11,7 @@ The `upgrade` role is used to kick off the Leapp OS upgrade on the target host. 
 | selinux_mode            | same as before upgrade | Define this variable to the desired SELinux mode to be set after the OS upgrade, i.e., enforcing, permissive, or disabled. By default, the SELinux mode will be set to what was found during the pre-upgrade analysis. |
 | set_crypto_policies     | true                  | Boolean to define if system-wide cryptographic policies should be set after the OS upgrade |
 | crypto_policy           | "DEFAULT"             | System-wide cryptographic to set, e.g., "FUTURE", "DEFAULT:SHA1", etc. Refer to the crypto-policies (7) man page for more information. |
+| post_reboot_delay       | 120                   | Optional integer to pass to the reboot post_reboot_delay option. |
 
 ## Example playbook
 
