@@ -55,5 +55,4 @@
     reboot_timeout: 7200
     post_reboot_delay: "{{ post_reboot_delay }}"
 
-
 ...
