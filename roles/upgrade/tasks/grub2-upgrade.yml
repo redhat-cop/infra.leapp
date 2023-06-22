@@ -53,5 +53,6 @@
 - name: Reboot to start using grub2
   ansible.builtin.reboot:
     reboot_timeout: 7200
+    post_reboot_delay: "{{ post_reboot_delay }}"
 
 ...

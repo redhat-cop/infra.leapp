@@ -59,4 +59,6 @@ leapp_repos_enabled: []
 # leapp_repos_enabled:
 #   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
 
+post_reboot_delay: 120
+
 ...

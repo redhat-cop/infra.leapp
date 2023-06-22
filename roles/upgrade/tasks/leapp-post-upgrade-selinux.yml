@@ -16,6 +16,7 @@
 - name: Reboot when required for SELinux change
   ansible.builtin.reboot:
     reboot_timeout: 7200
+    post_reboot_delay: "{{ post_reboot_delay }}"
   timeout: 7260
   when: selinux_results.reboot_required
 

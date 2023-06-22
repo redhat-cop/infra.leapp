@@ -43,4 +43,6 @@ update_grub_to_grub_2: true
 # /boot is on.
 # grub_boot_device: /dev/sda
 
+post_reboot_delay: 120
+
 ...
