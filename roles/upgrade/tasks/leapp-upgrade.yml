@@ -37,7 +37,6 @@
 - name: Reboot to continue Leapp OS upgrade
   ansible.builtin.reboot:
     msg: "Host is starting Leapp OS upgrade now!"
-    post_reboot_delay: 60
     reboot_timeout: 43200
     post_reboot_delay: "{{ post_reboot_delay }}"
   timeout: 43260
