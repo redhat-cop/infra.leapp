@@ -40,11 +40,11 @@
 
 - name: Display results of search for old packages and packages not versioned by rhel release
   ansible.builtin.debug:
-    msg: "{{ unsigned_packages_post.stdout_lines }}"
+    msg: "{{ unsigned_packages_post }}"
 
 - name: Search for packages from previous os release, packages not versioned by rhel release and all dependent packages
   ansible.builtin.package:
-    name: "{{ unsigned_packages_post.stdout_lines }}"
+    name: "{{ unsigned_packages_post }}"
     state: absent
   check_mode: true
   register: search_packages_result
