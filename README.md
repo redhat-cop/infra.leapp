@@ -1,8 +1,8 @@
 # Ansible Leapp Collection
 
-[![CI](https://github.com/oamg/ansible-leapp/workflows/CI/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![Lint](https://github.com/oamg/ansible-leapp/workflows/Yaml%20and%20Ansible%20Lint/badge.svg?event=push)](https://github.com/oamg/ansible-leapp/actions) [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7438/badge)](https://bestpractices.coreinfrastructure.org/projects/7438)
+[![CI](https://github.com/redhat-cop/infra.leapp/workflows/CI/badge.svg?event=push)](https://github.com/redhat-cop/infra.leapp/actions) [![Lint](https://github.com/redhat-cop/infra.leapp/workflows/Yaml%20and%20Ansible%20Lint/badge.svg?event=push)](https://github.com/redhat-cop/infra.leapp/actions) [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7438/badge)](https://bestpractices.coreinfrastructure.org/projects/7438)
 
-<!-- [![Codecov](https://img.shields.io/codecov/c/github/oamg/ansible-leapp)](https://codecov.io/gh/oamg/ansible-leapp) -->
+<!-- [![Codecov](https://img.shields.io/codecov/c/github/redhat-cop/infra.leapp)](https://codecov.io/gh/redhat-cop/infra.leapp) -->
 
 ## Overview
 
@@ -57,7 +57,7 @@ We are a fledgling community and welcome any new contributors. Get started by op
 
 ## Reporting issues
 
-Please open a [new issue](https://github.com/oamg/ansible-leapp/issues/new/choose) for any bugs or security vulnerabilities you may encounter. We also invite you to open an issue if you have ideas on how we can improve the solution or want to make a suggestion for enhancment.
+Please open a [new issue](https://github.com/redhat-cop/infra.leapp/issues/new/choose) for any bugs or security vulnerabilities you may encounter. We also invite you to open an issue if you have ideas on how we can improve the solution or want to make a suggestion for enhancment.
 
 ## More information
 
@@ -65,7 +65,7 @@ This Ansible collection is just one building block of our larger initiative to m
 
 ## Release notes
 
-See the [changelog](https://github.com/oamg/ansible-leapp/tree/main/CHANGELOG.rst).
+See the [changelog](https://github.com/redhat-cop/infra.leapp/tree/main/CHANGELOG.rst).
 
 ## Licensing
 
