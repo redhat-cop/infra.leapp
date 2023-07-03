@@ -10,9 +10,9 @@ on:
 
 jobs:
   pre-commit:
-    uses: oamg/ansible-leapp/.github/workflows/pre-commit.yml@main
+    uses: redhat-cop/infra.leapp/.github/workflows/pre-commit.yml@main
   sanity:
-    uses: oamg/ansible-leapp/.github/workflows/ansible-test.yml@main
+    uses: redhat-cop/infra.leapp/.github/workflows/ansible-test.yml@main
   prechecks:
     needs:
       - pre-commit
