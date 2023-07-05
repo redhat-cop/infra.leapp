@@ -34,7 +34,7 @@ crypto_policy: DEFAULT
 # crypto_policy: DEFAULT:SHA1
 
 # Whether or not to update from legacy grub to grub2 in post-upgrade steps from RHEL 6 -> 7.
-update_grub_to_grub_2: true
+update_grub_to_grub_2: false
 
 # Used by grub to grub2 upgrade in RHEL 6 to 7 post upgrade, and RHEL 7 to 8 post upgrade.
 # For grub to grub2 upgrade, if grub_boot_device is not defined, the parent device of /boot
