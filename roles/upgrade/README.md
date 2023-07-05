@@ -12,6 +12,7 @@ The `upgrade` role is used to kick off the Leapp OS upgrade on the target host. 
 | set_crypto_policies     | true                  | Boolean to define if system-wide cryptographic policies should be set after the OS upgrade |
 | crypto_policy           | "DEFAULT"             | System-wide cryptographic to set, e.g., "FUTURE", "DEFAULT:SHA1", etc. Refer to the crypto-policies (7) man page for more information. |
 | post_reboot_delay       | 120                   | Optional integer to pass to the reboot post_reboot_delay option. |
+| update_grub_to_grub_2   | false                 | Boolean to control whether grub gets upgraded to grub 2 in post RHEL 6 to 7 upgrade. |
 
 ## Example playbook
 
