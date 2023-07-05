@@ -1,6 +1,6 @@
 # Analysis
 
-The `analysis` role is used to create the Leapp pre-upgrade report on the target hosts. This is used during planning phase for enterprise IPU plans, as well as during each systems IPU journey.
+The `analysis` role is used to create the Leapp pre-upgrade report on the target hosts. This is used for IPU planning, as well as during execution of the IPU `upgrade` role.
 This role also saves a copy of the current ansible facts under the `/etc/ansible/facts.d` directory for validation after upgrade.
 
 The role is considered minimally invasive and as such should not complicate compliance with enterprise change management policy.  Installation of the software is isolated to dedicated RPMS.
