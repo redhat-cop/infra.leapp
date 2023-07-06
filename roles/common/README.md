@@ -36,6 +36,7 @@ Logs will not survive a rollback. They need to be removed off the system prior t
 
 This is a common role included by the `analysis` and `upgrade` roles. It does not need to be explicitly included in your playbook.
 
+
 # Authors
 Bob Mader, Scott Vick, Mike Savage, Jeffrey Cutter, David Danielsson
 
