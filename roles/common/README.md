@@ -2,11 +2,11 @@
 
 The `common` role is used to manage local log files that may help with debugging playbooks that include the `analysis` or `upgrade` roles.
 
-This role also implements a mutex locking mechanism that protects against accidentally running simultaneous playbook jobs on the same host.  
+This role also implements a mutex locking mechanism that protects against accidentally running simultaneous playbook jobs on the same host.
 
 Additionally this role provides common variables used by both `analysis` and `upgrade`.
 
-# Requirements 
+# Requirements
 
 Define job_name in the import as seen below
 
@@ -17,7 +17,7 @@ Define job_name in the import as seen below
 | log_directory | DirPath | Yes | "/var/log/ripu" | Directory under which local log files will be written. This directory will be created is it is not already present. |
 | log_file | FilePath | Yes | "{{ log_directory }}/ripu.log" | Local log filename. When a playbook job finishes, a timestamp suffix is appended to the end of the specified filename. |
 
- # Logging 
+ # Logging
 
 Logs will accumulate in the directory referenced by logfile, with a suffixed datestamp upon completion.
 
