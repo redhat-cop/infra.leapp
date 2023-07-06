@@ -65,6 +65,7 @@ jobs:
           # - stable-2.12
           - stable-2.13
           - stable-2.14
+          - stable-2.15
           # - devel
         # - milestone
     # Ansible-test on various stable branches does not yet work well with cgroups v2.
@@ -126,6 +127,7 @@ jobs:
           # - stable-2.12
           - stable-2.13
           - stable-2.14
+          - stable-2.15
           - devel
         # - milestone
 
@@ -182,6 +184,7 @@ jobs:
           # - stable-2.12
           - stable-2.13
           - stable-2.14
+          - stable-2.15
           - devel
         # - milestone
         python:
@@ -208,6 +211,8 @@ jobs:
           - ansible: stable-2.13
             python: '2.6'
           - ansible: stable-2.14
+            python: '2.6'
+          - ansible: stable-2.15
             python: '2.6'
           - ansible: devel
             python: '2.6'
