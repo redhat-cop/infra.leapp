@@ -42,6 +42,10 @@
         remote_src: true
         owner: root
         group: root
+      register: leapp_metadata_installed
+      until: leapp_metadata_installed is not failed
+      retries: 10
+      delay: 10
 
 - name: Ensure leapp log directory exists
   ansible.builtin.file:
