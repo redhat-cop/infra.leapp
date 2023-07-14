@@ -8,17 +8,15 @@ This role also saves a copy of the current ansible facts under the `/etc/ansible
 
 ## Requirements
 
-Metadata is required for leap preupgrade analysis to run.  When a system uses CDN, this is provided automatically.  For systems not on CDN, package metadata files needs to be provided by URL in leapp_metadata_url. Once obtained during IPU, file is unpacked on IPU host under `/etc/leapp/files` directory.
 
-In an upcomoing release, the metadata will be included as part of the RPM install of leapp RPMs.
-
-For more information, refer to the knowledge article [Leapp utility metadata in-place upgrades of RHEL for disconnected upgrades (including Satellite)](https://access.redhat.com/articles/3664871).
+Metadata is required for the Leapp pre-upgrade analysis to run.  When a system uses CDN, this is provided automatically.
+For systems not using CDN, metadata files will be retrieved from the URL defined by the `leapp_metadata_url` variable.
 
 ## Commonly modified variables
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| leapp_upgrade_type    | String  | satellite | satellite, cdn or rhui |
+| leapp_upgrade_type    | String  | "satellite" | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
 | leapp_preupg_opt | String | --no-rhsm when leapp_upgrade_type is connected | Upstream repository usage - whether to use RHSM |
 | leapp_metadata_url      | String |  | URL to the leapp metadata, usually over https |
 | leapp_enable_repos_args | String |  | --enablerepo (leapp_repos_enabled) or blank |
@@ -43,18 +41,13 @@ For more information, refer to the knowledge article [Leapp utility metadata in-
 | analysis_packages_el7 | List | leapp-upgrade             | RPMS that need to be installed for IPU to RHEL7 |
 | analysis_repos_el7    | List | rhel-7-server-extras-rpms | Repo to be enabled for IPU to RHEL7 |
 | analysis_packages_el8 | List | leapp-upgrade | RPMS that need to be installed for IPU to RHEL8 |
-| analysis_repos_el8 | List | rhel-7-server-extras-rpms | Repo to be enabled for IPU to RHEL7             |
+| analysis_repos_el8 | List | rhel-7-server-extras-rpms | Repo to be enabled for IPU to RHEL7 |
 | leapp_answerfile | TXT file | /var/log/leapp/answerfile | Optional - Source for Alternate AnswerFile needed during leapp process while upgrading  |
 | leapp_preupg_opts | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
 
 ## Example playbook
 
 See [`analysis.yml`](../../playbooks/analysis.yml)
-```
-- name: Include task for leapp preupgrade analysis
-  ansible.builtin.include_tasks: analysis-leapp.yml
-  when: ansible_distribution_major_version|int >= 7
-```
 
 ## Authors
 author: Bob Mader, Mike Savage, Jeffrey Cutter, David Danielsson, Scott Vick
