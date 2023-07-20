@@ -20,7 +20,7 @@ This role also saves a copy of the current ansible facts under the `/etc/ansible
 ## Variables for Satellite based upgrades
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| satellite_organization  | String | Example | Organization used in Satellite definition |
+| satellite_organization  | String |  | Organization used in Satellite definition |
 | satellite_activation_key_leapp | String |  | Key used to identify activation key |
 | satellite_activation_key_pre_leapp | String |  | initial state of subscriptions and svc level |
 | satellite_activation_key_leapp     | String |  | Post-IPU state of subscriptions and svc level |
