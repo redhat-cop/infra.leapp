@@ -18,7 +18,6 @@ For systems not using CDN, metadata files will be retrieved from the URL defined
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | leapp_upgrade_type    | String  | "satellite" | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
 | leapp_preupg_opt | String | --no-rhsm when leapp_upgrade_type is connected | Upstream repository usage - whether to use RHSM |
-| leapp_metadata_url      | String |  | URL to the leapp metadata, usually over https |
 | leapp_enable_repos_args | String |  | --enablerepo (leapp_repos_enabled) or blank |
 
 
