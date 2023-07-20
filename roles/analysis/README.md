@@ -8,10 +8,6 @@ This role also saves a copy of the current ansible facts under the `/etc/ansible
 
 ## Requirements
 
-
-Metadata is required for the Leapp pre-upgrade analysis to run.  When a system uses CDN, this is provided automatically.
-For systems not using CDN, metadata files will be retrieved from the URL defined by the `leapp_metadata_url` variable.
-
 ## Commonly modified variables
 
 | Name                  | Type | Default value           | Description                                     |
