@@ -16,8 +16,8 @@ Define job_name in the import as seen below
 | Name                  | Type | Optional | Default value | Description |
 |-----------------------|------|----------|---------------|-------------------------------------------------|
 | job_name | String | No | None | The string describes the job run |
-| log_directory | DirPath | Yes | "/var/log/ripu" | Directory under which local log files will be written. This directory will be created is it is not already present. |
-| log_file | FilePath | Yes | "{{ log_directory }}/ripu.log" | Local log filename. When a playbook job finishes, a timestamp suffix is appended to the end of the specified filename. |
+| log_directory | DirPath | Yes | "/var/log/ripu" | Directory under which local log files will be written. This directory will be created is it is not already present |
+| log_file | FilePath | Yes | "{{ log_directory }}/ripu.log" | Local log filename. When a playbook job finishes, a timestamp suffix is appended to the end of the specified filename |
 
  # Logging
 
