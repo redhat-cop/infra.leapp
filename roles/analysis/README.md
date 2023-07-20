@@ -15,7 +15,6 @@ This role also saves a copy of the current ansible facts under the `/etc/ansible
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | leapp_upgrade_type    | String  | "satellite" | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
 | leapp_preupg_opt | String |  | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
-| leapp_enable_repos_args | String |  | --enablerepo (leapp_repos_enabled) or blank |
 
 
 ## Variables for Satellite based upgrades
