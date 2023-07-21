@@ -20,4 +20,3 @@ See [`analysis.yml`](../../playbooks/analysis.yml).
 ## License
 
 MIT
-
