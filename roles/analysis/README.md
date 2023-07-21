@@ -1,42 +1,31 @@
 # Analysis
 
-The `analysis` role is used to create the Leapp pre-upgrade report on the target hosts.
+The `analysis` role is used to create the Leapp pre-upgrade report on the target hosts. It also saves a copy of the current ansible facts under the `/etc/ansible/facts.d` directory for validation after upgrade.
 
-This is used in IPU planning to identify unhandled cases, that would result in process failure.
+The role is considered minimally invasive and hopefully will fly under the radar of your enterprise change management policy. That said, it does install the RHEL rpm packages that provide the Leapp framework if they are not already present. While application impact is very low, it may require a change ticket depending on how pedantic your policies are.
 
-This role also saves a copy of the current ansible facts under the `/etc/ansible/facts.d` directory for validation after upgrade.
-
-## Satellite activation keys
-
-Satellite activation keys provide content for dnf/yum to solve dependencies.
-During analysis, the both current and final packages needs to be visible.  
-The current key is retained and reapplied after analysis is complete.
-
-- `satellite_activation_key_pre_leapp` is used to hold the key for the starting content view
-- `satellite_activation_key_leapp` provides both starting and final OS version content.
-
-## Requirements
-
-## Commonly modified variables
+## Role variables
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | leapp_upgrade_type    | String  | "satellite" | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
-| leapp_preupg_opt  | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade.|
 
-## Variables for Satellite based upgrades
+## Satellite variables
+
+Activation keys provide a method to identify content views available from Red Hat Satellite. To do in-place upgrades using Satellite, a content view including both the current RHEL version and the next version must be created. Use these variables to specify the activation keys for the required content views.
+
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | satellite_organization  | String   |  | Organization used in Satellite definition |
-| satellite_activation_key_leapp     | String |  | Satellite activation key used during analysis |
-| satellite_activation_key_pre_leapp | String |  | Satellite key for use after analysis |
+| satellite_activation_key_pre_leapp | String |  | Activation key for the current RHEL version content view |
+| satellite_activation_key_leapp     | String |  | Activation key for the content view including both the current RHEL version and the next version |
 | leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
 
 ## Optional variables
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| leapp_answerfile | Multi-line String |  | If defined, this writen to `/var/log/leapp/answerfile` before generating the pre-upgrade report. |
+| leapp_answerfile | Multi-line String |  | If defined, this s written to `/var/log/leapp/answerfile` before generating the pre-upgrade report. |
 | leapp_preupg_opts | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
 | post_reboot_delay | Int | 120 | Optional integer to pass to the reboot post_reboot_delay option. |
 
@@ -45,9 +34,9 @@ The current key is retained and reapplied after analysis is complete.
 See [`analysis.yml`](../../playbooks/analysis.yml)
 
 ## Authors
-author: Bob Mader, Mike Savage, Jeffrey Cutter, David Danielsson, Scott Vick
+
+Bob Mader, Mike Savage, Jeffrey Cutter, David Danielsson, Scott Vick
 
 ## License
 
 MIT
-
