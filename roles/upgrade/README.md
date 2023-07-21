@@ -21,12 +21,6 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 
 See [`upgrade.yml`](../../playbooks/upgrade.yml).
 
-```ansible
-- name: Perform OS upgrade
-  ansible.builtin.import_role:
-    name: infra.leapp.upgrade
-```
-
 ## Authors:
 Bob Mader, Mike Savage, Jeffrey Cutter, David Danielsson, Scott Vick
 
