@@ -33,4 +33,3 @@ Bob Mader, Scott Vick, Mike Savage, Jeffrey Cutter, David Danielsson
 # License
 
 MIT
-
