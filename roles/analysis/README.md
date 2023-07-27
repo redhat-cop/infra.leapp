@@ -4,6 +4,8 @@ The `analysis` role is used to create the Leapp pre-upgrade report on the target
 
 The role is considered minimally invasive and hopefully will fly under the radar of your enterprise change management policy. That said, it does install the RHEL rpm packages that provide the Leapp framework if they are not already present. While application impact is very low, it may require a change ticket depending on how pedantic your policies are.
 
+This role will not fail if there are inhibitors found, it will throw a warning. However, there is a fact available `upgrade_inhibited` which indicates whether the upgrade will be inhibited or not and you can choose to fail your own playbook using this variable.
+
 ## Role variables
 
 | Name                  | Type | Default value           | Description                                     |
