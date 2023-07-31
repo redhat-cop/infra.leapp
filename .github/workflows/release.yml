@@ -62,6 +62,19 @@ jobs:
       - name: Publish to galaxy
         run: ansible-galaxy collection publish --api-key=${{ secrets.GALAXY_INFRA_KEY }} ${{ steps.build.outputs.tar_file }}
 
+      - name: Publish to Automation Hub
+        run: |
+          cat << EOF > ansible.cfg
+          [galaxy]
+          server_list = rh_automation_hub
+          [galaxy_server.rh_automation_hub]
+          url=https://cloud.redhat.com/api/automation-hub/
+          auth_url=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+          token=${{ secrets.CONSOLE_API_KEY }}
+          EOF
+          ansible-galaxy collection publish ${{ steps.build.outputs.tar_file }}
+          rm ansible.cfg
+
       - name: Upload files to tag
         uses: svenstaro/upload-release-action@v2
         with:
