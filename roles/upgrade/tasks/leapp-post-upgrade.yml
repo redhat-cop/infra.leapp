@@ -55,7 +55,7 @@
 
 - name: Unset subscription-manager release
   ansible.builtin.shell: subscription-manager release --unset
-  when: leapp_upgrade_type == 'satellite'
+  when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
 
 # TODO: Unset rhui release.
 
