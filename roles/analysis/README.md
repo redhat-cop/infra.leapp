@@ -4,23 +4,40 @@ The `analysis` role is used to create the Leapp pre-upgrade report on the target
 
 The role is considered minimally invasive and hopefully will fly under the radar of your enterprise change management policy. That said, it does install the RHEL rpm packages that provide the Leapp framework if they are not already present. While application impact is very low, it may require a change ticket depending on how pedantic your policies are.
 
-## Requirements
-
-For non-CDN environments including Satellite, package metadata files needs to be provided. These files can be put on the host under the `/etc/leapp/files` directory before running the role. Alternatively, the `leapp_metadata_url` can be defined to tell the role where it can access the metadata tarball. For more information, refer to the knowledge article [Leapp utility metadata in-place upgrades of RHEL for disconnected upgrades (including Satellite)](https://access.redhat.com/articles/3664871).
+This role will not fail if there are inhibitors found, it will throw a warning. However, there is a fact available `upgrade_inhibited` which indicates whether the upgrade will be inhibited or not and you can choose to fail your own playbook using this variable.
 
 ## Role variables
 
-| Name                    | Default value         | Description                                         |
-|-------------------------|-----------------------|-----------------------------------------------------|
-| leapp_upgrade_type      | "satellite"           | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
-| leapp_metadata_url      |                       | See Requirements section above.                     |
-| leapp_answerfile        |                       | Optional multi-line string. If defined, this will be used as the contents of `/var/log/leapp/answerfile`. |
-| leapp_preupg_opts       |                       | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
-| post_reboot_delay       | 120                   | Optional integer to pass to the reboot post_reboot_delay option. |
+| Name                  | Type | Default value           | Description                                     |
+|-----------------------|------|-------------------------|-------------------------------------------------|
+| leapp_upgrade_type    | String  | "satellite" | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
+
+## Satellite variables
+
+Activation keys provide a method to identify content views available from Red Hat Satellite. To do in-place upgrades using Satellite, a content view including both the current RHEL version and the next version must be created. Use these variables to specify the activation keys for the required content views.
+
+| Name                  | Type | Default value           | Description                                     |
+|-----------------------|------|-------------------------|-------------------------------------------------|
+| satellite_organization  | String   |  | Organization used in Satellite definition |
+| satellite_activation_key_pre_leapp | String |  | Activation key for the current RHEL version content view |
+| satellite_activation_key_leapp     | String |  | Activation key for the content view including both the current RHEL version and the next version |
+| leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
+
+## Optional variables
+
+| Name                  | Type | Default value           | Description                                     |
+|-----------------------|------|-------------------------|-------------------------------------------------|
+| leapp_answerfile | Multi-line String |  | If defined, this s written to `/var/log/leapp/answerfile` before generating the pre-upgrade report. |
+| leapp_preupg_opts | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
+| post_reboot_delay | Int | 120 | Optional integer to pass to the reboot post_reboot_delay option. |
 
 ## Example playbook
 
-See [`analysis.yml`](../../playbooks/analysis.yml).
+See [`analysis.yml`](../../playbooks/analysis.yml)
+
+## Authors
+
+Bob Mader, Mike Savage, Jeffrey Cutter, David Danielsson, Scott Vick
 
 ## License
 

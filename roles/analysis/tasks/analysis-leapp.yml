@@ -24,25 +24,6 @@
     state: latest
   when: ansible_distribution_major_version|int == 8
 
-- name: Ensure leapp metadata is available for non CDN Leapp upgrades
-  when: leapp_upgrade_type != 'cdn'
-  block:
-    - name: /etc/leapp/files directory exists
-      ansible.builtin.file:
-        path: /etc/leapp/files
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-
-    - name: Leapp utility metadata is installed
-      ansible.builtin.unarchive:
-        src: "{{ leapp_metadata_url }}"
-        dest: /etc/leapp/files
-        remote_src: true
-        owner: root
-        group: root
-
 - name: Ensure leapp log directory exists
   ansible.builtin.file:
     path: /var/log/leapp
