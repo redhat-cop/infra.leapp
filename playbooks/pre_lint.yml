@@ -1,0 +1,6 @@
+---
+- name: Report size of boot
+  hosts: all
+  tasks:
+  - debug:
+      msg: "{{ (ansible_mounts | selectattr( 'mount', 'eq', '/boot') | list| first).size_total }}"
