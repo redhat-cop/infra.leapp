@@ -113,7 +113,7 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          base: devel
+          base: main
           branch: changelog-patches
           delete-branch: true
           title: '[RELEASE] Update changelog ${{ github.ref_name }}'
