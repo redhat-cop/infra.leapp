@@ -41,6 +41,7 @@
     name: '*'
     state: disabled
   when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn' or leapp_upgrade_type == 'rhui'
+  failed_when: false
 
 # TODO: Add support for non-RHSM.
 
