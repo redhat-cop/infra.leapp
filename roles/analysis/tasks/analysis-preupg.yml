@@ -14,11 +14,26 @@
   register: sub_man_reg
   failed_when: false
 
+- name: Enable requisite RHUI repos
+  ansible.builtin.shell: |
+    set -o pipefail
+    yum-config-manager --enable {{ item }}
+  loop: "{{ analysis_repos_el6 }}"
+  when: leapp_upgrade_type == 'rhui'
+  failed_when: false
+
 - name: Preupgrade Assistant and Red Hat Upgrade Tool packages are latest
   ansible.builtin.package:
     name: "{{ analysis_packages_el6 }}"
     enablerepo: "{{ analysis_repos_el6 }}"
     state: latest
+  when: leapp_upgrade_type != 'rhui'
+
+- name: Preupgrade Assistant and Red Hat Upgrade Tool packages are latest - RHUI
+  ansible.builtin.package:
+    name: "{{ analysis_packages_el6 }}"
+    state: latest
+  when: leapp_upgrade_type == 'rhui'
 
 - name: Lynx is installed for text report
   ansible.builtin.package:

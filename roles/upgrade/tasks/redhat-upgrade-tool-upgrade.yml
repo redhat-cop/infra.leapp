@@ -36,11 +36,12 @@
 - name: Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
-- name: Disable RHEL 6 RHSM repos
+- name: Disable RHEL 6 RHSM or RHUI repos
   community.general.rhsm_repository:
     name: '*'
     state: disabled
-  when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
+  when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn' or leapp_upgrade_type == 'rhui'
+  failed_when: false
 
 # TODO: Add support for non-RHSM.
 
