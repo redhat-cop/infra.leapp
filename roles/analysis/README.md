@@ -30,6 +30,7 @@ Activation keys provide a method to identify content views available from Red Ha
 | leapp_answerfile | Multi-line String |  | If defined, this s written to `/var/log/leapp/answerfile` before generating the pre-upgrade report. |
 | leapp_preupg_opts | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
 | post_reboot_delay | Int | 120 | Optional integer to pass to the reboot post_reboot_delay option. |
+| os_path | String | Option string to override the $PATH variable used on the target node |
 
 ## Example playbook
 
