@@ -40,10 +40,13 @@
         grub_boot_device: "{{ boot_device_dict.device | regex_replace('[1-9]$', '') }}"
 
 - name: Run grub2-install
-  ansible.builtin.shell: grub2-install {{ grub_boot_device }}
+  ansible.builtin.shell: |
+    export PATH={{ os_release }}
+    grub2-install {{ grub_boot_device }}
 
 - name: Run grub2-mkconfig
   ansible.builtin.shell: |
+    export PATH={{ os_release }}
     set -o pipefail
     grub2-mkconfig -o /boot/grub2/grub.cfg
     grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg

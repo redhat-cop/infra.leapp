@@ -1,7 +1,9 @@
 ---
 # /etc/dnf/dnf.conf is an ini file and could be parsed to check if exclude has value and run this conditionally.
 - name: Clean dnf exclude list
-  ansible.builtin.shell: dnf config-manager --save --setopt exclude=''
+  ansible.builtin.shell: >
+    export PATH={{ os_release }};
+    dnf config-manager --save --setopt exclude=''
 
 # leapp 7 to 8 documentation cleans up old kernels
 - name: Block for RHEL 7 kernel cleanup
@@ -17,6 +19,7 @@
 
     - name: Remove weak modules from old kernels
       ansible.builtin.shell: |
+        export PATH={{ os_release }}
         set -o pipefail
         [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item.path | basename }}
       loop: "{{ old_kernels.files }}"
@@ -24,6 +27,7 @@
 
     - name: Remove the old kernels from the boot loader entry
       ansible.builtin.shell: |
+        export PATH={{ os_release }}
         set -o pipefail
         /bin/kernel-install remove {{ item.path | basename }} {{ item.path }}/vmlinuz
       loop: "{{ old_kernels.files }}"
@@ -54,7 +58,9 @@
     var: result
 
 - name: Unset subscription-manager release
-  ansible.builtin.shell: subscription-manager release --unset
+  ansible.builtin.shell: >
+    export PATH={{ os_release }};
+    subscription-manager release --unset
   when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
 
 # TODO: Unset rhui release.
@@ -78,6 +84,7 @@
 # Only found in RHEL 7 to 8 documentation
 - name:  Old kernels have been removed from the bootloader entry for RHEL 7 to 8
   ansible.builtin.shell: |
+    export PATH={{ os_release }}
     grubby --info=ALL | grep "\.el7" || echo "Old kernels are not present in the bootloader."
   register: grubby_check
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
