@@ -24,7 +24,7 @@
 
 - name: Start Leapp OS upgrade
   ansible.builtin.shell: >
-    export PATH={{ os_release }};
+    export PATH={{ os_path }};
     set -o pipefail;
     leapp upgrade
     {{ leapp_upgrade_opts }}
@@ -63,7 +63,7 @@
   block:
     - name: Run grub2-install
       ansible.builtin.shell: >
-        export PATH={{ os_release }};
+        export PATH={{ os_path }};
         grub2-install {{ grub_boot_device }}
 
     - name: Reboot to pickup grub update

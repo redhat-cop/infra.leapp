@@ -41,12 +41,12 @@
 
 - name: Run grub2-install
   ansible.builtin.shell: |
-    export PATH={{ os_release }}
+    export PATH={{ os_path }}
     grub2-install {{ grub_boot_device }}
 
 - name: Run grub2-mkconfig
   ansible.builtin.shell: |
-    export PATH={{ os_release }}
+    export PATH={{ os_path }}
     set -o pipefail
     grub2-mkconfig -o /boot/grub2/grub.cfg
     grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg

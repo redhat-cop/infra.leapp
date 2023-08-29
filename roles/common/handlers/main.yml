@@ -22,7 +22,7 @@
 
 - name: Rename log file
   ansible.builtin.shell: |
-    export PATH={{ os_release }}
+    export PATH={{ os_path }}
     mv {{ log_file }} {{ log_file }}-{{ ansible_date_time.iso8601_basic_short }}
   listen: Archive log file
 ...
