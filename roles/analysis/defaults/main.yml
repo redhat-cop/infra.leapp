@@ -55,4 +55,5 @@ leapp_repos_enabled: []
 
 post_reboot_delay: 120
 
+os_path: $PATH
 ...

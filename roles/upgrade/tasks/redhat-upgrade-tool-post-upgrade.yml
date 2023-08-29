@@ -7,6 +7,7 @@
 
 - name: "Register to post upgrade activation key"
   ansible.builtin.shell: >
+    export PATH={{ os_path }};
     subscription-manager register
     --org="{{ satellite_organization }}"
     --activationkey="{{ satellite_activation_key_post_leapp }}"

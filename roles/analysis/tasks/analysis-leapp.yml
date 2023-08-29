@@ -43,6 +43,7 @@
 
 - name: Leapp preupgrade report
   ansible.builtin.shell: >
+    export PATH={{ os_path }}
     set -o pipefail;
     leapp preupgrade
     {{ leapp_preupg_opts }}

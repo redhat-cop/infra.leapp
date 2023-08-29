@@ -3,6 +3,7 @@
 - name: Search for old packages and packages not versioned by rhel release
   ansible.builtin.shell:
     cmd: >-
+      export PATH={{ os_release }};
       set -o pipefail;
       rpm -qa |
       grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |

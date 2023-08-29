@@ -2,6 +2,7 @@
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: Register to upgrade activation key
   ansible.builtin.shell: >
+    export PATH={{ os_release }};
     subscription-manager register
     --org="{{ satellite_organization }}"
     --activationkey="{{ satellite_activation_key_pre_leapp }}"
@@ -16,6 +17,7 @@
 
 - name: Enable requisite RHUI repos
   ansible.builtin.shell: |
+    export PATH={{ os_release }}
     set -o pipefail
     yum-config-manager --enable {{ item }}
   loop: "{{ analysis_repos_el6 }}"
@@ -48,6 +50,7 @@
 
 - name: Run preupg
   ansible.builtin.shell: >
+    export PATH={{ os_release }};
     set -o pipefail;
     preupg --force --text
     2>&1 | tee -a {{ log_file }}
