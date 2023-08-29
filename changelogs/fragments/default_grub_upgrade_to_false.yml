@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Change default value for update_grub_to_grub_2 from true to false.  Grub will not be upgraded by default.
-...

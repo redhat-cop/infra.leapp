@@ -1,1 +1,13 @@
-releases: {}
+ancestor: null
+releases:
+  1.1.1:
+    changes:
+      major_changes:
+      - initial release
+      minor_changes:
+      - Change default value for update_grub_to_grub_2 from true to false.  Grub will
+        not be upgraded by default.
+    fragments:
+    - default_grub_upgrade_to_false.yml
+    - release.yml
+    release_date: '2023-08-29'
