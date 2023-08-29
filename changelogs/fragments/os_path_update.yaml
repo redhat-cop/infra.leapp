@@ -1,10 +1,4 @@
-ancestor: null
-releases:
-  1.1.2:
-    changes:
-      minor_changes:
-      - Added os_path variable
-      - Fixed shell tasks to use the correct variable "os_path"
-    fragments:
-    - os_path.yml
-    release_date: '2023-08-29'
+---
+minor_changes:
+  - Fixed shell tasks to use the correct variable "os_path"
+...
