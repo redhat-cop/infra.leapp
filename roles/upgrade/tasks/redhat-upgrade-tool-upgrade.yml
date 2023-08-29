@@ -1,7 +1,7 @@
 ---
 - name: Run preupg --riskcheck
   ansible.builtin.shell: >
-    export PATH={{ os_release }};
+    export PATH={{ os_path }};
     preupg --riskcheck
   register: preupg
   changed_when: false
@@ -15,7 +15,7 @@
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: Register to leapp activation key
   ansible.builtin.shell: >
-    export PATH={{ os_release }};
+    export PATH={{ os_path }};
     subscription-manager register
     --org_id: "{{ satellite_organization }}"
     activationkey: "{{ satellite_activation_key_leapp }}"
@@ -51,7 +51,7 @@
 # --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.
 - name: Run redhat-upgrade-tool
   ansible.builtin.shell: >
-    export PATH={{ os_release }};
+    export PATH={{ os_path }};
     set -o pipefail;
     redhat-upgrade-tool --network 7.9 --instrepo {{ rhel_7_network_install_repo_url }} --force --cleanup-post
     2>&1 | tee -a {{ log_file }}

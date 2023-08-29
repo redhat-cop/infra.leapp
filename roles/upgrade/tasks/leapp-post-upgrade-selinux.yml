@@ -2,7 +2,7 @@
 # TODO: Relocate to validation and compare to previous selinux state.
 # - name: Ensure there are no SELinux denials
 #   ansible.builtin.shell: >
-#     export PATH={{ os_release }};
+#     export PATH={{ os_path }};
 #     ausearch -m AVC,USER_AVC -ts boot 2>&1
 #   register: ausearch_results
 #   changed_when: false
