@@ -1,1 +1,9 @@
-releases: {}
+ancestor: null
+releases:
+  1.1.1:
+    changes:
+      minor_changes:
+      - Added os_path variable
+    fragments:
+    - os_path.yml
+    release_date: '2023-08-29'
