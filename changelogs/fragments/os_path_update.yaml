@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Fixed shell tasks to use the correct variable "os_path"
-...

@@ -7,3 +7,10 @@ releases:
     fragments:
     - os_path.yml
     release_date: '2023-08-29'
+  1.1.2:
+    changes:
+      bugfixes:
+      - Fixed shell tasks to use the correct variable "os_path"
+    fragments:
+    - os_path_update.yaml
+    release_date: '2023-08-29'
