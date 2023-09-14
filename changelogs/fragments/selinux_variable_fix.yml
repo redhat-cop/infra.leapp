@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Set the default to "disabled" in the selinux_mode default variable
+    - This resolves an issue with a missing Ansible fact for servers where selinux is disabled
+...
