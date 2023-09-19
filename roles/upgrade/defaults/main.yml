@@ -24,7 +24,8 @@ rhel_7_network_install_repo_url: http://capsule1.example.com/pub/ISO/RHEL7.9
 # selinux_mode: permissive
 # selinux_mode: disabled
 # Default selinux_mode to what was found during the pre-upgrade analysis automation.
-selinux_mode: "{{ ansible_facts.ansible_local.pre_ripu.selinux.config_mode }}"
+# The config_mode fact is not created if selinux is disabled so default the variable to "disabled"
+selinux_mode: "{{ ansible_facts.ansible_local.pre_ripu.selinux.config_mode | default('disabled') }}"
 
 # System-wide cryptographic policies
 # set_crypto_policies: false
