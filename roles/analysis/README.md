@@ -31,7 +31,8 @@ Activation keys provide a method to identify content views available from Red Ha
 | leapp_preupg_opts | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
 | post_reboot_delay | Int | 120 | Optional integer to pass to the reboot post_reboot_delay option. |
 | os_path | String | Option string to override the $PATH variable used on the target node |
-
+| async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
+| async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
 ## Example playbook
 
 See [`analysis.yml`](../../playbooks/analysis.yml)
