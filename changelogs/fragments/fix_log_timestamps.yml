@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - Fixed common role to resolve incorrect timestamps in log files
+...
