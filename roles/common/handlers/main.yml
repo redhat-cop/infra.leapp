@@ -3,7 +3,7 @@
 - name: Add end time to log file
   ansible.builtin.lineinfile:
     path: "{{ log_file }}"
-    line: Job ended at {{ ansible_date_time.iso8601 }}
+    line: Job ended at {{ now(fmt='%Y-%m-%dT%H:%M:%SZ', utc=true) }}
     owner: root
     group: root
     mode: '0644'
