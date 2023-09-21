@@ -22,7 +22,7 @@
   ansible.builtin.copy:
     content: |
       {{ job_name }}
-      Job started at {{ ansible_date_time.iso8601 }}
+      Job started at {{ now(fmt='%Y-%m-%dT%H:%M:%SZ', utc=true) }}
     dest: "{{ log_file }}"
     owner: root
     group: root
