@@ -56,4 +56,7 @@ leapp_repos_enabled: []
 post_reboot_delay: 120
 
 os_path: $PATH
+
+async_timeout_maximum: 7200
+async_poll_interval: 60
 ...

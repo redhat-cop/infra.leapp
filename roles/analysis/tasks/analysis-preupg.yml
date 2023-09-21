@@ -57,8 +57,8 @@
   register: preupg
   args:
     executable: /bin/bash
-  async: 43200
-  poll: 60
+  async: "{{ async_timeout_maximum | int }}"
+  poll: "{{ async_poll_interval | int }}"
   failed_when: false
 
 - name: Assert that preupg did not encounter errors

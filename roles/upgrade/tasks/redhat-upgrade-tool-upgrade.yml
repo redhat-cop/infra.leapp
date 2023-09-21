@@ -58,8 +58,8 @@
   register: redhat_upgrade_tool
   args:
     executable: /bin/bash
-  async: 43200
-  poll: 60
+  async: "{{ async_timeout_maximum | int }}"
+  poll: "{{ async_poll_interval | int }}"
   # failed_when: false
 
 - name: Reboot to continue OS upgrade

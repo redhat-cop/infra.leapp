@@ -4,8 +4,8 @@
     name: '*'
     state: latest
   register: updates_available
-  async: 7200
-  poll: 30
+  async: "{{ async_timeout_maximum | int }}"
+  poll: "{{ async_poll_interval | int }}"
 
 - name: Reboot when updates applied
   ansible.builtin.reboot:
