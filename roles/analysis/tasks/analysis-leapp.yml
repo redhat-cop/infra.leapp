@@ -52,8 +52,8 @@
   register: leapp
   args:
     executable: /bin/bash
-  async: 43200
-  poll: 60
+  async: "{{ async_timeout_maximum | int }}"
+  poll: "{{ async_poll_interval | int }}"
   failed_when: "'report has been generated' not in leapp.stdout"
 
 - name: Include check-results-file.yml

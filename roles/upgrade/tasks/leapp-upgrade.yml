@@ -32,8 +32,8 @@
     2>&1 | tee -a {{ log_file }}
   args:
     executable: /bin/bash
-  async: 43200
-  poll: 60
+  async: "{{ async_timeout_maximum | int }}"
+  poll: "{{ async_poll_interval | int }}"
 
 - name: Reboot to continue Leapp OS upgrade
   ansible.builtin.reboot:

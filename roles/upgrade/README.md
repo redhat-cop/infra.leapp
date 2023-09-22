@@ -17,6 +17,8 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | post_reboot_delay       | 120                   | Optional integer to pass to the reboot post_reboot_delay option. |
 | update_grub_to_grub_2   | false                 | Boolean to control whether grub gets upgraded to grub 2 in post RHEL 6 to 7 upgrade. |
 | os_path                 | $PATH                 | Variable used to override the default $PATH environmental variable on the target node
+| async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
+| async_poll_interval     | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
 
 ## Example playbook
 
