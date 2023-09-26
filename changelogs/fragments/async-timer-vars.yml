@@ -1,5 +1,0 @@
----
-minor_changes:
-  - Add the default variables async_timeout_maximum and async_poll_interval which configure the timeout and polling values resepectively for asynchronous task execution.
-    - Setting async/poll values as default vars will allow override timer values based on the end user's particular needs.
-...

@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Fixed os_path is undefined error in upgrade role
-...

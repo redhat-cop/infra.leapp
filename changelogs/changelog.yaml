@@ -14,3 +14,22 @@ releases:
     fragments:
     - os_path_update.yaml
     release_date: '2023-08-29'
+  1.1.3:
+    changes:
+      bugfixes:
+      - Fixed common role to resolve incorrect timestamps in log files
+      - Fixed os_path is undefined error in upgrade role
+      minor_changes:
+      - Add the default variables async_timeout_maximum and async_poll_interval which
+        configure the timeout and polling values resepectively for asynchronous task
+        execution. - Setting async/poll values as default vars will allow override
+        timer values based on the end user's particular needs.
+      - Set the default to "disabled" in the selinux_mode default variable - This
+        resolves an issue with a missing Ansible fact for servers where selinux is
+        disabled
+    fragments:
+    - async-timer-vars.yml
+    - fix_log_timestamps.yml
+    - fix_os_path.yml
+    - selinux_variable_fix.yml
+    release_date: '2023-09-26'
