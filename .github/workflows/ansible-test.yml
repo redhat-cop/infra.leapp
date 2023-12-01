@@ -216,6 +216,11 @@ jobs:
             python: '2.6'
           - ansible: devel
             python: '2.6'
+          # Upstream has removed Python 2.7 and 3.6 support
+          - ansible: devel
+            python: '2.7'
+          - ansible: devel
+            python: '3.6'
 
 
     steps:
