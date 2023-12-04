@@ -17,6 +17,16 @@ These are the roles included in the collection. Follow the links below to see th
 - [`parse_leapp_report`](./roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
 - [`upgrade`](./roles/upgrade/) - executes the Leapp OS upgrade
 
+## Supported RHEL versions
+
+The collection supports RHEL in-place upgrades for the following RHEL versions:
+
+- RHEL 6 to RHEL 7 (RUT)
+- RHEL 7 to RHEL 8 (Leapp)
+- RHEL 8 to RHEL 9 (Leapp)
+
+The collection may be used for the RHEL upgrade paths and minor versions supported by the indicated upgrade utilities (Leapp or RUT). Refer the to Red Hat knowledge solution article [Supported in-place upgrade paths for Red Hat Enterprise Linux](https://access.redhat.com/articles/4263361) for the latest support details.
+
 ## Example playbooks
 
 Example playbooks can be found [here](./playbooks/).
@@ -57,7 +67,7 @@ We are a fledgling community and welcome any new contributors. Get started by op
 
 ## Reporting issues
 
-Please open a [new issue](https://github.com/redhat-cop/infra.leapp/issues/new/choose) for any bugs or security vulnerabilities you may encounter. We also invite you to open an issue if you have ideas on how we can improve the solution or want to make a suggestion for enhancment.
+Please open a [new issue](https://github.com/redhat-cop/infra.leapp/issues/new/choose) for any bugs or security vulnerabilities you may encounter. We also invite you to open an issue if you have ideas on how we can improve the solution or want to make a suggestion for enhancement.
 
 ## More information
 
