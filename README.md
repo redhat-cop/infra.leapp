@@ -27,6 +27,12 @@ The collection supports RHEL in-place upgrades for the following RHEL versions:
 
 The collection may be used for the RHEL upgrade paths and minor versions supported by the indicated upgrade utilities (Leapp or RUT). Refer the to Red Hat knowledge solution article [Supported in-place upgrade paths for Red Hat Enterprise Linux](https://access.redhat.com/articles/4263361) for the latest support details.
 
+Third-party products and packages are not upgraded. It is expected that the playbook including the `upgrade` role will perform the additional tasks required to handle the upgrade of any installed third-party tools and agents, for example [Veritas Cluster](https://www.veritas.com/support/en_US/doc/infoscale_wp_upgradewithRedHat), [SAP HANA](https://access.redhat.com/solutions/5154031), etc. Likewise for packages installed from non-RHEL repositories such as [Red Hat Software Collections](https://access.redhat.com/support/policy/updates/rhscl), [EPEL](https://docs.fedoraproject.org/en-US/epel/), [RPM Fusion](https://rpmfusion.org/), etc.
+
+Having said that, most application workloads will still function correctly after a RHEL in-place upgrade if simply left untouched, thanks to [RHEL Application Compatibility](https://access.redhat.com/articles/rhel8-abi-compatibility) support.
+
+The roles in this collection have been successfully used in a number of different environments including on-prem bare metal servers and VMs pulling RHEL packages from Red Hat CDN repos, Satellite content views, or mirrored repos internal to disconnected networks. Upgrading RHEL on Amazon EC2 instances pulling from bring-your-own-subscription CDN repos or pay-as-you-go RHUI repos have also been tested. Upgrading RHEL on other public clouds should be possible as well after setting the documented role variables as required.
+
 ## Example playbooks
 
 Example playbooks can be found [here](./playbooks/).
