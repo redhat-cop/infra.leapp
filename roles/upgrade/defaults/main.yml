@@ -2,9 +2,16 @@
 # defaults file for upgrade
 leapp_upgrade_type: satellite
 # leapp_upgrade_type: cdn
-# leapp_upgrade_type: rhui
+# leapp_upgrade_type: rhui-aws
+# leapp_upgrade_type: rhui-azure
+# leapp_upgrade_type: rhui-gcp
 # TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
+
+leapp_rhui_map:
+  rhui-aws: leapp-rhui-aws
+  rhui-azure: leapp-rhui-azure
+  rhui-gcp: leapp-rhui-google
 
 leapp_upgrade_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
 

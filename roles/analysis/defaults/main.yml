@@ -12,6 +12,9 @@ analysis_packages_el7:
   # - leapp-upgrade-el7toel8
   # Try this instead.
   - leapp-upgrade
+  # In case you are on a PAYG instance using RHUI, you have to install one of the
+  # "leapp-rhui" rpms providing the target system content, keys, and certificates
+  - "{{ leapp_rhui_map[leapp_upgrade_type] if leapp_upgrade_type.startswith('rhui') else '' }}"
 
 analysis_packages_el8:
   # TODO: Seems to cause package dependency problems with post upgrade cleanup.
@@ -20,8 +23,9 @@ analysis_packages_el8:
   - leapp-upgrade
   # TODO: This should be part of inhibitor remediation.
   # - vdo
-  # TODO: only w/ rhui for aws
-  # - leapp-rhui-aws
+  # In case you are on a PAYG instance using RHUI, you have to install one of the
+  # "leapp-rhui" rpms providing the target system content, keys, and certificates
+  - "{{ leapp_rhui_map.leapp_upgrade_type if leapp_upgrade_type.startswith('rhui') else '' }}"
 
 analysis_repos_el6:
   - rhel-6-server-extras-rpms
@@ -29,19 +33,27 @@ analysis_repos_el6:
 
 analysis_repos_el7:
   - rhel-7-server-extras-rpms
+  - "{{ 'rhel-7-server-rhui-extras-rpms' if leapp_upgrade_type.startswith('rhui') else '' }}"
 
 # If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.
 # leapp_answerfile: |
 #   [remove_pam_pkcs11_module_check]
 #   confirm = True
 
+leapp_rhui_map:
+  rhui-aws: leapp-rhui-aws
+  rhui-azure: leapp-rhui-azure
+  rhui-gcp: leapp-rhui-google
+
 leapp_upgrade_type: satellite
 # leapp_upgrade_type: cdn
-# leapp_upgrade_type: rhui
+# leapp_upgrade_type: rhui-aws
+# leapp_upgrade_type: rhui-azure
+# leapp_upgrade_type: rhui-gcp
 # TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
 
-leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
+leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type.startswith('rhui') else '' }}"
 
 # Satellite Organization and Activation Keys are required if using Satellite to change content views
 # unless the content view already in use has all required repositories.
