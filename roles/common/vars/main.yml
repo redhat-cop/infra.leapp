@@ -38,7 +38,7 @@ preupg_return_codes:
     fail: true
     inhibited: true
   26:
-    msg: You specified a text convertor which is not allowed. Allowed convertors are w3m, lynx and elinks.
+    msg: You specified a text converter which is not allowed. Allowed converters are w3m, lynx and elinks.
     fail: true
     inhibited: true
   27:
@@ -54,7 +54,7 @@ preupg_return_codes:
     fail: true
     inhibited: true
   30:
-    msg: User aborted the assesment.
+    msg: User aborted the assessment.
     fail: true
     inhibited: true
   127:

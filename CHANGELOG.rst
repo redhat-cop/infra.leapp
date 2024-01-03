@@ -11,7 +11,7 @@ v1.1.3
 Minor Changes
 -------------
 
-- Add the default variables async_timeout_maximum and async_poll_interval which configure the timeout and polling values resepectively for asynchronous task execution. - Setting async/poll values as default vars will allow override timer values based on the end user's particular needs.
+- Add the default variables async_timeout_maximum and async_poll_interval which configure the timeout and polling values respectively for asynchronous task execution. - Setting async/poll values as default vars will allow override timer values based on the end user's particular needs.
 - Set the default to "disabled" in the selinux_mode default variable - This resolves an issue with a missing Ansible fact for servers where selinux is disabled
 
 Bugfixes
