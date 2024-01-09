@@ -5,7 +5,6 @@
 - name: Determine rhel_dest_major_version
   ansible.builtin.set_fact:
     rhel_dest_major_version: "{{ ((ansible_facts.ansible_local.pre_ripu.distribution_major_version | int) + 1) | string }}"
-    rhel_dest_kernel_check: "el{{ ((ansible_facts.ansible_local.pre_ripu.distribution_major_version | int) + 1) | string }}"
 
 - name: Validate current OS major version
   ansible.builtin.assert:
@@ -16,6 +15,7 @@
 - name: Validate running kernel matches OS version
   ansible.builtin.assert:
     that: rhel_dest_kernel_check in ansible_kernel
+    that: "'el' ~ rhel_dest_major_version in ansible_kernel"
     fail_msg: Kernel version {{ ansible_kernel }} does not match expected OS major version el{{ rhel_dest_major_version }}.
     success_msg: Current kernel version is {{ ansible_kernel }}.
 
