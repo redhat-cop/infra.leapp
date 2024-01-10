@@ -5,6 +5,14 @@ Ansible Leapp Collection Release Notes
 .. contents:: Topics
 
 
+v1.1.4
+======
+
+Bugfixes
+--------
+
+- switched template to jinja vars for version upgrade verification
+
 v1.1.3
 ======
 
