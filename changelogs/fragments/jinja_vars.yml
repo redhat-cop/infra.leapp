@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - switched template to jinja vars for version upgrade verification
+...
