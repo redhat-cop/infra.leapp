@@ -1,0 +1,41 @@
+---
+- name: LEAPP_MISSING_YUM_PLUGINS | Load required plugins
+  vars:
+    leapp_report_location: /var/log/leapp/leapp-report.json
+    entry_title: Required .* plugins are not being loaded.
+  block:
+    - name: LEAPP_MISSING_YUM_PLUGINS | Check that the leapp-report.json with remediation command exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: LEAPP_MISSING_YUM_PLUGINS | End execution of playbook if leapp report does not exist (not possible to remediate)
+      ansible.builtin.meta: end_host
+      when: leapp_report_stat.stat.exists is false
+
+    - name: LEAPP_MISSING_YUM_PLUGINS | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: LEAPP_MISSING_YUM_PLUGINS | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: LEAPP_MISSING_YUM_PLUGINS | Find matching entries
+      ansible.builtin.set_fact:
+        remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title is match(entry_title) and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
+
+    - name: LEAPP_MISSING_YUM_PLUGINS | Output command to be executed
+      ansible.builtin.debug:
+        msg: "{{ remediation.context | last }}"
+
+    - name: LEAPP_MISSING_YUM_PLUGINS | Execute the remediation command - remove the deprecated directives from the sshd configuration
+      ansible.builtin.command: "{{ remediation.context | join(' ') }}"
+      when: remediation is defined
+      register: remediation_command_output
+      changed_when: remediation_command_output.rc == 0
+
+...

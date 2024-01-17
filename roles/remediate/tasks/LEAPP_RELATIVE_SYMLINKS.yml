@@ -1,0 +1,41 @@
+---
+- name: LEAPP_RELATIVE_SYMLINKS | Change symbolic links in root directory to be relative
+  vars:
+    leapp_report_location: /var/log/leapp/leapp-report.json
+    entry_title: Upgrade requires links in root directory to be relative
+  block:
+    - name: LEAPP_RELATIVE_SYMLINKS | Check that the leapp-report.json with remediation command exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: LEAPP_RELATIVE_SYMLINKS | End execution of playbook if leapp report does not exist (not possible to remediate)
+      ansible.builtin.meta: end_host
+      when: leapp_report_stat.stat.exists is false
+
+    - name: LEAPP_RELATIVE_SYMLINKS | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: LEAPP_RELATIVE_SYMLINKS | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: LEAPP_RELATIVE_SYMLINKS | Find matching entries
+      ansible.builtin.set_fact:
+        remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title == entry_title and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
+
+    - name: LEAPP_RELATIVE_SYMLINKS | Output command to be executed
+      ansible.builtin.debug:
+        msg: "{{ remediation.context | last }}"
+
+    - name: LEAPP_RELATIVE_SYMLINKS | Set links in root directory to be relative
+      ansible.builtin.command: "{{ remediation.context | last }}"
+      when: remediation is defined
+      register: leapp_relative_symlinks
+      changed_when: leapp_relative_symlinks.rc == 0
+
+...

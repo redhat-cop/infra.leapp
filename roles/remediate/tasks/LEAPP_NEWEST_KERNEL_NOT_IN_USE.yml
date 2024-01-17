@@ -1,0 +1,29 @@
+---
+- name: LEAPP_NEWEST_KERNEL_NOT_IN_USE | Boot to latest kernel
+  block:
+    - name: LEAPP_NEWEST_KERNEL_NOT_IN_USE | Get list of installed kernels packages sorted by the newest version
+      ansible.builtin.shell: |
+        set -o pipefail
+        sudo rpm -q kernel --queryformat '%{version}-%{release}.%{arch}\n' | sort -Vr
+      register: installed_kernels
+      changed_when: true
+
+    - name: LEAPP_NEWEST_KERNEL_NOT_IN_USE | Set default kernel to latest
+      ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
+      register: set_default_kernel
+      changed_when: set_default_kernel.rc == 0
+
+    - name: LEAPP_NEWEST_KERNEL_NOT_IN_USE | Reboot into new kernel
+      ansible.builtin.shell: sleep 2 && shutdown -r now
+      async: 1
+      poll: 0
+      failed_when: false
+      changed_when: true
+
+    - name: LEAPP_NEWEST_KERNEL_NOT_IN_USE | Wait for reboot
+      ansible.builtin.wait_for_connection:
+        delay: 15
+        timeout: 60
+      become: false
+
+...

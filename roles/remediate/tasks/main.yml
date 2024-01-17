@@ -1,0 +1,10 @@
+---
+# tasks file for remediations
+
+- name: Remediate the system
+  ansible.builtin.include_tasks: "{{ item }}.yml"
+  loop: "{{ remediation_playbooks }}"
+  loop_control:
+    loop_var: remediation
+  when: remediation in remediation_todo
+...

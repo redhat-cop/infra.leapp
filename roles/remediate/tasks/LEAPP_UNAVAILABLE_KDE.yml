@@ -1,0 +1,9 @@
+---
+- name: LEAPP_UNAVAILABLE_KDE | Install the GNOME desktop environment to be able to upgrade
+  block:
+    - name: LEAPP_UNAVAILABLE_KDE | Install the GNOME desktop environment
+      ansible.builtin.yum:
+        name: LEAPP_UNAVAILABLE_KDE | @^graphical-server-environment
+        state: present
+
+...

@@ -1,0 +1,41 @@
+---
+- name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | Remove the deprecated directives from the sshd configuration.
+  vars:
+    leapp_report_location: /var/log/leapp/leapp-report.json
+    entry_title: A deprecated directive in the sshd configuration
+  block:
+    - name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | Check that the leapp-report.json with remediation command exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | End execution of playbook if leapp report does not exist (not possible to remediate)
+      ansible.builtin.meta: end_host
+      when: leapp_report_stat.stat.exists is false
+
+    - name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | Find matching entries
+      ansible.builtin.set_fact:
+        remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title == entry_title and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
+
+    - name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | Output command to be executed
+      ansible.builtin.debug:
+        msg: "{{ remediation.context | join(' ') }}"
+
+    - name: LEAPP_DEPRECATED_SSHD_DIRECTIVE | Execute the remediation command - remove the deprecated directives from the sshd configuration
+      ansible.builtin.command: "{{ remediation.context | join(' ') }}"
+      when: remediation is defined
+      register: remediation_command_output
+      changed_when: remediation_command_output.rc == 0
+
+...
