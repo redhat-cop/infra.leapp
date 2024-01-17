@@ -1,0 +1,33 @@
+---
+- name: LEAPP_OLD_POSTGRESQL_DATA | Backup and then remove /var/lib/pgsql/data for remediation
+  block:
+    - name: LEAPP_OLD_POSTGRESQL_DATA | Check if /var/lib/pgsql/data exists
+      ansible.builtin.stat:
+        path: /var/lib/pgsql/data
+      register: pgsql_data_stat
+
+    - name: LEAPP_OLD_POSTGRESQL_DATA | End play if /var/lib/psql/data does not exist
+      ansible.builtin.meta: end_play
+      when: not pgsql_data_stat.stat.exists
+
+    - name: LEAPP_OLD_POSTGRESQL_DATA | Set backup filename with timestamp
+      ansible.builtin.set_fact:
+        backup_filename: pgsql_data_backup_{{ ansible_date_time.iso8601_basic_short }}.tar.gz
+    - name: LEAPP_OLD_POSTGRESQL_DATA | Ensure /var/backups exists
+      ansible.builtin.file:
+        path: /var/backups
+        state: directory
+        mode: "0755"
+
+    - name: LEAPP_OLD_POSTGRESQL_DATA | Backup /var/lib/pgsql/data
+      ansible.builtin.command:
+        cmd: sudo tar czvf /var/backups/{{ backup_filename }} -C /var/lib/pgsql data
+      register: backup_command
+      changed_when: backup_command.rc == 0
+
+    - name: LEAPP_OLD_POSTGRESQL_DATA | Remove /var/lib/pgsql/data after backup
+      ansible.builtin.file:
+        path: /var/lib/pgsql/data
+        state: absent
+
+...

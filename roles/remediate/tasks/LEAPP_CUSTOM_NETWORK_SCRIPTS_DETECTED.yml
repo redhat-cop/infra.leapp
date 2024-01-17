@@ -1,0 +1,80 @@
+---
+- name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Move custom network-scripts to NetworkManager dispatcher scripts
+  block:
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Create /opt/network-scripts/ directory if it does not exist
+      ansible.builtin.file:
+        path: /opt/network-scripts/
+        state: directory
+        mode: "0755"
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Check if pre up script exists
+      ansible.builtin.stat:
+        path: /sbin/ifup-pre-local
+      register: pre_up
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Check if pre down script exists
+      ansible.builtin.stat:
+        path: /sbin/ifdown-pre-local
+      register: pre_down
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Move scripts in /sbin to /opt/network-scripts/, end playbook if this fails
+      ansible.builtin.shell: mv /sbin/if*-local /opt/network-scripts/
+      register: move_scripts
+      changed_when: move_scripts.rc == 0
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Create /etc/NetworkManager/dispatcher.d/20-if-local
+      ansible.builtin.copy:
+        dest: /etc/NetworkManager/dispatcher.d/20-if-local
+        mode: +x
+        content: >
+          #!/bin/bash
+
+          test -n "$DEVICE_IFACE" || exit 0
+
+          run() {
+              test -x "$1" || exit 0
+              "$1" "$DEVICE_IFACE"
+          }
+
+          case "$2" in
+              "up")
+                  run /opt/network-scripts/ifup-local
+                  ;;
+              "pre-up")
+                  run /opt/network-scripts/ifup-pre-local
+                  ;;
+              "down")
+                  run /opt/network-scripts/ifdown-local
+                  ;;
+              "pre-down")
+                  run /opt/network-scripts/ifdown-pre-local
+                  ;;
+          esac
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Set permissions on /etc/NetworkManager/dispatcher.d/20-if-local
+      ansible.builtin.file:
+        path: /etc/NetworkManager/dispatcher.d/20-if-local
+        owner: root
+        group: root
+        mode: +x
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | Restore SELinux context on /etc/NetworkManager/dispatcher.d/20-if-local
+      ansible.builtin.command: restorecon -v /etc/NetworkManager/dispatcher.d/20-if-local
+      register: restorecon
+      changed_when: restorecon.rc == 0
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | If pre up script exists, create symbolic link
+      ansible.builtin.file:
+        src: /etc/NetworkManager/dispatcher.d/20-if-local
+        dest: /etc/NetworkManager/dispatcher.d/pre-up.d/20-if-local
+        state: link
+      when: pre_up.stat.exists
+
+    - name: LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED | If pre down script exists, create symbolic link
+      ansible.builtin.file:
+        src: /etc/NetworkManager/dispatcher.d/20-if-local
+        dest: /etc/NetworkManager/dispatcher.d/pre-down.d/20-if-local
+        state: link
+      when: pre_down.stat.exists
+
+...

@@ -1,0 +1,9 @@
+---
+- name: LEAPP_MISSING_EFIBOOTMGR | Install efibootmgr package - required on EFI systems
+  block:
+    - name: LEAPP_MISSING_EFIBOOTMGR | Install efibootmgr package
+      ansible.builtin.yum:
+        name: LEAPP_MISSING_EFIBOOTMGR | efibootmgr
+        state: present
+
+...

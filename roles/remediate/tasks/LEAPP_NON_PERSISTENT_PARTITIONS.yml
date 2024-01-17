@@ -1,0 +1,41 @@
+---
+- name: LEAPP_NON_PERSISTENT_PARTITIONS | Add mount entry to /etc/fstab for non persistent /var/lib/leapp mount
+  block:
+    - name: LEAPP_NON_PERSISTENT_PARTITIONS | Check if /var/lib/leapp exists in /etc/fstab
+      ansible.builtin.command: grep '/var/lib/leapp' /etc/fstab
+      register: fstab_output
+      failed_when: true
+      changed_when: fstab_output.stdout is defined
+
+    - name: LEAPP_NON_PERSISTENT_PARTITIONS | Get /var/lib/leapp mount device
+      ansible.builtin.command: findmnt -nr -o SOURCE /var/lib/leapp
+      register: mount_device_output
+      changed_when: true
+
+    - name: LEAPP_NON_PERSISTENT_PARTITIONS | Get /var/lib/leapp mount filesystem type
+      ansible.builtin.command: findmnt -nr -o FSTYPE /var/lib/leapp
+      register: mount_filesystem_output
+      changed_when: true
+
+    - name: LEAPP_NON_PERSISTENT_PARTITIONS | Get /var/lib/leapp mount options
+      ansible.builtin.command: findmnt -nr -o OPTIONS /var/lib/leapp
+      register: mount_options_output
+      changed_when: true
+
+    - name: LEAPP_NON_PERSISTENT_PARTITIONS | Get UUID for the device
+      ansible.builtin.command: blkid -s UUID -o value {{ mount_device_output.stdout }}
+      register: uuid_output
+      failed_when: true
+      changed_when: true
+
+    - name: LEAPP_NON_PERSISTENT_PARTITIONS | Add /var/lib/leapp to /etc/fstab
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        line: UUID={{ uuid_output.stdout }} /var/lib/leapp {{ mount_filesystem_output.stdout }} {{ mount_options_output.stdout }} 0 0
+      when:
+        - "'/var/lib/leapp' not in fstab_output.stdout"
+        - uuid_output.stdout is defined
+        - mount_filesystem_output.stdout is defined
+        - mount_options_output.stdout is defined
+
+...

@@ -1,0 +1,29 @@
+---
+- name: LEAPP_PARTITIONS_WITH_NOEXEC | Remount noexec partition with exec option
+  block:
+    - name: LEAPP_PARTITIONS_WITH_NOEXEC | Get all mountpoints with noexec option
+      ansible.builtin.shell: |
+        set -o pipefail
+        sudo mount | grep -E '(/var|/var/lib|/var/lib/leapp).*noexec'
+      register: mountpoints
+      changed_when: mountpoints.rc == 0
+      failed_when: false
+
+    - name: LEAPP_PARTITIONS_WITH_NOEXEC | Go through the the mountpoints and remount
+      ansible.posix.mount:
+        path: "{{ item.split(' ')[2] }}"
+        src: "{{ item.split(' ')[0] }}"
+        fstype: "{{ item.split(' ')[4] }}"
+        opts: "{{ item.split(' ')[5].replace('(', '').replace(')', '').replace('noexec', 'exec') }}"
+        state: remounted
+      with_items: "{{ mountpoints.stdout_lines }}"
+      when: mountpoints.stdout_lines | length > 0
+
+    - name: LEAPP_PARTITIONS_WITH_NOEXEC | Modify /etc/fstab to replace the noexec option
+      ansible.builtin.shell: |
+        set -o pipefail
+        sudo sed -i '/\/var\/lib\/leapp\|\/var\/lib\|\/var/s/noexec/exec/' /etc/fstab
+      register: sed_result
+      changed_when: sed_result.rc == 0
+
+...

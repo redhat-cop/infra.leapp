@@ -1,0 +1,72 @@
+---
+- name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Remove unsupported tftp-client service from firewalld
+  vars:
+    entry_title: Firewalld Service tftp-client Is Unsupported
+    leapp_report_location: /var/log/leapp/leapp-report.json
+  block:
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | End play if no leapp report exists
+      ansible.builtin.meta: end_play
+      when: leapp_report_stat.stat.exists is false
+
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Find matching entries
+      ansible.builtin.set_fact:
+        summary: "{{ item.summary }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title is match(entry_title) and (item.summary | length > 0)
+
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Remove the service from zones and policies
+      block:
+        - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | List all firewalld zones
+          ansible.builtin.command: firewall-cmd --get-zones
+          register: all_zones
+          changed_when: false
+
+        - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Split the zones into a list
+          ansible.builtin.set_fact:
+            zone_list: "{{ all_zones.stdout | split }}"
+
+        - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Remove the service from zones
+          ansible.builtin.command: firewall-cmd --permanent --zone={{ item }} --remove-service=tftp-client
+          loop: "{{ zone_list }}"
+          failed_when: true
+          changed_when: false
+
+        - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Remove the service from policies
+          ansible.builtin.command: firewall-cmd --permanent --remove-service=tftp-client
+          failed_when: true
+          changed_when: false
+
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Remove the rich rules
+      block:
+        - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | List all rich rules
+          ansible.builtin.command: firewall-cmd --list-rich-rules
+          register: rich_rules
+          changed_when: false
+
+        - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Iterate through rich rules and remove tftp-client
+          ansible.builtin.command: firewall-cmd --permanent --remove-rich-rule '{{ item }}'
+          loop: "{{ rich_rules.stdout_lines }}"
+          failed_when: true
+          when: "'tftp-client' in item"
+          changed_when: true
+
+    - name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | Reload firewalld to apply changes
+      ansible.builtin.service:
+        name: LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT | firewalld
+        state: reloaded
+
+...

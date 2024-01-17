@@ -16,6 +16,7 @@ These are the roles included in the collection. Follow the links below to see th
 - [`common`](./roles/common/) - used for local logging, mutex locking, and common vars
 - [`parse_leapp_report`](./roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
 - [`upgrade`](./roles/upgrade/) - executes the Leapp OS upgrade
+- [`remediate`](./roles/remediate/) - assists in the remediation of a system
 
 ## Supported RHEL versions
 

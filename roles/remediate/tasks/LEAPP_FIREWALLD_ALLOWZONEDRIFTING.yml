@@ -1,0 +1,11 @@
+---
+- name: LEAPP_FIREWALLD_ALLOWZONEDRIFTING | Set the "AllowZoneDrifting" in firewalld.conf to "no"
+  block:
+    - name: LEAPP_FIREWALLD_ALLOWZONEDRIFTING | Set the "AllowZoneDrifting" in firewalld.conf to "no"
+      ansible.builtin.lineinfile:
+        path: /etc/firewalld/firewalld.conf
+        regexp: ^AllowZoneDrifting=.*
+        line: AllowZoneDrifting=no
+        backup: true
+
+...

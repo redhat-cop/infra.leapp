@@ -1,0 +1,37 @@
+---
+- name: LEAPP_MISSING_PKG | Install required leapp data package on public clouds
+  vars:
+    entry_title_pattern: Package "[-\w]+" is missing
+    leapp_report_location: /var/log/leapp/leapp-report.json
+  block:
+    - name: LEAPP_MISSING_PKG | Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: LEAPP_MISSING_PKG | End play if no leapp report exists
+      ansible.builtin.meta: end_play
+      when: leapp_report_stat.stat.exists is false
+
+    - name: LEAPP_MISSING_PKG | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: LEAPP_MISSING_PKG | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: LEAPP_MISSING_PKG | Find matching entries
+      ansible.builtin.set_fact:
+        remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title is match(entry_title_pattern) and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
+
+    - name: LEAPP_MISSING_PKG | Install the missing package via remediation command
+      ansible.builtin.command: "{{ remediation.context | join(' ') }}"
+      when: remediation is defined
+      register: remediation_result
+      changed_when: remediation_result.rc == 0
+
+...

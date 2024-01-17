@@ -1,0 +1,10 @@
+---
+- name: LEAPP_CIFS_DETECTED | Comment cifs shares in /etc/fstab
+  block:
+    - name: LEAPP_CIFS_DETECTED | Comment CIFS shares in /etc/fstab
+      ansible.builtin.replace:
+        path: /etc/fstab
+        regexp: (.*)cifs(.*)
+        replace: "# \\1cifs\\2"
+
+...

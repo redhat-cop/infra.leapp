@@ -1,0 +1,64 @@
+---
+- name: LEAPP_CORRUPTED_GRUBENV_FILE | Detected a corrupted grubenv file
+  vars:
+    entry_title: Detected a corrupted grubenv file
+    leapp_report_location: /var/log/leapp/leapp-report.json
+  block:
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | End play if no leapp report exists
+      ansible.builtin.meta: end_play
+      when: leapp_report_stat.stat.exists is false
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Find matching entries
+      ansible.builtin.set_fact:
+        hint: "{{ item.detail.remediations | selectattr('type', 'eq', 'hint') | first }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title is match(entry_title) and (item.detail.remediations | selectattr('type', 'eq', 'hint') | length > 0)
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Extract file(s) using regex
+      ansible.builtin.set_fact:
+        files_grub: "{{ hint.context | regex_findall('Delete (.+?) file', '\\1') | first | split(',') | map('trim') }}"
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Backup file(s)
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item }}.backup"
+        mode: "0644"
+      with_items: "{{ files_grub }}"
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Find grub.cfg file
+      ansible.builtin.command: find /boot -name 'grub.cfg'
+      register: grub_cfg_path
+      changed_when: grub_cfg_path.rc == 0
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Backup grub.cfg file
+      ansible.builtin.copy:
+        src: "{{ grub_cfg_path.stdout }}"
+        dest: "{{ grub_cfg_path.stdout }}.backup"
+        mode: "0644"
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Delete file(s)
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items: "{{ files_grub }}"
+
+    - name: LEAPP_CORRUPTED_GRUBENV_FILE | Regenerate grub config
+      ansible.builtin.command: grub2-mkconfig -o {{ grub_cfg_path.stdout }}
+      register: grub_mkconfig
+      changed_when: grub_mkconfig.rc == 0
+
+...

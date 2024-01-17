@@ -1,0 +1,47 @@
+---
+- name: LEAPP_MULTIPLE_KERNELS | Boot to latest kernel and remove old kernels
+  block:
+    - name: LEAPP_MULTIPLE_KERNELS | Get list of installed kernels packages sorted by the newest version
+      ansible.builtin.shell: |
+        set -o pipefail
+        sudo rpm -q kernel --queryformat '%{version}-%{release}.%{arch}\n' | sort -Vr
+      register: installed_kernels
+      changed_when: true
+
+    - name: LEAPP_MULTIPLE_KERNELS | Check current kernel version
+      ansible.builtin.command: uname -r
+      register: current_kernel
+      changed_when: true
+
+    - name: LEAPP_MULTIPLE_KERNELS | Set default kernel to latest
+      ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
+      when: installed_kernels.stdout_lines[0] != current_kernel.stdout
+      register: set_default_kernel
+      changed_when: set_default_kernel.rc == 0
+
+    - name: LEAPP_MULTIPLE_KERNELS | Reboot into new kernel
+      ansible.builtin.shell: sleep 2 && shutdown -r now
+      async: 1
+      poll: 0
+      failed_when: false
+      when: installed_kernels.stdout_lines[0] != current_kernel.stdout
+      changed_when: true
+
+    - name: LEAPP_MULTIPLE_KERNELS | Wait for reboot
+      ansible.builtin.wait_for_connection:
+        delay: 15
+        timeout: 60
+      become: false
+      when: installed_kernels.stdout_lines[0] != current_kernel.stdout
+
+    - name: LEAPP_MULTIPLE_KERNELS | Remove old kernels
+      ansible.builtin.yum:
+        name: LEAPP_MULTIPLE_KERNELS | kernel-core-{{ item }}
+        state: absent
+      loop: "{{ installed_kernels.stdout_lines[1:] }}"
+
+    - name: LEAPP_MULTIPLE_KERNELS | Print the list of installed kernels
+      ansible.builtin.debug:
+        var: installed_kernels.stdout_lines
+
+...
