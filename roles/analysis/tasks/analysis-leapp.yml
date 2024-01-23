@@ -30,7 +30,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Populate leapp_answers file
   ansible.builtin.copy:
@@ -38,8 +38,17 @@
     dest: /var/log/leapp/answerfile
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: leapp_answerfile is defined
+
+- name: Populate custom repositories file
+  ansible.builtin.copy:
+    content: "{{ leapp_reposfile }}"
+    dest: /etc/leapp/files/leapp_upgrade_repositories.repo
+    owner: root
+    group: root
+    mode: "0644"
+  when: leapp_upgrade_type == 'custom'
 
 - name: Leapp preupgrade report
   ansible.builtin.shell: >
@@ -62,5 +71,3 @@
 - name: Include the parse_leapp_report role to check for inhibitors
   ansible.builtin.include_role:
     name: infra.leapp.parse_leapp_report
-
-...

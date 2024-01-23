@@ -35,10 +35,20 @@ analysis_repos_el7:
 #   [remove_pam_pkcs11_module_check]
 #   confirm = True
 
+# If defined, this is written to `/etc/leapp/files/leapp_upgrade_repositories.repo` before generating the pre-upgrade report.
+# This can be used if optional variable `leapp_upgrade_type` is defined as custom.
+# leapp_reposfile: |
+#      [epel-8]
+#      baseurl = https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/
+#      enabled = 1
+#      gpgcheck = 1
+#      sslverify = 0
+#      gpgkey = https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+#      name = EPEL 8
+
 leapp_upgrade_type: satellite
 # leapp_upgrade_type: cdn
 # leapp_upgrade_type: rhui
-# TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
 
 leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
@@ -59,4 +69,3 @@ os_path: $PATH
 
 async_timeout_maximum: 7200
 async_poll_interval: 60
-...
