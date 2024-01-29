@@ -31,5 +31,4 @@ jobs:
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@main # or version tag instead of 'main'
-        # uses: pre-commit/action@v3.0.0
 ...
