@@ -41,6 +41,9 @@
 - name: Include check-for-old-packages.yml
   ansible.builtin.include_tasks: check-for-old-packages.yml
 
+- name: Delete exclude line from dnf.conf
+  ansible.builtin.command: "/bin/dnf config-manager --save --setopt exclude=''"
+
 - name: Remove leapp related packages
   ansible.builtin.package:
     name:
