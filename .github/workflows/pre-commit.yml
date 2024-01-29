@@ -1,18 +1,12 @@
 ---
 name: Yaml and Ansible Lint
-
 on: [push, pull_request, workflow_call]  # yamllint disable-line rule:truthy
-
 jobs:
-  pre-commit:
+  build:
+    name: Ansible Lint # Naming the build is important to use it as a status check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - name: Install Ansible
-        run: pip install --upgrade ansible-core
+      - uses: actions/checkout@v4
 
       - name: Build collection
         run: ansible-galaxy collection build -vvv
@@ -34,5 +28,8 @@ jobs:
 
       - name: Install collection dependencies
         run: ansible-galaxy collection install -r ${{ github.run_id }}.yml
-      - uses: pre-commit/action@v3.0.0
+  
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main # or version tag instead of 'main'
+        # uses: pre-commit/action@v3.0.0
 ...
