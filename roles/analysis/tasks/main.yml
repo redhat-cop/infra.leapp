@@ -25,8 +25,8 @@
 - name: Capture a list of non-rhel versioned packages
   ansible.builtin.shell:
     cmd: >-
-      export PATH={{ os_path }};
       set -o pipefail;
+      export PATH={{ os_path }};
       rpm -qa | grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |
       grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
       sort

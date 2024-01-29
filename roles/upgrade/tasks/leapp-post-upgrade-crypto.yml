@@ -1,5 +1,5 @@
 ---
-- name: Include rhel_system_roles.crypto_policies role
+- name: leapp-post-upgrade-crypto | Include rhel_system_roles.crypto_policies role
   ansible.builtin.include_role:
     name: fedora.linux_system_roles.crypto_policies
   vars:

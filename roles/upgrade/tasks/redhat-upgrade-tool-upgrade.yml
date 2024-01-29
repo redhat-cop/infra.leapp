@@ -1,5 +1,5 @@
 ---
-- name: Run preupg --riskcheck
+- name: redhat-upgrade-tool-upgrade | Run preupg --riskcheck
   ansible.builtin.shell: >
     export PATH={{ os_path }};
     preupg --riskcheck
@@ -7,14 +7,15 @@
   changed_when: false
   failed_when: false
 
-- name: Assert that preupg was successful
+- name: redhat-upgrade-tool-upgrade | Assert that preupg was successful
   ansible.builtin.assert:
     that: not preupg_return_codes[preupg.rc].inhibited
     msg: "{{ preupg_return_codes[preupg.rc].msg }}"
 
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
-- name: Register to leapp activation key
+- name: redhat-upgrade-tool-upgrade | Register to leapp activation key
   ansible.builtin.shell: >
+    set -o pipefail;
     export PATH={{ os_path }};
     subscription-manager register
     --org_id: "{{ satellite_organization }}"
@@ -26,20 +27,21 @@
     - satellite_organization is defined
     - satellite_activation_key_leapp is defined
   failed_when: false
+  changed_when: true
 
-- name: Gather package facts
+- name: redhat-upgrade-tool-upgrade | Gather package facts
   ansible.builtin.package_facts:
 
-- name: No packages are version locked
+- name: redhat-upgrade-tool-upgrade | No packages are version locked
   community.general.yum_versionlock:
     name: '*'
     state: absent
   when: "'yum-plugin-versionlock' in ansible_facts.packages"
 
-- name: Include update-and-reboot.yml
+- name: redhat-upgrade-tool-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
-- name: Disable RHEL 6 RHSM or RHUI repos
+- name: redhat-upgrade-tool-upgrade | Disable RHEL 6 RHSM or RHUI repos
   community.general.rhsm_repository:
     name: '*'
     state: disabled
@@ -49,10 +51,10 @@
 # TODO: Add support for non-RHSM.
 
 # --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.
-- name: Run redhat-upgrade-tool
+- name: redhat-upgrade-tool-upgrade | Run redhat-upgrade-tool
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
     set -o pipefail;
+    export PATH={{ os_path }};
     redhat-upgrade-tool --network 7.9 --instrepo {{ rhel_7_network_install_repo_url }} --force --cleanup-post
     2>&1 | tee -a {{ log_file }}
   register: redhat_upgrade_tool
@@ -61,8 +63,9 @@
   async: "{{ async_timeout_maximum | int }}"
   poll: "{{ async_poll_interval | int }}"
   # failed_when: false
+  changed_when: true
 
-- name: Reboot to continue OS upgrade
+- name: redhat-upgrade-tool-upgrade | Reboot to continue OS upgrade
   ansible.builtin.reboot:
     msg: "Host is starting OS upgrade now!"
     post_reboot_delay: "{{ post_reboot_delay }}"

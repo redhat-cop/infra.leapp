@@ -1,15 +1,16 @@
 ---
 # /etc/dnf/dnf.conf is an ini file and could be parsed to check if exclude has value and run this conditionally.
-- name: Clean dnf exclude list
+- name: leapp-post-upgrade | Clean dnf exclude list
   ansible.builtin.shell: >
     export PATH={{ os_path }};
     dnf config-manager --save --setopt exclude=''
+  changed_when: true
 
 # leapp 7 to 8 documentation cleans up old kernels
-- name: Block for RHEL 7 kernel cleanup
+- name: leapp-post-upgrade | Block for RHEL 7 kernel cleanup
   when: "ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7"
   block:
-    - name: Find old kernels
+    - name: leapp-post-upgrade | Find old kernels
       ansible.builtin.find:
         paths:
           - /lib/modules
@@ -17,31 +18,33 @@
         file_type: directory
       register: old_kernels
 
-    - name: Remove weak modules from old kernels
+    - name: leapp-post-upgrade | Remove weak modules from old kernels
       ansible.builtin.shell: |
         export PATH={{ os_path }}
         set -o pipefail
         [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item.path | basename }}
       loop: "{{ old_kernels.files }}"
       failed_when: false
+      changed_when: true
 
-    - name: Remove the old kernels from the boot loader entry
+    - name: leapp-post-upgrade | Remove the old kernels from the boot loader entry
       ansible.builtin.shell: |
         export PATH={{ os_path }}
         set -o pipefail
         /bin/kernel-install remove {{ item.path | basename }} {{ item.path }}/vmlinuz
       loop: "{{ old_kernels.files }}"
+      changed_when: true
 
-    - name: Remove any remaining old kernel module directories
+    - name: leapp-post-upgrade | Remove any remaining old kernel module directories
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: absent
       loop: "{{ old_kernels.files }}"
 
-- name: Include check-for-old-packages.yml
+- name: leapp-post-upgrade | Include check-for-old-packages.yml
   ansible.builtin.include_tasks: check-for-old-packages.yml
 
-- name: Remove leapp related packages
+- name: leapp-post-upgrade | Remove leapp related packages
   ansible.builtin.package:
     name:
       - leapp
@@ -53,19 +56,20 @@
     state: absent
   register: result
 
-- name: Report leapp related packages that were removed
+- name: leapp-post-upgrade | Report leapp related packages that were removed
   ansible.builtin.debug:
     var: result
 
-- name: Unset subscription-manager release
+- name: leapp-post-upgrade | Unset subscription-manager release
   ansible.builtin.shell: >
     export PATH={{ os_path }};
     subscription-manager release --unset
   when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
+  changed_when: true
 
 # TODO: Unset rhui release.
 
-- name: "Register to post leapp activation key"
+- name: leapp-post-upgrade | "Register to post leapp activation key"
   community.general.redhat_subscription:
     state: present
     activationkey: "{{ satellite_activation_key_post_leapp }}"
@@ -76,25 +80,26 @@
     - satellite_organization is defined
     - satellite_activation_key_post_leapp is defined
 
-- name: Include update-and-reboot.yml
+- name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
 # TODO: Validate RHEL OS versions again?
 
 # Only found in RHEL 7 to 8 documentation
-- name:  Old kernels have been removed from the bootloader entry for RHEL 7 to 8
+- name: leapp-post-upgrade |  Old kernels have been removed from the bootloader entry for RHEL 7 to 8
   ansible.builtin.shell: |
-    export PATH={{ os_path }}
+    set -o pipefail;
+    export PATH={{ os_path }};
     grubby --info=ALL | grep "\.el7" || echo "Old kernels are not present in the bootloader."
   register: grubby_check
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
   changed_when: false
   failed_when: grubby_check.stdout != 'Old kernels are not present in the bootloader.'
 
-- name: Include tasks for leapp post upgrade selinux
+- name: leapp-post-upgrade | Include tasks for leapp post upgrade selinux
   ansible.builtin.include_tasks: leapp-post-upgrade-selinux.yml
 
-- name: Include tasks for leapp post upgrade crypto policies
+- name: leapp-post-upgrade | Include tasks for leapp post upgrade crypto policies
   ansible.builtin.include_tasks: leapp-post-upgrade-crypto.yml
   when: set_crypto_policies
 ...

@@ -1,11 +1,11 @@
 ---
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
-- name: Ensure redhat-upgrade-cmdline-instrepo.repo file is absent
+- name: redhat-upgrade-tool-post-upgrade | Ensure redhat-upgrade-cmdline-instrepo.repo file is absent
   ansible.builtin.file:
     path: /etc/yum.repos.d/redhat-upgrade-cmdline-instrepo.repo
     state: absent
 
-- name: "Register to post upgrade activation key"
+- name: redhat-upgrade-tool-post-upgrade | "Register to post upgrade activation key"
   ansible.builtin.shell: >
     export PATH={{ os_path }};
     subscription-manager register
@@ -18,17 +18,18 @@
     - satellite_organization is defined
     - satellite_activation_key_post_leapp is defined
   failed_when: false
+  changed_when: true
 
-- name: Include check-for-old-packages.yml
+- name: redhat-upgrade-tool-post-upgrade | Include check-for-old-packages.yml
   ansible.builtin.include_tasks: check-for-old-packages.yml
 
-- name: Include grub2-upgrade.yml
+- name: redhat-upgrade-tool-post-upgrade | Include grub2-upgrade.yml
   ansible.builtin.include_tasks: grub2-upgrade.yml
   when:
     - ansible_architecture == 'x86_64'
     - update_grub_to_grub_2
 
-- name: Include update-and-reboot.yml
+- name: redhat-upgrade-tool-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
 ...
