@@ -83,8 +83,8 @@ warn_list:
 # By default it will run all transforms (effectively `write_list: ["all"]`).
 # You can disable running transforms by setting `write_list: ["none"]`.
 # Or only enable a subset of rule transforms by listing rules/tags here.
-write_list:
-  - all
+# write_list:
+#   - all
 
 # Offline mode disables installation of requirements.yml and schema refreshing
 offline: false

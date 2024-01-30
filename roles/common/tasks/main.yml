@@ -15,8 +15,7 @@
 
 - name: Fail if log file already exists
   ansible.builtin.fail:
-    msg: Another RIPU playbook job is already running. See {{ log_file }} for details. If the previous job was aborted, rename the log file to clear this failure
-      and try again.
+    msg: Another RIPU playbook job is already running. See {{ log_file }} for details. If the previous job was aborted, rename the log file to clear this failure and try again.
   when: log_file_stat.stat.exists
 
 - name: Create new log file
