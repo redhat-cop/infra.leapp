@@ -4,7 +4,7 @@
   ansible.builtin.import_role:
     name: infra.leapp.common
   vars:
-    job_name: 'RIPU in-place OS upgrade'
+    job_name: RIPU in-place OS upgrade
 
 - name: Include tasks for upgrade using redhat-upgrade-tool
   ansible.builtin.include_tasks: redhat-upgrade-tool-upgrade.yml

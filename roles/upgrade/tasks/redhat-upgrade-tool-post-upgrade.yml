@@ -31,5 +31,4 @@
 
 - name: redhat-upgrade-tool-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
-
 ...

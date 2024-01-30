@@ -21,5 +21,4 @@
 - name: upgrade-validation | Include leapp post upgrade validation
   ansible.builtin.include_tasks: leapp-upgrade-validation.yml
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int >= 7
-
 ...

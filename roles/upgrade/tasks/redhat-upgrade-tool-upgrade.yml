@@ -34,7 +34,7 @@
 
 - name: redhat-upgrade-tool-upgrade | No packages are version locked
   community.general.yum_versionlock:
-    name: '*'
+    name: "*"
     state: absent
   when: "'yum-plugin-versionlock' in ansible_facts.packages"
 
@@ -43,7 +43,7 @@
 
 - name: redhat-upgrade-tool-upgrade | Disable RHEL 6 RHSM or RHUI repos
   community.general.rhsm_repository:
-    name: '*'
+    name: "*"
     state: disabled
   when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn' or leapp_upgrade_type == 'rhui'
   failed_when: false
@@ -67,8 +67,7 @@
 
 - name: redhat-upgrade-tool-upgrade | Reboot to continue OS upgrade
   ansible.builtin.reboot:
-    msg: "Host is starting OS upgrade now!"
+    msg: Host is starting OS upgrade now!
     post_reboot_delay: "{{ post_reboot_delay }}"
     reboot_timeout: 43200
-
 ...

@@ -15,7 +15,7 @@
     dest: /etc/default/grub
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
 
 # If grub_boot_device is not defined, attempt to determine it based on /boot if present, or / if /boot is not present.
 - name: grub2-upgrade | Determine grub_boot_device if not defined

@@ -30,7 +30,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: analysis-leapp | Populate leapp_answers file
   ansible.builtin.copy:
@@ -38,7 +38,7 @@
     dest: /var/log/leapp/answerfile
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: leapp_answerfile is defined
 
 - name: analysis-leapp | Leapp preupgrade report
@@ -63,5 +63,4 @@
 - name: analysis-leapp | Include the parse_leapp_report role to check for inhibitors
   ansible.builtin.include_role:
     name: infra.leapp.parse_leapp_report
-
 ...

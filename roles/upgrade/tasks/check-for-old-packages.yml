@@ -27,7 +27,7 @@
 - name: check-for-old-packages | Display warning message if there are any missing non-rhel versioned packages from the pre-upgrade
   ansible.builtin.debug:
     msg:
-      - "Warning!! There are non-rhel packages that were removed during the upgrade. Please review the list of missing packages"
+      - Warning!! There are non-rhel packages that were removed during the upgrade. Please review the list of missing packages
       - "{{ missing_non_rhel_packages }}"
   when: missing_non_rhel_packages | length >= 1
 
@@ -35,7 +35,7 @@
   ansible.builtin.copy:
     content: "{{ missing_non_rhel_packages }}"
     dest: /etc/ansible/facts.d/missing_packages.fact
-    mode: '0644'
+    mode: "0644"
     owner: root
     group: root
 
@@ -50,7 +50,8 @@
   check_mode: true
   register: search_packages_result
 
-- name: check-for-old-packages | Display results of the search for packages from the previous os release, packages not versioned by rhel release and all dependent packages
+- name: check-for-old-packages | Display results of the search for packages from the previous os release, packages not versioned by rhel release and all dependent
+    packages
   ansible.builtin.debug:
     msg: "{{ search_packages_result.changes.removed | default(search_packages_result.results) | default([]) | regex_replace('Removed: ', '') }}"
 

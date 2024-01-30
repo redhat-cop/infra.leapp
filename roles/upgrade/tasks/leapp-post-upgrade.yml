@@ -8,13 +8,13 @@
 
 # leapp 7 to 8 documentation cleans up old kernels
 - name: leapp-post-upgrade | Block for RHEL 7 kernel cleanup
-  when: "ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7"
+  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
   block:
     - name: leapp-post-upgrade | Find old kernels
       ansible.builtin.find:
         paths:
           - /lib/modules
-        patterns: '*.el7*'
+        patterns: "*.el7*"
         file_type: directory
       register: old_kernels
 

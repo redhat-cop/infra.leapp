@@ -1,7 +1,7 @@
 ---
 - name: update-and-reboot | Ensure all updates are applied
   ansible.builtin.package:
-    name: '*'
+    name: "*"
     state: latest
   register: updates_available
   async: "{{ async_timeout_maximum | int }}"
