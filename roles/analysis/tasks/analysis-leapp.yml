@@ -15,13 +15,13 @@
   ansible.builtin.package:
     name: "{{ analysis_packages_el7 }}"
     enablerepo: "{{ analysis_repos_el7 }}"
-    state: latest
+    state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 7
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 8
   ansible.builtin.package:
     name: "{{ analysis_packages_el8 }}"
-    state: latest
+    state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 8
 
 - name: analysis-leapp | Ensure leapp log directory exists

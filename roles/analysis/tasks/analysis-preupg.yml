@@ -30,13 +30,13 @@
   ansible.builtin.package:
     name: "{{ analysis_packages_el6 }}"
     enablerepo: "{{ analysis_repos_el6 }}"
-    state: latest
+    state: latest # noqa package-latest
   when: leapp_upgrade_type != 'rhui'
 
 - name: analysis-preupg | Preupgrade Assistant and Red Hat Upgrade Tool packages are latest - RHUI
   ansible.builtin.package:
     name: "{{ analysis_packages_el6 }}"
-    state: latest
+    state: latest # noqa package-latest
   when: leapp_upgrade_type == 'rhui'
 
 - name: analysis-preupg | Lynx is installed for text report
