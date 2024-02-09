@@ -10,7 +10,6 @@
     satellite_organization: My Satellite Organization
     satellite_activation_key_pre_leapp: MY_ACTIVATION_KEY_PRE
     satellite_activation_key_leapp: MY_ACTIVATION_KEY
-    analysis_repos_el7: copr:copr.fedorainfracloud.org:group_oamg:leapp
     # By default the analysis role will use:
     # analysis_repos_el7: rhel-7-server-extras-rpms
     # Optionally override the default analysis_repos_el7 to use the upstream copr leapp repository:
