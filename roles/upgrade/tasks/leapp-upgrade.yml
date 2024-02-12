@@ -1,14 +1,14 @@
 ---
-- name: Include the parse_leapp_report role to check for inhibitors
+- name: leapp-upgrade | Include the parse_leapp_report role to check for inhibitors
   ansible.builtin.include_role:
     name: infra.leapp.parse_leapp_report
 
-- name: Verify no inhibitor results found during preupgrade
+- name: leapp-upgrade | Verify no inhibitor results found during preupgrade
   ansible.builtin.assert:
     that: not upgrade_inhibited
     msg: Inhibitors found, please investigate and rerun analysis.
 
-- name: Register to leapp activation key
+- name: leapp-upgrade | Register to leapp activation key
   community.general.redhat_subscription:
     state: present
     activationkey: "{{ satellite_activation_key_leapp }}"
@@ -19,13 +19,13 @@
     - satellite_organization is defined
     - satellite_activation_key_leapp is defined
 
-- name: Include update-and-reboot.yml
+- name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
-- name: Start Leapp OS upgrade
+- name: leapp-upgrade | Start Leapp OS upgrade
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
     set -o pipefail;
+    export PATH={{ os_path }};
     leapp upgrade
     {{ leapp_upgrade_opts }}
     {{ leapp_enable_repos_args }}
@@ -34,20 +34,21 @@
     executable: /bin/bash
   async: "{{ async_timeout_maximum | int }}"
   poll: "{{ async_poll_interval | int }}"
+  changed_when: true
 
-- name: Reboot to continue Leapp OS upgrade
+- name: leapp-upgrade | Reboot to continue Leapp OS upgrade
   ansible.builtin.reboot:
-    msg: "Host is starting Leapp OS upgrade now!"
+    msg: Host is starting Leapp OS upgrade now!
     reboot_timeout: 43200
     post_reboot_delay: "{{ post_reboot_delay }}"
   timeout: 43260
 
 # Ansible discovers /usr/bin/python on RHEL 7, then on RHEL 8 it is no longer available.
-- name: Set python interpreter to /usr/bin/python3 since /usr/bin/python is no longer available
+- name: leapp-upgrade | Set python interpreter to /usr/bin/python3 since /usr/bin/python is no longer available
   ansible.builtin.set_fact:
     ansible_python_interpreter: /usr/bin/python3
 
-- name: Wait for leapp_resume run once service to no longer exist
+- name: leapp-upgrade | Wait for leapp_resume run once service to no longer exist
   ansible.builtin.service:
     name: leapp_resume
     state: started
@@ -58,18 +59,18 @@
   retries: 360
   delay: 10
 
-- name: Block to handle grub_boot_device option
+- name: leapp-upgrade | Block to handle grub_boot_device option
   when: grub_boot_device is defined
   block:
-    - name: Run grub2-install
+    - name: leapp-upgrade | Run grub2-install
       ansible.builtin.shell: >
         export PATH={{ os_path }};
         grub2-install {{ grub_boot_device }}
+      changed_when: true
 
-    - name: Reboot to pickup grub update
+    - name: leapp-upgrade | Reboot to pickup grub update
       ansible.builtin.reboot:
         reboot_timeout: 7200
         post_reboot_delay: "{{ post_reboot_delay }}"
       timeout: 7260
-
 ...

@@ -1,25 +1,24 @@
 ---
-- name: Collect updated facts
+- name: upgrade-validation | Collect updated facts
   ansible.builtin.setup:
 
-- name: Determine rhel_dest_major_version
+- name: upgrade-validation | Determine rhel_dest_major_version
   ansible.builtin.set_fact:
     rhel_dest_major_version: "{{ ((ansible_facts.ansible_local.pre_ripu.distribution_major_version | int) + 1) | string }}"
 
-- name: Validate current OS major version
+- name: upgrade-validation | Validate current OS major version
   ansible.builtin.assert:
     that: ansible_distribution_major_version == rhel_dest_major_version
     fail_msg: Expected leapp destination OS major version {{ rhel_dest_major_version }} but OS major version is {{ ansible_distribution_major_version }}.
     success_msg: Current OS version is {{ ansible_distribution_version }}.
 
-- name: Validate running kernel matches OS version
+- name: upgrade-validation | Validate running kernel matches OS version
   ansible.builtin.assert:
     that: "'el' ~ rhel_dest_major_version in ansible_kernel"
     fail_msg: Kernel version {{ ansible_kernel }} does not match expected OS major version el{{ rhel_dest_major_version }}.
     success_msg: Current kernel version is {{ ansible_kernel }}.
 
-- name: Include leapp post upgrade validation
+- name: upgrade-validation | Include leapp post upgrade validation
   ansible.builtin.include_tasks: leapp-upgrade-validation.yml
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int >= 7
-
 ...

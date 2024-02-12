@@ -1,13 +1,13 @@
 ---
-- name: Ensure all updates are applied
+- name: update-and-reboot | Ensure all updates are applied
   ansible.builtin.package:
-    name: '*'
-    state: latest
+    name: "*"
+    state: latest # noqa package-latest
   register: updates_available
   async: "{{ async_timeout_maximum | int }}"
   poll: "{{ async_poll_interval | int }}"
 
-- name: Reboot when updates applied
+- name: update-and-reboot | Reboot when updates applied
   ansible.builtin.reboot:
     reboot_timeout: 7200
     post_reboot_delay: "{{ post_reboot_delay }}"

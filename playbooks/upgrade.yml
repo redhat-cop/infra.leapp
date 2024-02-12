@@ -5,10 +5,10 @@
   become: true
   force_handlers: true
   vars:
-    satellite_organization: 'My Satellite Organization'
-    satellite_activation_key_leapp: 'MY_ACTIVATION_KEY'
-    satellite_activation_key_post_leapp: 'MY_ACTIVATION_KEY_POST'
-    leapp_upgrade_opts: '--target 8.8'
+    satellite_organization: My Satellite Organization
+    satellite_activation_key_leapp: MY_ACTIVATION_KEY
+    satellite_activation_key_post_leapp: MY_ACTIVATION_KEY_POST
+    leapp_upgrade_opts: --target 8.8
     update_grub_to_grub_2: true
     selinux_mode: permissive
   tasks:

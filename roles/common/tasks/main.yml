@@ -6,7 +6,7 @@
     state: directory
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Check for existing log file
   ansible.builtin.stat:
@@ -15,7 +15,7 @@
 
 - name: Fail if log file already exists
   ansible.builtin.fail:
-    msg: "Another RIPU playbook job is already running. See {{ log_file }} for details. If the previous job was aborted, rename the log file to clear this failure and try again."
+    msg: Another RIPU playbook job is already running. See {{ log_file }} for details. If the previous job was aborted, rename the log file to clear this failure and try again.
   when: log_file_stat.stat.exists
 
 - name: Create new log file
@@ -26,7 +26,7 @@
     dest: "{{ log_file }}"
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   notify:
-    - "Archive log file"
+    - Archive log file
 ...

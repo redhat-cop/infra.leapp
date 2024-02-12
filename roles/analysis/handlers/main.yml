@@ -16,6 +16,7 @@
     --activationkey="{{ satellite_activation_key_pre_leapp }}"
     --force
   register: sub_man_reg
+  changed_when: true
   failed_when: false
 
 - name: Remove lynx package
