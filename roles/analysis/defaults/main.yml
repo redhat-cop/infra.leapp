@@ -41,6 +41,8 @@ leapp_upgrade_type: satellite
 # TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
 
+leapp_target_release: ""
+
 leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
 
 # Satellite Organization and Activation Keys are required if using Satellite to change content views
