@@ -46,6 +46,7 @@
     set -o pipefail;
     export PATH={{ os_path }};
     leapp preupgrade
+    {{ "--target " ~ leapp_target_release if leapp_target_release | length > 0 }}
     {{ leapp_preupg_opts }}
     {{ leapp_enable_repos_args }}
     2>&1 | tee -a {{ log_file }}
