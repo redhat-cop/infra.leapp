@@ -8,7 +8,7 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 
 | Name                    | Default value         | Description                                         |
 |-------------------------|-----------------------|-----------------------------------------------------|
-| leapp_upgrade_type      | "satellite"           | Set to "cdn" for hosts registered with Red Hat CDN and "rhui" for hosts using rhui repos. |
+| leapp_upgrade_type      | "satellite"           | Set to "cdn" for hosts registered with Red Hat CDN, "rhui" for hosts using rhui repos, and "custom" for custom repos. |
 | leapp_upgrade_opts      |                       | Optional string to define command line options to be passed to the `leapp` command when running the upgrade. |
 | leapp_repos_enabled     |                       | Optional list of repos to limit for use in the upgrade process. |
 | selinux_mode            | same as before upgrade | Define this variable to the desired SELinux mode to be set after the OS upgrade, i.e., enforcing, permissive, or disabled. By default, the SELinux mode will be set to what was found during the pre-upgrade analysis. |
