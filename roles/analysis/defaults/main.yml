@@ -38,10 +38,9 @@ analysis_repos_el7:
 leapp_upgrade_type: satellite
 # leapp_upgrade_type: cdn
 # leapp_upgrade_type: rhui
-# TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
 
-leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
+leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' or leapp_upgrade_type == 'custom' else '' }}"
 
 # Satellite Organization and Activation Keys are required if using Satellite to change content views
 # unless the content view already in use has all required repositories.
@@ -52,6 +51,24 @@ leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
 leapp_repos_enabled: []
 # leapp_repos_enabled:
 #   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
+
+# For leapp_upgrade_type == "custom"
+# Used to generate /etc/leapp/files/leapp_upgrade_repositories.repo
+# Generated using ansible.builtin.yum_repository.
+local_repos_leapp: []
+# local_repos_leapp:
+#   - name: rhel-8-for-x86_64-baseos-rpms
+#     description: Red Hat 8.8 Base OS
+#     baseurl: http://repo01.example.com/8.8/rhel-8-for-x86_64-baseos-rpms
+#     # enabled: 1 # Default 1
+#     # gpgcheck: 0 # Default 0
+#     # gpgkey: XXX # Default omit.
+#   - name: rhel-8-for-x86_64-appstream-rpms
+#     description: Red Hat 8.8 App Stream
+#     baseurl: http://repo01.example.com/8.8/rhel-8-for-x86_64-baseos-rpms
+#     # enabled: 1 # Default 1
+#     # gpgcheck: 0 # Default 0
+#     # gpgkey: XXX # Default omit.
 
 post_reboot_delay: 120
 

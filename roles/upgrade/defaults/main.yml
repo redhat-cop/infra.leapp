@@ -6,7 +6,7 @@ leapp_upgrade_type: satellite
 # TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
 
-leapp_upgrade_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
+leapp_upgrade_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' or leapp_upgrade_type == 'custom' else '' }}"
 
 leapp_repos_enabled: []
 # leapp_repos_enabled:
@@ -18,6 +18,50 @@ rhel_7_network_install_repo_url: http://capsule1.example.com/pub/ISO/RHEL7.9
 # unless the content view already in use has all required repositories.
 # satellite_organization: Example
 # satellite_activation_key_post_leapp: rhel{{ ansible_distribution_major_version }}_prod
+
+# For leapp_upgrade_type == "custom"
+# Used to generate /etc/leapp/files/leapp_upgrade_repositories.repo
+# Generated using ansible.builtin.yum_repository.
+local_repos_leapp: []
+# local_repos_leapp:
+#   - name: rhel-8-for-x86_64-baseos-rpms
+#     description: Red Hat 8.8 Base OS
+#     baseurl: http://repo01.example.com/8.8/rhel-8-for-x86_64-baseos-rpms
+#     # enabled: 1 # Default 1
+#     # gpgcheck: 0 # Default 0
+#     # gpgkey: XXX # Default omit.
+#   - name: rhel-8-for-x86_64-appstream-rpms
+#     description: Red Hat 8.8 App Stream
+#     baseurl: http://repo01.example.com/8.8/rhel-8-for-x86_64-baseos-rpms
+#     # enabled: 1 # Default 1
+#     # gpgcheck: 0 # Default 0
+#     # gpgkey: XXX # Default omit.
+
+# For leapp_upgrade_type == "custom"
+# Used to remove previous version repositories post upgrade.
+# /etc/yum.repos.d/ prepended to file names in task.
+repo_files_to_remove_post_upgrade: []
+# yum_repos_d_files_to_remove_post_upgrade:
+#   - rhel7Server.repo
+
+# For leapp_upgrade_type == "custom"
+# Applied using ansible.builtin.yum_repository post upgrade.
+local_repos_post_upgrade: []
+# local_repos_post_upgrade:
+#  - name: rhel-8-for-x86_64-baseos-rpms
+#    description: Red Hat 8 Base OS
+#    baseurl: http://repo01.example.com/8/rhel-8-for-x86_64-baseos-rpms
+#    # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#    # enabled: 0 # Default 1
+#    # gpgcheck: 1 # Default 0
+#    # gpgkey: XXX # Default omit.
+#  - name: rhel-8-for-x86_64-appstream-rpms
+#    description: Red Hat 8 App Stream
+#    baseurl: http://repo01.example.com/8/rhel-8-for-x86_64-baseos-rpms
+#    # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#    # enabled: 0 # Default 1
+#    # gpgcheck: 1 # Default 0
+#    # gpgkey: XXX # Default omit.
 
 # Desired selinux mode post Leapp upgrade.
 # selinux_mode: enforcing

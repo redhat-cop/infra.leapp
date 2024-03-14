@@ -20,6 +20,10 @@
   failed_when: false
   changed_when: true
 
+- name: redhat-upgrade-tool-post-upgrade | Include custom-local-repos.yml
+  ansible.builtin.include_tasks: custom-local-repos.yml
+  when: leapp_upgrade_type == "custom"
+
 - name: redhat-upgrade-tool-post-upgrade | Include check-for-old-packages.yml
   ansible.builtin.include_tasks: check-for-old-packages.yml
 

@@ -22,6 +22,28 @@
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
+- name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
+  ansible.builtin.yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    enabled: "{{ item.enabled | default(1) }}"
+    gpgcheck: "{{ item.gpgcheck | default(0) }}"
+    file: /etc/leapp/files/leapp_upgrade_repositories
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ local_repos_leapp }}"
+  when:
+    - leapp_upgrade_type == 'custom'
+    - local_repos_leapp | length > 0
+
+- name: leapp-upgrade | Include disable-previous-repo-files.yml
+  ansible.builtin.include_tasks: disable-previous-repo-files.yml
+  when:
+    - leapp_upgrade_type == "custom"
+    - repo_files_to_remove_post_upgrade | length > 0
+
 - name: leapp-upgrade | Start Leapp OS upgrade
   ansible.builtin.shell: >
     set -o pipefail;

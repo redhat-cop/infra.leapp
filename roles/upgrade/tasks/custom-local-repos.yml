@@ -1,0 +1,17 @@
+---
+- name: custom-local-repos | Enable post upgrade yum repositories
+  ansible.builtin.yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    enabled: "{{ item.enabled | default(1) }}"
+    gpgcheck: "{{ item.gpgcheck | default(0) }}"
+    file: "{{ item.file | default('local') }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ local_repos_post_upgrade }}"
+  when:
+    - local_repos_post_upgrade | length > 0
+
+...
