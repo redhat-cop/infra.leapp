@@ -54,7 +54,7 @@
   when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn' or leapp_upgrade_type == 'rhui'
   failed_when: false
 
-- name: leapp-upgrade | Include disable-previous-repo-files.yml
+- name: redhat-upgrade-tool-upgrade | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
   when: leapp_upgrade_type == "custom"
 
