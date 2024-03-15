@@ -50,7 +50,7 @@ local_repos_leapp: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
-#     # Can include file in this data structure to re-use this for local_repos_post_upgrade.
+#     # Can include file in this data structure to reuse this for local_repos_post_upgrade.
 #     # file: local # Will be ignored for leapp_upgrade_repositories.repo
 #     # state: present # Defaults to present.
 #   - name: rhel-8-for-x86_64-appstream-rpms
@@ -59,7 +59,7 @@ local_repos_leapp: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
-#     # Can include file in this data structure to re-use this for local_repos_post_upgrade.
+#     # Can include file in this data structure to reuse this for local_repos_post_upgrade.
 #     # file: local # Will be ignored for leapp_upgrade_repositories.repo
 #     # state: present # Defaults to present.
 
