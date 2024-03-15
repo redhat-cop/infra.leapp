@@ -41,7 +41,7 @@ local_repos_leapp: []
 # Used to remove previous version repositories post upgrade.
 # /etc/yum.repos.d/ prepended to file names in task.
 repo_files_to_remove_post_upgrade: []
-# yum_repos_d_files_to_remove_post_upgrade:
+# repo_files_to_remove_post_upgrade:
 #   - rhel7Server.repo
 
 # For leapp_upgrade_type == "custom"
