@@ -7,12 +7,12 @@
     owner: root
     group: root
     mode: "0644"
-  loop: "{{ repo_files_to_remove_post_upgrade }}"
+  loop: "{{ repo_files_to_remove_at_upgrade }}"
 
 - name: disable-previous-repo-files | Remove previous OS version repo files
   ansible.builtin.file:
     path: "/etc/yum.repos.d/{{ item }}"
     state: absent
-  loop: "{{ repo_files_to_remove_post_upgrade }}"
+  loop: "{{ repo_files_to_remove_at_upgrade }}"
 
 ...

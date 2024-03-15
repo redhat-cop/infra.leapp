@@ -19,6 +19,12 @@
     - satellite_organization is defined
     - satellite_activation_key_leapp is defined
 
+- name: leapp-upgrade | Include custom-local-repos.yml local_repos_pre_leapp
+  vars:
+    __local_repos: "{{ local_repos_pre_leapp }}"
+  ansible.builtin.include_tasks: custom-local-repos.yml
+  when: leapp_upgrade_type == "custom"
+
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
@@ -40,9 +46,7 @@
 
 - name: leapp-upgrade | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
-  when:
-    - leapp_upgrade_type == "custom"
-    - repo_files_to_remove_post_upgrade | length > 0
+  when: leapp_upgrade_type == "custom"
 
 - name: leapp-upgrade | Start Leapp OS upgrade
   ansible.builtin.shell: >

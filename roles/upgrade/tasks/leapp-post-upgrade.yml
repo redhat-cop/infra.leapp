@@ -80,7 +80,9 @@
     - satellite_organization is defined
     - satellite_activation_key_post_leapp is defined
 
-- name: leapp-post-upgrade | Include custom-local-repos.yml
+- name: leapp-post-upgrade | Include custom-local-repos.yml for local_repos_post_upgrade
+  vars:
+    __local_repos: "{{ local_repos_post_upgrade }}"
   ansible.builtin.include_tasks: custom-local-repos.yml
   when: leapp_upgrade_type == "custom"
 

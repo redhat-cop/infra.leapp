@@ -29,11 +29,11 @@
   failed_when: false
   changed_when: true
 
-- name: redhat-upgrade-tool-upgrade | Include disable-previous-repo-files.yml
-  ansible.builtin.include_tasks: disable-previous-repo-files.yml
-  when:
-    - leapp_upgrade_type == "custom"
-    - repo_files_to_remove_post_upgrade | length > 0
+- name: redhat-upgrade-tool-upgrade | Include custom-local-repos.yml local_repos_post_upgrade
+  vars:
+    __local_repos: "{{ local_repos_post_upgrade }}"
+  ansible.builtin.include_tasks: custom-local-repos.yml
+  when: leapp_upgrade_type == "custom"
 
 - name: redhat-upgrade-tool-upgrade | Gather package facts
   ansible.builtin.package_facts:
@@ -54,7 +54,9 @@
   when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn' or leapp_upgrade_type == 'rhui'
   failed_when: false
 
-# TODO: Add support for non-RHSM.
+- name: leapp-upgrade | Include disable-previous-repo-files.yml
+  ansible.builtin.include_tasks: disable-previous-repo-files.yml
+  when: leapp_upgrade_type == "custom"
 
 # --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.
 - name: redhat-upgrade-tool-upgrade | Run redhat-upgrade-tool
