@@ -19,6 +19,8 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | os_path                 | $PATH                 | Variable used to override the default $PATH environmental variable on the target node
 | async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
 | async_poll_interval     | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
+| post_upgrade_unset_release| true                | Boolean used to control whether Leapp's RHSM release lock is unset.
+| post_upgrade_release    |                       | Optional string used to set a specific RHSM release lock after the Leapp upgrade, but before the final update pass.
 
 ## Example playbook
 
