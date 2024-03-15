@@ -64,9 +64,7 @@
   ansible.builtin.shell: >
     export PATH={{ os_path }};
     subscription-manager release --unset
-  when:
-    - leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
-    - leapp_target_release | length > 0
+  when: leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
   changed_when: true
 
 # TODO: Unset rhui release.

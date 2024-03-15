@@ -6,8 +6,6 @@ leapp_upgrade_type: satellite
 # TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
 
-leapp_target_release: ""
-
 leapp_upgrade_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' else '' }}"
 
 leapp_repos_enabled: []

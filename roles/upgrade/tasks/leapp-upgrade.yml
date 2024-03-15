@@ -27,7 +27,6 @@
     set -o pipefail;
     export PATH={{ os_path }};
     leapp upgrade
-    {{ "--target " ~ leapp_target_release if leapp_target_release | length > 0 else "" }}
     {{ leapp_upgrade_opts }}
     {{ leapp_enable_repos_args }}
     2>&1 | tee -a {{ log_file }}
