@@ -46,6 +46,8 @@
 
 - name: leapp-upgrade | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
+  vars:
+    __repo_files: "{{ repo_files_to_remove_at_upgrade }}"
   when: leapp_upgrade_type == "custom"
 
 - name: leapp-upgrade | Start Leapp OS upgrade

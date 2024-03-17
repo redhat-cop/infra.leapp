@@ -3,7 +3,6 @@
 leapp_upgrade_type: satellite
 # leapp_upgrade_type: cdn
 # leapp_upgrade_type: rhui
-# TODO: Add support for custom repositories?
 # leapp_upgrade_type: custom
 
 leapp_upgrade_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' or leapp_upgrade_type == 'custom' else '' }}"
@@ -64,7 +63,7 @@ local_repos_leapp: []
 #     # state: present # Defaults to present.
 
 # For leapp_upgrade_type == "custom"
-# Used to remove previous version repositories post upgrade.
+# Used to rename previous previous repo files with timestamp at the end for future reference.
 # /etc/yum.repos.d/ prepended to file names in task.
 repo_files_to_remove_at_upgrade: []
 # repo_files_to_remove_at_upgrade:

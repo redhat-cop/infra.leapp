@@ -1,5 +1,5 @@
 ---
-- name: disable-previous-repo-files | Backup previous OS version repo files
+- name: disable-previous-repo-files | Backup repo files
   ansible.builtin.copy:
     remote_src: true
     src: "/etc/yum.repos.d/{{ item }}"
@@ -7,12 +7,12 @@
     owner: root
     group: root
     mode: "0644"
-  loop: "{{ repo_files_to_remove_at_upgrade }}"
+  loop: "{{ __repo_files }}"
 
-- name: disable-previous-repo-files | Remove previous OS version repo files
+- name: disable-previous-repo-files | Remove repo files
   ansible.builtin.file:
     path: "/etc/yum.repos.d/{{ item }}"
     state: absent
-  loop: "{{ repo_files_to_remove_at_upgrade }}"
+  loop: "{{ __repo_files }}"
 
 ...
