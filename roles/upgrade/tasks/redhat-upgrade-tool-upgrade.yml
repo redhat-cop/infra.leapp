@@ -48,9 +48,8 @@
 # So upgrade-and-reboot.yml can succed.
 - name: redhat-upgrade-tool-upgrade | Disable redhat-upgrade-cmdline-instrepo.repo
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
-  vars:
-    __repo_files:
-      - redhat-upgrade-cmdline-instrepo.repo
+  loop:
+    - redhat-upgrade-cmdline-instrepo.repo
   when: leapp_upgrade_type == "custom"
 
 - name: redhat-upgrade-tool-upgrade | Include update-and-reboot.yml
@@ -64,8 +63,7 @@
 
 - name: redhat-upgrade-tool-upgrade | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
-  vars:
-    __repo_files: "{{ repo_files_to_remove_at_upgrade }}"
+  loop: "{{ repo_files_to_remove_at_upgrade }}"
   when: leapp_upgrade_type == "custom"
 
 - name: Install RPM Key for RHEL 7 ISO Repository
