@@ -31,7 +31,7 @@
 
 - name: redhat-upgrade-tool-upgrade | Include custom-local-repos.yml local_repos_post_upgrade
   vars:
-    __local_repos: "{{ local_repos_post_upgrade }}"
+    __local_repos: "{{ local_repos_pre_leapp }}"
   ansible.builtin.include_tasks: custom-local-repos.yml
   when: leapp_upgrade_type == "custom"
 
