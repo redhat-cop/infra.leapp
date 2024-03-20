@@ -20,6 +20,7 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
 | async_poll_interval     | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
 | check_leapp_analysis_results| true              | Allows for running remediation and going straight to upgrade without re-running analysis. |
+| post_upgrade_update     | true                   | Boolean to decide if after the upgrade is performed a dnf update will run|
 
 ## Example playbook
 
