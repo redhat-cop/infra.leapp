@@ -1,0 +1,4 @@
+---
+major_changes:
+  - added a boolean to allow users to skip the dnf update after the upgrade has completed
+...

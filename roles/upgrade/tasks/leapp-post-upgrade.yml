@@ -82,6 +82,7 @@
 
 - name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
+  when: post_upgrade_update
 
 # TODO: Validate RHEL OS versions again?
 
