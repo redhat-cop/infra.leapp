@@ -20,6 +20,28 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
 | async_poll_interval     | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
 
+## Satellite variables
+
+Activation keys provide a method to identify content views available from Red Hat Satellite. To do in-place upgrades using Satellite, a content view including both the current RHEL version and the next version must be created. Use these variables to specify the activation keys for the required content views.
+
+| Name                  | Type | Default value           | Description                                     |
+|-----------------------|------|-------------------------|-------------------------------------------------|
+| satellite_organization  | String   |  | Organization used in Satellite definition |
+| satellite_activation_key_leapp     | String |  | Activation key for the content view including both the current RHEL version and the next version |
+| satellite_activation_key_post_leapp     | String |  | Activation key for the content view for the next version post leapp |
+| leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
+
+## Custom repos variables
+
+See comments in defaults/main.yml for additional details.
+
+| Name                  | Type | Default value           | Description                                     |
+|-----------------------|------|-------------------------|-------------------------------------------------|
+| local_repos_pre_leapp  | List of dicts   | [] | Used to configure repos for yum update before running leapp upgrade (current version).|
+| local_repos_leapp  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo.
+| local_repos_post_upgrade  | List of dicts   | [] | Used to configure next version repos post upgrade (can be set to local_repos_leapp if the same)
+| repo_files_to_remove_at_upgrade  | List   | [] | Simpler way to remove /etc/yum.repo.d files before leapp upgrade is run.
+
 ## Example playbook
 
 See [`upgrade.yml`](../../playbooks/upgrade.yml).

@@ -23,6 +23,16 @@ Activation keys provide a method to identify content views available from Red Ha
 | satellite_activation_key_leapp     | String |  | Activation key for the content view including both the current RHEL version and the next version |
 | leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
 
+## Custom repos variables
+
+See comments in defaults/main.yml for additional details.
+
+| Name                  | Type | Default value           | Description                                     |
+|-----------------------|------|-------------------------|-------------------------------------------------|
+| local_repos_pre_leapp  | List of dicts   | [] | Used to configure repos before running leapp analysis / installing leapp packages.|
+| local_repos_leapp  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo.
+| local_repos_post_analysis  | List of dicts   | [] | Used to return repos to previous state after leapp analysis if necessary.
+
 ## Optional variables
 
 | Name                  | Type | Default value           | Description                                     |
