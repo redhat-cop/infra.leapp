@@ -20,8 +20,36 @@
     - satellite_organization is defined
     - satellite_activation_key_leapp is defined
 
+- name: leapp-upgrade | Include custom-local-repos.yml local_repos_pre_leapp
+  vars:
+    __local_repos: "{{ local_repos_pre_leapp }}"
+  ansible.builtin.include_tasks: custom-local-repos.yml
+  when: leapp_upgrade_type == "custom"
+
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
+
+- name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
+  ansible.builtin.yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    enabled: "{{ item.enabled | default(1) }}"
+    gpgcheck: "{{ item.gpgcheck | default(0) }}"
+    file: /etc/leapp/files/leapp_upgrade_repositories
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ local_repos_leapp }}"
+  when:
+    - leapp_upgrade_type == 'custom'
+    - local_repos_leapp | length > 0
+
+- name: leapp-upgrade | Include disable-previous-repo-files.yml
+  ansible.builtin.include_tasks: disable-previous-repo-files.yml
+  loop:
+    "{{ repo_files_to_remove_at_upgrade }}"
+  when: leapp_upgrade_type == "custom"
 
 - name: leapp-upgrade | Start Leapp OS upgrade
   ansible.builtin.shell: >

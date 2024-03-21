@@ -16,6 +16,12 @@
   failed_when: false
   changed_when: true
 
+- name: analysis-preupg | Include custom-local-repos.yml for local_repos_pre_leapp
+  vars:
+    __local_repos: "{{ local_repos_pre_leapp }}"
+  ansible.builtin.include_tasks: custom-local-repos.yml
+  when: leapp_upgrade_type == "custom"
+
 - name: analysis-preupg | Enable requisite RHUI repos
   ansible.builtin.shell: |
     set -o pipefail;
@@ -68,6 +74,12 @@
   ansible.builtin.assert:
     that: not preupg_return_codes[preupg.rc].fail
     msg: "{{ preupg_return_codes[preupg.rc].msg }}"
+
+- name: analysis-preupg | Include custom-local-repos.yml for local_repos_post_analysis
+  vars:
+    __local_repos: "{{ local_repos_post_analysis }}"
+  ansible.builtin.include_tasks: custom-local-repos.yml
+  when: leapp_upgrade_type == "custom"
 
 - name: analysis-preupg | Include check-results-file.yml
   ansible.builtin.include_tasks: check-results-file.yml
