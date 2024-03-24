@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Fix analysis handler for Satellite registration (add conditional for if pre_leapp key is defined).
+...
