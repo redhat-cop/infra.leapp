@@ -6,6 +6,10 @@
     activationkey: "{{ satellite_activation_key_pre_leapp }}"
     org_id: "{{ satellite_organization }}"
     force_register: true
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - satellite_organization is defined
+    - satellite_activation_key_pre_leapp is defined
 
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: Register to pre leapp activation key RHEL 6
