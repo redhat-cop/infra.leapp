@@ -1,0 +1,5 @@
+---
+major_changes:
+  - Add capturing of high (error) findings in analysis and upgrade.
+  - Improve reporting of inhibitors and high (error) findings
+...
