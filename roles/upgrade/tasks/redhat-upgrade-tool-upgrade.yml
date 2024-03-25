@@ -72,8 +72,8 @@
     state: present
   when: leapp_upgrade_type == "custom"
 
-- name: leapp-upgrade | Include rmmod_kernel_modules.yml
-  ansible.builtin.include_tasks: rmmod_kernel_modules.yml
+- name: redhat-upgrade-tool-upgrade | Include rmmod-kernel-modules.yml
+  ansible.builtin.include_tasks: rmmod-kernel-modules.yml
   loop: "{{ kernel_modules_to_unload_before_upgrade }}"
 
 # --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.

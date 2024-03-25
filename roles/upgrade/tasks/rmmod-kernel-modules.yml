@@ -1,6 +1,7 @@
 ---
-- name: Unload "{{ item}}" module
+- name: rmmod-kernel-modules | Unload module {{ item }}
   community.general.modprobe:
     name: "{{ item }}"
     state: absent
 
+...
