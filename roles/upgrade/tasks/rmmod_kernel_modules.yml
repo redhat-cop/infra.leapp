@@ -1,0 +1,6 @@
+---
+- name: Unload "{{ item}}" module
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: absent
+

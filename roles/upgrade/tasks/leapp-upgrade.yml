@@ -51,6 +51,10 @@
     "{{ repo_files_to_remove_at_upgrade }}"
   when: leapp_upgrade_type == "custom"
 
+- name: leapp-upgrade | Include rmmod_kernel_modules.yml
+  ansible.builtin.include_tasks: rmmod_kernel_modules.yml
+  loop: "{{ kernel_modules_to_unload_before_upgrade }}"
+
 - name: leapp-upgrade | Start Leapp OS upgrade
   ansible.builtin.shell: >
     set -o pipefail;
