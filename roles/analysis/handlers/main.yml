@@ -31,7 +31,7 @@
 # Keep this last so it's easy to find in the job output.
 - name: Display inhibitors
   ansible.builtin.debug:
-    msg: results_inhibitors.stdout_lines
+    var: results_inhibitors.stdout_lines
   when:
     - results_inhibitors is defined
     - results_inhibitors.stdout_lines | length > 0
@@ -39,7 +39,7 @@
 
 - name: Display errors
   ansible.builtin.debug:
-    msg: results_errors.stdout_lines
+    var: results_errors.stdout_lines
   when:
     - results_errors is defined
     - results_errors.stdout_lines | length > 0
