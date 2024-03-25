@@ -127,4 +127,5 @@ async_poll_interval: 60
 
 check_leapp_analysis_results: true
 
+kernel_modules_to_unload_before_upgrade: []
 ...
