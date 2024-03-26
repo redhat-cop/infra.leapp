@@ -56,7 +56,7 @@
               severity: high
               summary: "{{ results_errors.stdout }}"
               title: "Likely issues found with high (error) severity found, see summary."
-              hostname: "{{ ansible_hostname }}"
+              hostname: "{{ ansible_fqdn }}"
 
     - name: Add errors as inhibitors to leapp_report_json
       ansible.builtin.set_fact:
