@@ -23,6 +23,7 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | post_upgrade_update     | true                   | Boolean to decide if after the upgrade is performed a dnf update will run|
 | post_upgrade_unset_release| true                | Boolean used to control whether Leapp's RHSM release lock is unset.
 | post_upgrade_release    |                       | Optional string used to set a specific RHSM release lock after the Leapp upgrade, but before the final update pass.
+| kernel_modules_to_unload_before_upgrade | []    | A list of kernel modules to be unloaded prior to running leapp. |
 
 ## Satellite variables
 
