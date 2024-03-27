@@ -23,4 +23,43 @@
     upgrade_inhibited: true
   when: "'inhibitor' in item.flags"
   loop: "{{ leapp_report_json.entries }}"
+
+# Not all inhibitors are high.
+- name: Collect inhibitors
+  ansible.builtin.command:
+    cmd: awk '/\(inhibitor\)/,/^-------/' /var/log/leapp/leapp-report.txt
+  register: results_inhibitors
+  changed_when: false
+  failed_when: false
+
+- name: Collect high errors
+  ansible.builtin.command:
+    cmd: awk '/high \(error\)/,/^-------/' /var/log/leapp/leapp-report.txt
+  register: results_errors
+  changed_when: false
+  failed_when: false
+
+- name: Block for handling leapp-report.txt errors
+  when: results_errors.stdout_lines | length > 0
+  block:
+    - name: Update upgrade_inhibited to true
+      ansible.builtin.set_fact:
+        upgrade_inhibited: true
+
+    - name: Construct a data structure to add high errors to leapp_report_json
+      ansible.builtin.set_fact:
+        __results_errors:
+          entries:
+            - audience: sysadmin
+              flags:
+                - inhibitor
+              severity: high
+              summary: "{{ results_errors.stdout }}"
+              title: "Likely issues found with high (error) severity found, see summary."
+              hostname: "{{ ansible_fqdn }}"
+
+    - name: Add errors as inhibitors to leapp_report_json
+      ansible.builtin.set_fact:
+        leapp_report_json: "{{ leapp_report_json | ansible.builtin.combine(__results_errors, list_merge='append') }}"
+
 ...

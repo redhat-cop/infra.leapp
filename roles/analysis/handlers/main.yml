@@ -29,11 +29,27 @@
     state: absent
 
 # Keep this last so it's easy to find in the job output.
+- name: Display inhibitors
+  ansible.builtin.debug:
+    var: results_inhibitors.stdout_lines
+  when:
+    - results_inhibitors is defined
+    - results_inhibitors.stdout_lines | length > 0
+  listen: Preupgrade analysis report is done
+
+- name: Display errors
+  ansible.builtin.debug:
+    var: results_errors.stdout_lines
+  when:
+    - results_errors is defined
+    - results_errors.stdout_lines | length > 0
+  listen: Preupgrade analysis report is done
+
 - name: Preupgrade analysis report is done
   ansible.builtin.debug:
     msg: >-
       The preupgrade analysis report generation is now complete.
       {{ 'WARNING: Inhibitors' if upgrade_inhibited else 'SUCCESS: No inhibitors' }} found.
-      Review the result file at {{ result_filename }}.
+      Review the tasks above or the result file at {{ result_filename }}.
 
 ...

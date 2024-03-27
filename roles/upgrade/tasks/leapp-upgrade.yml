@@ -55,19 +55,41 @@
   ansible.builtin.include_tasks: rmmod-kernel-modules.yml
   loop: "{{ kernel_modules_to_unload_before_upgrade }}"
 
-- name: leapp-upgrade | Start Leapp OS upgrade
-  ansible.builtin.shell: >
-    set -o pipefail;
-    export PATH={{ os_path }};
-    leapp upgrade
-    {{ leapp_upgrade_opts }}
-    {{ leapp_enable_repos_args }}
-    2>&1 | tee -a {{ log_file }}
-  args:
-    executable: /bin/bash
-  async: "{{ async_timeout_maximum | int }}"
-  poll: "{{ async_poll_interval | int }}"
-  changed_when: true
+- name: leapp-upgrade | Block to rescue leapp failures to collect errors
+  block:
+    - name: leapp-upgrade | Start Leapp OS upgrade
+      ansible.builtin.shell: >
+        set -o pipefail;
+        export PATH={{ os_path }};
+        leapp upgrade
+        {{ leapp_upgrade_opts }}
+        {{ leapp_enable_repos_args }}
+        2>&1 | tee -a {{ log_file }}
+      args:
+        executable: /bin/bash
+      async: "{{ async_timeout_maximum | int }}"
+      poll: "{{ async_poll_interval | int }}"
+      changed_when: true
+  rescue:
+    - name: leapp-upgrade | Include the parse_leapp_report role to check for inhibitors
+      ansible.builtin.include_role:
+        name: infra.leapp.parse_leapp_report
+
+    - name: leapp-upgrade | Display inhibitors
+      ansible.builtin.debug:
+        var: results_inhibitors.stdout_lines
+      when: results_inhibitors.stdout_lines | length > 0
+
+    - name: leapp-upgrade | Display errors
+      ansible.builtin.debug:
+        var: results_errors.stdout_lines
+      when: results_errors.stdout_lines | length > 0
+
+    - name: leapp-upgrade | Fail Leapp upgrade
+      ansible.builtin.fail:
+        msg: >-
+          Errors encountered running Leapp upgrade command.
+          Review the tasks above or the result file at {{ result_filename }}.
 
 - name: leapp-upgrade | Reboot to continue Leapp OS upgrade
   ansible.builtin.reboot:
