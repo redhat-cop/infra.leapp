@@ -1,0 +1,9 @@
+---
+- name: leapp_vdo_check_needed | Install vdo package - required for performing the VDO check of block devices
+  block:
+    - name: leapp_vdo_check_needed | Install vdo package
+      ansible.builtin.dnf:
+        name: leapp_vdo_check_needed | vdo
+        state: present
+
+...
