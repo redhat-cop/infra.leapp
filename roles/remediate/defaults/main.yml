@@ -3,26 +3,26 @@
 
 leapp_report_location: /var/log/leapp/leapp-report.json
 remediation_playbooks:
-  - LEAPP_CIFS_DETECTED
-  - LEAPP_CORRUPTED_GRUBENV_FILE
-  - LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED
-  - LEAPP_DEPRECATED_SSHD_DIRECTIVE
-  - LEAPP_FIREWALLD_ALLOWZONEDRIFTING
-  - LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT
-  - LEAPP_LOADED_REMOVED_KERNEL_DRIVERS
-  - LEAPP_MISSING_EFIBOOTMGR
-  - LEAPP_MISSING_PKG
-  - LEAPP_MISSING_YUM_PLUGINS
-  - LEAPP_MULTIPLE_KERNELS
-  - LEAPP_NEWEST_KERNEL_NOT_IN_USE
-  - LEAPP_NFS_DETECTED
-  - LEAPP_NON_PERSISTENT_PARTITIONS
-  - LEAPP_NON_STANDARD_OPENSSL_CONFIG
-  - LEAPP_OLD_POSTGRESQL_DATA
-  - LEAPP_PARTITIONS_WITH_NOEXEC
-  - LEAPP_RELATIVE_SYMLINKS
-  - LEAPP_RPMS_WITH_RSA_SHA1_DETECTED
-  - LEAPP_UNAVAILABLE_KDE
-  - LEAPP_VDO_CHECK_NEEDED
+  - leapp_cifs_detected
+  - leapp_corrupted_grubenv_file
+  - leapp_custom_network_scripts_detected
+  - leapp_deprecated_sshd_directive
+  - leapp_firewalld_allowzonedrifting
+  - leapp_firewalld_unsupported_tftp_client
+  - leapp_loaded_removed_kernel_drivers
+  - leapp_missing_efibootmgr
+  - leapp_missing_pkg
+  - leapp_missing_yum_plugins
+  - leapp_multiple_kernels
+  - leapp_newest_kernel_not_in_use
+  - leapp_nfs_detected
+  - leapp_non_persistent_partitions
+  - leapp_non_standard_openssl_config
+  - leapp_old_postgresql_data
+  - leapp_partitions_with_noexec
+  - leapp_relative_symlinks
+  - leapp_rpms_with_rsa_sha1_detected
+  - leapp_unavailable_kde
+  - leapp_vdo_check_needed
 remediation_todo: []
 ...

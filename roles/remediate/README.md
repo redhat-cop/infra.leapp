@@ -14,55 +14,55 @@ The `remediation` role is to assist in the remediation of a system. This role co
 
 ```yaml
 remediation_todo:
-  - LEAPP_CIFS_DETECTED
-  - LEAPP_CORRUPTED_GRUBENV_FILE
+  - leapp_cifs_detected
+  - leapp_corrupted_grubenv_file
 ```
 
 ## Remediation playbooks
 
 The list of available remediation playbooks with their corresponding inhibitors titles:
 
-- `LEAPP_CIFS_DETECTED`
+- `leapp_cifs_detected`
   - **Solves:** Use of CIFS detected. Upgrade can't proceed.  CIFS is currently not supported by the inplace upgrade.
-- `LEAPP_CORRUPTED_GRUBENV_FILE`
+- `leapp_corrupted_grubenv_file`
   - **Solves:** Detected a corrupted grubenv file.
-- `LEAPP_CUSTOM_NETWORK_SCRIPTS_DETECTED`
+- `leapp_custom_network_scripts_detected`
   - **Solves:** custom network-scripts detected. RHEL 9 does not support the legacy network-scripts package that was deprecated in RHEL 8.
-- `LEAPP_DEPRECATED_SSHD_DIRECTIVE`
+- `leapp_deprecated_sshd_directive`
   - **Solves:** A deprecated directive in the sshd configuration.
-- `LEAPP_FIREWALLD_ALLOWZONEDRIFTING`:
+- `leapp_firewalld_allowzonedrifting`:
   - **Solves:** Firewalld Configuration AllowZoneDrifting Is Unsupported.
-- `LEAPP_FIREWALLD_UNSUPPORTED_TFTP_CLIENT`
+- `leapp_firewalld_unsupported_tftp_client`
   - **Solves:** Firewalld Service tftp-client Is Unsupported.
-- `LEAPP_LOADED_REMOVED_KERNEL_DRIVERS`
+- `leapp_loaded_removed_kernel_drivers`
   - **Solves:** Leapp detected loaded kernel drivers which have been removed in RHEL 8. Upgrade cannot proceed.
-- `LEAPP_MISSING_EFIBOOTMGR`
+- `leapp_missing_efibootmgr`
   - **Solves:** efibootmgr package is required on EFI systems.
-- `LEAPP_MISSING_PKG`
+- `leapp_missing_pkg`
   - **Solves:** Leapp detected missing packages.
-- `LEAPP_MISSING_YUM_PLUGINS`
+- `leapp_missing_yum_plugins`
   - **Solves:** Required DNF plugins are not being loaded.
-- `LEAPP_MULTIPLE_KERNELS`
+- `leapp_multiple_kernels`
   - **Solves:** Multiple kernels installed.
-- `LEAPP_NEWEST_KERNEL_NOT_IN_USE`
+- `leapp_newest_kernel_not_in_use`
   - **Solves:** Newest installed kernel not in use.
-- `LEAPP_NFS_DETECTED`
+- `leapp_nfs_detected`
   - **Solves:** Use of NFS detected. Upgrade can't proceed.
-- `LEAPP_NON_PERSISTENT_PARTITIONS`
+- `leapp_non_persistent_partitions`
   - **Solves:** Detected partitions mounted in a non-persistent fashion, preventing a successful in-place upgrade.
-- `LEAPP_NON_STANDARD_OPENSSL_CONFIG`
+- `leapp_non_standard_openssl_config`
   - **Solves:** Non-standard configuration of openssl.cnf.
-- `LEAPP_OLD_POSTGRESQL_DATA`
+- `leapp_old_postgresql_data`
   - **Solves:** Old PostgreSQL data found in `/var/lib/pgsql/data`.
-- `LEAPP_PARTITIONS_WITH_NOEXEC`
+- `leapp_partitions_with_noexec`
   - **Solves:** Detected partitions mounted with the `noexec` option, preventing a successful in-place upgrade.
-- `LEAPP_RELATIVE_SYMLINKS`
+- `leapp_relative_symlinks`
   - **Solves:** Upgrade requires links in root directory to be relative
-- `LEAPP_RPMS_WITH_RSA_SHA1_DETECTED`
+- `leapp_rpms_with_rsa_sha1_detected`
   - **Solves:** Detected RPMs with RSA/SHA1 signature.
-- `LEAPP_UNAVAILABLE_KDE`
+- `leapp_unavailable_kde`
   - **Solves:** The installed KDE environment is unavailable on RHEL 8.
-- `LEAPP_VDO_CHECK_NEEDED`
+- `leapp_vdo_check_needed`
   - **Solves:** Cannot perform the VDO check of block devices.
 
 ## Example playbook

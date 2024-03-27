@@ -6,8 +6,8 @@
   force_handlers: true
   vars:
     remediation_todo:
-      - LEAPP_FIREWALLD_ALLOWZONEDRIFTING
-      - LEAPP_MISSING_PKG
+      - leapp_firewalld_allowzonedrifting
+      - leapp_missing_pkg
   tasks:
     - name: Perform remediations on the system
       ansible.builtin.import_role:
