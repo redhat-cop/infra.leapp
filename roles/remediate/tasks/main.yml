@@ -1,6 +1,12 @@
 ---
 # tasks file for remediations
 
+- name: Check if the system is RHEL 8
+  ansible.builtin.assert:
+    that: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
+    msg: "This role is only applicable to RHEL 8"
+  tags: remediate
+
 - name: Remediate the system
   ansible.builtin.include_tasks: "{{ item }}.yml"
   loop: "{{ remediation_playbooks }}"
