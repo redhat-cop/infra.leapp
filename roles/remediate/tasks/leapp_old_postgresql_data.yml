@@ -7,7 +7,7 @@
       register: pgsql_data_stat
 
     - name: leapp_old_postgresql_data | End play if /var/lib/psql/data does not exist
-      ansible.builtin.meta: end_play
+      ansible.builtin.meta: end_host
       when: not pgsql_data_stat.stat.exists
 
     - name: leapp_old_postgresql_data | Set backup filename with timestamp

@@ -10,7 +10,7 @@
       register: leapp_report_stat
 
     - name: leapp_firewalld_unsupported_tftp_client | End play if no leapp report exists
-      ansible.builtin.meta: end_play
+      ansible.builtin.meta: end_host
       when: leapp_report_stat.stat.exists is false
 
     - name: leapp_firewalld_unsupported_tftp_client | Read leapp report
@@ -27,6 +27,10 @@
         summary: "{{ item.summary }}"
       loop: "{{ leappreportdata.entries }}"
       when: item.title is match(entry_title) and (item.summary | length > 0)
+
+    - name: leapp_firewalld_unsupported_tftp_client | End execution of playbook if no entry found in leapp report
+      ansible.builtin.meta: end_host
+      when: summary is not defined
 
     - name: leapp_firewalld_unsupported_tftp_client | Remove the service from zones and policies
       block:
@@ -66,7 +70,7 @@
 
     - name: leapp_firewalld_unsupported_tftp_client | Reload firewalld to apply changes
       ansible.builtin.service:
-        name: leapp_firewalld_unsupported_tftp_client | firewalld
+        name: firewalld
         state: reloaded
 
 ...

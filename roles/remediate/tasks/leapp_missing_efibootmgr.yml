@@ -3,7 +3,7 @@
   block:
     - name: leapp_missing_efibootmgr | Install efibootmgr package
       ansible.builtin.yum:
-        name: leapp_missing_efibootmgr | efibootmgr
+        name: efibootmgr
         state: present
 
 ...

@@ -28,6 +28,10 @@
       loop: "{{ leappreportdata.entries }}"
       when: item.title == entry_title and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
 
+    - name: leapp_relative_symlinks | End execution of playbook if no entry found in leapp report
+      ansible.builtin.meta: end_host
+      when: remediation is not defined
+
     - name: leapp_relative_symlinks | Output command to be executed
       ansible.builtin.debug:
         msg: "{{ remediation.context | last }}"

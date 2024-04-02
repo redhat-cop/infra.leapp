@@ -10,7 +10,7 @@
       register: leapp_report_stat
 
     - name: leapp_missing_pkg | End play if no leapp report exists
-      ansible.builtin.meta: end_play
+      ansible.builtin.meta: end_host
       when: leapp_report_stat.stat.exists is false
 
     - name: leapp_missing_pkg | Read leapp report
@@ -27,6 +27,10 @@
         remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
       loop: "{{ leappreportdata.entries }}"
       when: item.title is match(entry_title_pattern) and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
+
+    - name: leapp_missing_pkg | End execution of playbook if no entry found in leapp report
+      ansible.builtin.meta: end_host
+      when: remediation is not defined
 
     - name: leapp_missing_pkg | Install the missing package via remediation command
       ansible.builtin.command: "{{ remediation.context | join(' ') }}"

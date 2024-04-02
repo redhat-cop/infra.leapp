@@ -10,7 +10,7 @@
       register: leapp_report_stat
 
     - name: leapp_nfs_detected | End play if no leapp report exists
-      ansible.builtin.meta: end_play
+      ansible.builtin.meta: end_host
       when: leapp_report_stat.stat.exists is false
 
     - name: leapp_nfs_detected | Read leapp report
@@ -27,6 +27,10 @@
         summary: "{{ item.summary }}"
       loop: "{{ leappreportdata.entries }}"
       when: item.title is match(entry_title) and (item.summary | length > 0)
+
+    - name: leapp_nfs_detected | End execution of playbook if no entry found in leapp report
+      ansible.builtin.meta: end_host
+      when: summary is not defined
 
     - name: leapp_nfs_detected | Split summary
       ansible.builtin.set_fact:

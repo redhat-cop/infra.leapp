@@ -45,9 +45,9 @@ The list of available remediation playbooks with their corresponding inhibitors 
 - `leapp_missing_yum_plugins`
   - **Solves:** Required DNF plugins are not being loaded.
 - `leapp_multiple_kernels`
-  - **Solves:** Multiple kernels installed.
+  - **Solves:** Multiple kernels installed. **Requires reboot.**
 - `leapp_newest_kernel_not_in_use`
-  - **Solves:** Newest installed kernel not in use.
+  - **Solves:** Newest installed kernel not in use. **Requires reboot.**
 - `leapp_nfs_detected`
   - **Solves:** Use of NFS detected. Upgrade can't proceed.
 - `leapp_non_persistent_partitions`

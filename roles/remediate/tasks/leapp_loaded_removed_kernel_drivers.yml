@@ -28,6 +28,10 @@
       loop: "{{ leappreportdata.entries }}"
       when: item.title is match(entry_title_pattern)
 
+    - name: leapp_loaded_removed_kernel_drivers | End execution of playbook if no entry found in leapp report
+      ansible.builtin.meta: end_host
+      when: leapp_entry is not defined
+
     - name: leapp_loaded_removed_kernel_drivers | Parse summary to obtain list of modules
       ansible.builtin.set_fact:
         unsupported_modules: "{{ leapp_entry.summary | regex_findall('(?<=- ).*') }}"

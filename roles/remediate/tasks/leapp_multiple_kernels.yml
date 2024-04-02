@@ -19,24 +19,14 @@
       register: set_default_kernel
       changed_when: set_default_kernel.rc == 0
 
-    - name: leapp_multiple_kernels | Reboot into new kernel
-      ansible.builtin.shell: sleep 2 && shutdown -r now
-      async: 1
-      poll: 0
-      failed_when: false
+    - name: leapp_multiple_kernels | Update-and-reboot | Reboot when updates applied
+      ansible.builtin.reboot:
+        reboot_timeout: 7200
+        post_reboot_delay: "{{ post_reboot_delay }}"
       when: installed_kernels.stdout_lines[0] != current_kernel.stdout
-      changed_when: true
-
-    - name: leapp_multiple_kernels | Wait for reboot
-      ansible.builtin.wait_for_connection:
-        delay: 15
-        timeout: 60
-      become: false
-      when: installed_kernels.stdout_lines[0] != current_kernel.stdout
-
     - name: leapp_multiple_kernels | Remove old kernels
       ansible.builtin.yum:
-        name: leapp_multiple_kernels | kernel-core-{{ item }}
+        name: kernel-core-{{ item }}
         state: absent
       loop: "{{ installed_kernels.stdout_lines[1:] }}"
 

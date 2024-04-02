@@ -3,7 +3,7 @@
   block:
     - name: leapp_vdo_check_needed | Install vdo package
       ansible.builtin.dnf:
-        name: leapp_vdo_check_needed | vdo
+        name: vdo
         state: present
 
 ...

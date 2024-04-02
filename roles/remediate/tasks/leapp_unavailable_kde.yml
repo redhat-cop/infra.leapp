@@ -3,7 +3,7 @@
   block:
     - name: leapp_unavailable_kde | Install the GNOME desktop environment
       ansible.builtin.yum:
-        name: leapp_unavailable_kde | @^graphical-server-environment
+        name: "@^graphical-server-environment"
         state: present
 
 ...
