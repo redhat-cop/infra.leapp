@@ -198,6 +198,11 @@ jobs:
           - '3.11'
           - '3.12'
         exclude:
+          # Python 3.12 is not supported with ansible-core <= 2.15
+          - ansible: stable-2.14
+            python: '3.12'
+          - ansible: stable-2.15
+            python: '3.12'
           # Python 3.6 is not supported with ansible-core >= 2.16
           - ansible: stable-2.16
             python: '3.6'
