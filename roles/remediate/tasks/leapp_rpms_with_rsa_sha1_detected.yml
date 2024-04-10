@@ -1,0 +1,45 @@
+---
+- name: leapp_rpms_with_rsa_sha1_detected | Remove RPMs with RSA/SHA1 signature
+  vars:
+    leapp_report_location: /var/log/leapp/leapp-report.json
+    entry_title: Detected RPMs with RSA/SHA1 signature
+  block:
+    - name: leapp_rpms_with_rsa_sha1_detected | Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: leapp_rpms_with_rsa_sha1_detected | End play if no leapp report exists
+      ansible.builtin.meta: end_host
+      when: leapp_report_stat.stat.exists is false
+
+    - name: leapp_rpms_with_rsa_sha1_detected | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: leapp_rpms_with_rsa_sha1_detected | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: leapp_rpms_with_rsa_sha1_detected | Find matching entries
+      ansible.builtin.set_fact:
+        summary: "{{ item.summary }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title is match(entry_title) and (item.summary | length > 0)
+
+    - name: leapp_rpms_with_rsa_sha1_detected | End execution of playbook if no entry found in leapp report
+      ansible.builtin.meta: end_host
+      when: summary is not defined
+
+    - name: leapp_rpms_with_rsa_sha1_detected | Parse bad_pkgs
+      ansible.builtin.set_fact:
+        bad_pkgs: "{{ summary | split('The list of problematic packages:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+
+    - name: leapp_rpms_with_rsa_sha1_detected | Remove bad packages
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ bad_pkgs }}"
+
+...

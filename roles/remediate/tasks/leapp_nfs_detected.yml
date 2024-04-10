@@ -1,0 +1,69 @@
+---
+- name: leapp_nfs_detected | Disable NFS temporarily for the upgrade
+  vars:
+    entry_title: Use of NFS detected. Upgrade can't proceed
+    leapp_report_location: /var/log/leapp/leapp-report.json
+  block:
+    - name: leapp_nfs_detected | Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: leapp_nfs_detected | End play if no leapp report exists
+      ansible.builtin.meta: end_host
+      when: leapp_report_stat.stat.exists is false
+
+    - name: leapp_nfs_detected | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: leapp_nfs_detected | Parse leapp report to json
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: leapp_nfs_detected | Find matching entries
+      ansible.builtin.set_fact:
+        summary: "{{ item.summary }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title is match(entry_title) and (item.summary | length > 0)
+
+    - name: leapp_nfs_detected | End execution of playbook if no entry found in leapp report
+      ansible.builtin.meta: end_host
+      when: summary is not defined
+
+    - name: leapp_nfs_detected | Split summary
+      ansible.builtin.set_fact:
+        split_summary: "{{ summary.split('- NFS')[1:] | map('regex_replace', '^[\\s\\n]+', '- NFS ') | list }}"
+    - name: leapp_nfs_detected | Get fstab_entries
+      ansible.builtin.set_fact:
+        fstab_entries: "{{ item | split('- NFS shares found in /etc/fstab:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+      loop: "{{ split_summary }}"
+      when: "'- NFS shares found in /etc/fstab:' in item"
+    - name: leapp_nfs_detected | Get nfs_mounts
+      ansible.builtin.set_fact:
+        nfs_mounts: "{{ item | split('- NFS shares currently mounted:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+      loop: "{{ split_summary }}"
+      when: "'- NFS shares currently mounted:' in item"
+    - name: leapp_nfs_detected | Get systemd_mounts
+      ansible.builtin.set_fact:
+        systemd_mounts: "{{ item | split('- NFS mounts configured with systemd-mount:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+      loop: "{{ split_summary }}"
+      when: "'- NFS mounts configured with systemd-mount:' in item"
+
+    - name: leapp_nfs_detected | Comment NFS shares in /etc/fstab
+      loop: "{{ fstab_entries }}"
+      ansible.builtin.shell: |
+        set -o pipefail
+        entry="{{ item }}"
+        grep -qF "$entry" /etc/fstab && sed -i "s|^$entry|# $entry|" /etc/fstab
+      when: fstab_entries is defined
+      changed_when: fstab_entries is defined
+
+    - name: leapp_nfs_detected | Unmount NFS Mounts
+      ansible.builtin.command: umount -l {{ item }}
+      loop: "{{ nfs_mounts }}"
+      when: nfs_mounts is defined
+      changed_when: nfs_mounts is defined
+
+...

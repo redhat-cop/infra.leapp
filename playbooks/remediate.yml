@@ -1,0 +1,15 @@
+---
+- name: Remediate
+  hosts: all
+  strategy: free
+  become: true
+  force_handlers: true
+  vars:
+    remediation_todo:
+      - leapp_firewalld_allowzonedrifting
+      - leapp_missing_pkg
+  tasks:
+    - name: Perform remediations on the system
+      ansible.builtin.import_role:
+        name: infra.leapp.remediate
+...

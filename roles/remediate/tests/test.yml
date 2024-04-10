@@ -1,0 +1,9 @@
+---
+# tests file for upgrade
+
+- name: Test
+  hosts: localhost
+  remote_user: root
+  roles:
+    - remediate
+...
