@@ -39,7 +39,6 @@ See comments in defaults/main.yml for additional details.
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | leapp_answerfile | Multi-line String |  | If defined, this is written to `/var/log/leapp/answerfile` before generating the pre-upgrade report. |
 | leapp_preupg_opts | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
-| post_reboot_delay | Int | 120 | Optional integer to pass to the reboot post_reboot_delay option. |
 | os_path | String | $PATH | Option string to override the $PATH variable used on the target node |
 | async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
 | async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
