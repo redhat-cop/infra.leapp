@@ -92,4 +92,16 @@
 - name: analysis-leapp | Include the parse_leapp_report role to check for inhibitors
   ansible.builtin.include_role:
     name: infra.leapp.parse_leapp_report
+
+- name: analysis-leapp | Capture inhibitors in a list leapp_inhibitors
+  ansible.builtin.set_fact:
+    leapp_inhibitors: "{{ leapp_inhibitors | default([]) + [item] }}"
+  when: "'inhibitor' in item.flags"
+  loop: "{{ leapp_report_json.entries }}"
+
+- name: analysis-leapp | Set stats for leapp_inhibitors
+  ansible.builtin.set_stats:
+    data:
+      leapp_inhibitors: "{{ leapp_inhibitors }}"
+
 ...
