@@ -99,9 +99,9 @@
   timeout: 43260
 
 # Ansible discovers /usr/bin/python on RHEL 7, then on RHEL 8 it is no longer available.
-- name: leapp-upgrade | Set python interpreter to /usr/bin/python3 since /usr/bin/python is no longer available
+- name: leapp-upgrade | Set python interpreter to /usr/libexec/platform-python since /usr/bin/python is no longer available
   ansible.builtin.set_fact:
-    ansible_python_interpreter: /usr/bin/python3
+    ansible_python_interpreter: /usr/libexec/platform-python
 
 - name: leapp-upgrade | Wait for leapp_resume run once service to no longer exist
   ansible.builtin.service:
