@@ -11,6 +11,8 @@ The `remediation` role is to assist in the remediation of a system. This role co
 | leapp_report_location   | /var/log/leapp/leapp-report.json | Location of the leapp report file.       |
 | remediation_playbooks   | see [Remediation playbooks](#remediation-playbooks) | List of available remediation playbooks.|
 | remediation_todo        | []                    | List of remediation playbooks to run.               |
+| reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete.     |
+| post_reboot_delay       | 120                   | Integer to pass to the reboot post_reboot_delay option. |
 
 `remediation_todo` is a list of remediation playbooks to run. The list is empty by default. The list can be populated by the titles from [Remediation playbooks](#remediation-playbooks) section. For example:
 

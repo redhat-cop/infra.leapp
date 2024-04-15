@@ -60,7 +60,8 @@
 
 - name: grub2-upgrade | Reboot to start using grub2
   ansible.builtin.reboot:
-    reboot_timeout: 7200
+    reboot_timeout: "{{ reboot_timeout }}"
     post_reboot_delay: "{{ post_reboot_delay }}"
+  timeout: "{{ reboot_timeout }}"
 
 ...
