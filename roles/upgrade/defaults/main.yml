@@ -132,4 +132,6 @@ async_poll_interval: 60
 check_leapp_analysis_results: true
 
 kernel_modules_to_unload_before_upgrade: []
+
+post_7_to_8_python_interpreter: /usr/libexec/platform-python
 ...
