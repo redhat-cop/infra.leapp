@@ -1,4 +1,4 @@
 ---
-major_changes:
+minor_changes:
   - Variabilize reboot_timeout and upgrade_timeout.
 ...
