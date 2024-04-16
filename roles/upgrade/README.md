@@ -22,6 +22,8 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | check_leapp_analysis_results| true              | Allows for running remediation and going straight to upgrade without re-running analysis. |
 | post_upgrade_update     | true                   | Boolean to decide if after the upgrade is performed a dnf update will run|
 | kernel_modules_to_unload_before_upgrade | []    | A list of kernel modules to be unloaded prior to running leapp. |
+| post_7_to_8_python_interpreter | /usr/libexec/platform-python | For RHEL 7 to 8 upgrades, /usr/bin/python is discovered but not available post upgrade. For 7 to 8 upgrades, ansible_python_interpreter is set to this value post upgrade reboot prior to reconnecting. |
+
 
 ## Satellite variables
 

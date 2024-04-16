@@ -101,7 +101,8 @@
 # Ansible discovers /usr/bin/python on RHEL 7, then on RHEL 8 it is no longer available.
 - name: leapp-upgrade | Set python interpreter to /usr/libexec/platform-python since /usr/bin/python is no longer available
   ansible.builtin.set_fact:
-    ansible_python_interpreter: /usr/libexec/platform-python
+    ansible_python_interpreter: "{{ post_7_to_8_python_interpreter }}"
+  when: ansible_distribution_major_version == "7"
 
 - name: leapp-upgrade | Wait for leapp_resume run once service to no longer exist
   ansible.builtin.service:
