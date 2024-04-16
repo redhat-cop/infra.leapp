@@ -120,6 +120,8 @@ post_upgrade_release: ""
 # /boot is on.
 # grub_boot_device: /dev/sda
 
+reboot_timeout: 7200
+upgrade_timeout: 14400
 post_reboot_delay: 120
 
 os_path: $PATH

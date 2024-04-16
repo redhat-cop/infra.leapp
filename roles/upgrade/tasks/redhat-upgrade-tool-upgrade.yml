@@ -94,6 +94,8 @@
 - name: redhat-upgrade-tool-upgrade | Reboot to continue OS upgrade
   ansible.builtin.reboot:
     msg: Host is starting OS upgrade now!
+    reboot_timeout: "{{ upgrade_timeout }}"
     post_reboot_delay: "{{ post_reboot_delay }}"
-    reboot_timeout: 43200
+  timeout: "{{ upgrade_timeout }}"
+
 ...

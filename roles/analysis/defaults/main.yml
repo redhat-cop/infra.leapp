@@ -128,8 +128,6 @@ local_repos_post_analysis: []
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     # state: present # Defaults to present
 
-post_reboot_delay: 120
-
 os_path: $PATH
 
 async_timeout_maximum: 7200

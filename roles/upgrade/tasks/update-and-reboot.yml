@@ -9,8 +9,9 @@
 
 - name: update-and-reboot | Reboot when updates applied
   ansible.builtin.reboot:
-    reboot_timeout: 7200
+    reboot_timeout: "{{ reboot_timeout }}"
     post_reboot_delay: "{{ post_reboot_delay }}"
+  timeout: "{{ reboot_timeout }}"
   when: updates_available.changed # noqa: no-handler
 
 ...
