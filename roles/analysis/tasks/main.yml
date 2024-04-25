@@ -56,6 +56,11 @@
   ansible.builtin.include_tasks: analysis-leapp.yml
   when: ansible_distribution_major_version|int >= 7
 
+- name: Set stats for leapp_inhibitors
+  ansible.builtin.set_stats:
+    data:
+      leapp_inhibitors: "{{ leapp_inhibitors }}"
+
 - name: Notify analysis report is done handler
   ansible.builtin.assert:
     that: true
