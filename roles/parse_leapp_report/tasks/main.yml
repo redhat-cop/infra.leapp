@@ -27,14 +27,14 @@
 # Not all inhibitors are high.
 - name: Collect inhibitors
   ansible.builtin.command:
-    cmd: awk '/\(inhibitor\)/,/^-------/' /var/log/leapp/leapp-report.txt
+    cmd: awk '/\(inhibitor\)/,/^-------/' {{ result_filename }}
   register: results_inhibitors
   changed_when: false
   failed_when: false
 
 - name: Collect high errors
   ansible.builtin.command:
-    cmd: awk '/high \(error\)/,/^-------/' /var/log/leapp/leapp-report.txt
+    cmd: awk '/high \(error\)/,/^-------/' {{ result_filename }}
   register: results_errors
   changed_when: false
   failed_when: false
