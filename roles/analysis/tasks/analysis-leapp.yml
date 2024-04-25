@@ -18,14 +18,14 @@
   when: leapp_upgrade_type == "custom"
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 7
-  ansible.builtin.package:
+  ansible.builtin.yum:
     name: "{{ analysis_packages_el7 }}"
     enablerepo: "{{ analysis_repos_el7 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 7
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 8
-  ansible.builtin.package:
+  ansible.builtin.dnf:
     name: "{{ analysis_packages_el8 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 8
