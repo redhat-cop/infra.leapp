@@ -1,0 +1,118 @@
+---
+# Based on:
+# https://access.redhat.com/articles/7012677
+#
+# This could probably use some more error checking and verification of
+# cluster status for production usage.
+#
+# The RHEL 9.2+ HA repository must be available.
+# This can be accomplished by including it in the leapp_repos_enabled list:
+#   leapp_repos_enabled:
+#     - rhel-9-for-x86_64-highavailability-rpms
+#
+- name: Upgrade the CIB
+  hosts: all
+  become: true
+  tasks: &upgrade_cib_block
+    - name: Block to upgrade the CIB
+      run_once: true
+      block:
+        - name: Upgrade the CIB
+          ansible.builtin.command:
+            cmd: pcs cluster cib-upgrade
+          register: __pcs_cluster_cib_upgrade
+          changed_when: __pcs_cluster_cib_upgrade.stdout == "Cluster CIB has been upgraded to latest version"
+
+        - name: Show pcs cluster cib-upgrade register
+          ansible.builtin.debug:
+            var: __pcs_cluster_cib_upgrade
+            verbosity: 1
+
+- name: Rolling upgrade of Red Hat High Availability Cluster
+  hosts: all
+  strategy: free
+  become: true
+  force_handlers: true
+  serial: 1
+  order: sorted
+  tasks:
+    - name: Unregister to avoid lab issue # TODO: Remove
+      ansible.builtin.command:
+        cmd: subscription-manager unregister
+      changed_when: true
+      failed_when: false
+
+    - name: Disable cluster on this node
+      ansible.builtin.command:
+        cmd: pcs cluster disable {{ inventory_hostname }}
+      register: __pcs_cluster_disable
+      changed_when: __pcs_cluster_disable.stdout == inventory_hostname + ":" + " Cluster Disabled"
+
+    - name: Show pcs cluster disable register
+      ansible.builtin.debug:
+        var: __pcs_cluster_disable
+        verbosity: 1
+
+    # TODO: Verify resources are migrated?
+
+    - name: Stop cluster on this node
+      ansible.builtin.command:
+        cmd: pcs cluster stop
+      register: __pcs_cluster_stop
+      changed_when: "'Stopping Cluster' in __pcs_cluster_stop.stdout"
+
+    - name: Show pcs cluster stop register
+      ansible.builtin.debug:
+        var: __pcs_cluster_stop
+        verbosity: 1
+
+    - name: Perform OS upgrade
+      ansible.builtin.import_role:
+        name: infra.leapp.upgrade
+
+    - name: Start cluster on this node
+      ansible.builtin.command:
+        cmd: pcs cluster start
+      register: __pcs_cluster_start
+      changed_when: "'Starting Cluster...' in __pcs_cluster_start.stderr_lines"
+
+    - name: Show pcs cluster start register
+      ansible.builtin.debug:
+        var: __pcs_cluster_start
+        verbosity: 1
+
+    - name: Unstandby node
+      ansible.builtin.command:
+        cmd: pcs node unstandby {{ inventory_hostname }}
+      register: __pcs_node_unstandby
+      changed_when: true
+
+    - name: Show pcs node unstandby register
+      ansible.builtin.debug:
+        var: __pcs_node_unstandby
+        verbosity: 1
+
+#   # TODO: Verify node is successfully joined?
+
+- name: Finalize cluster upgrade
+  hosts: all
+  become: true
+  tasks:
+    - <<: *upgrade_cib_block
+
+    # TODO: Verify resources per document cited above.
+
+    - name: Cluster enable all
+      ansible.builtin.command:
+        cmd: pcs cluster enable --all
+      register: __pcs_cluster_enable_all
+      changed_when: "'Cluster Enabled' in __pcs_cluster_enable_all.stderr"
+      run_once: true
+
+    - name: Show pcs cluster enable --all register
+      ansible.builtin.debug:
+        var: __pcs_cluster_enable_all
+        verbosity: 1
+      run_once: true
+
+...
