@@ -106,7 +106,7 @@
       ansible.builtin.command:
         cmd: pcs cluster enable --all
       register: __pcs_cluster_enable_all
-      changed_when: "'Cluster Enabled' in __pcs_cluster_enabled_all.stderr"
+      changed_when: "'Cluster Enabled' in __pcs_cluster_enable_all.stderr"
       run_once: true
 
     - name: Show pcs cluster enable --all register
