@@ -97,4 +97,29 @@
   ansible.builtin.set_fact:
     upgrade_inhibited: "{{ preupg_return_codes[preupg.rc].inhibited }}"
 
+# We already have preupg_report_txt that has this info in it.
+# However, this makes it work the same as leapp which is using
+# some awk magic to parse the file.
+- name: analysis-preupg | Collect inhibitors
+  ansible.builtin.command:
+    cmd: grep "preupg.risk.EXTREME:" {{ result_filename }}
+  register: results_inhibitors
+  changed_when: false
+  failed_when: false
+
+- name: analysis-preupg | Collect high errors
+  ansible.builtin.command:
+    cmd: egrep -i "preupg.risk.HIGH:.*not enough free space" {{ result_filename }}
+  register: results_errors
+  changed_when: false
+  failed_when: false
+
+- name: analysis-preupg | Check for not enough space errors and update upgrade_inhibited
+  ansible.builtin.set_fact:
+    upgrade_inhibited: true
+  when: results_errors.stdout_lines | length > 0
+
+- name: analysis-preupg | Capture inhibitors in a list leapp_inhibitors
+  ansible.builtin.set_fact:
+    leapp_inhibitors: "{{ results_inhibitors.stdout_lines + results_errors.stdout_lines }}"
 ...

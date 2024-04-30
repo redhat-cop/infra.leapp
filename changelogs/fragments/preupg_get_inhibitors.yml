@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - For RHEL 6 upgrades, similarly capture inhibitor and high errors for not enough space for display in output and inclusion into set_stats for leapp_inhibitors.
+...
