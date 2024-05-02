@@ -1,5 +1,6 @@
 /tests/output/
 /changelogs/.plugin-cache.yaml
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

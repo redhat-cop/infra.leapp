@@ -10,7 +10,7 @@ on:
 
 jobs:
   pre-commit:
-    uses: redhat-cop/infra.leapp/.github/workflows/pre-commit.yml@main
+    uses: redhat-cop/infra.leapp/.github/workflows/ansible-lint.yml@main
   sanity:
     uses: redhat-cop/infra.leapp/.github/workflows/ansible-test.yml@main
   prechecks:
