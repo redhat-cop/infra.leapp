@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Add option to unload kernel modules prior to running leapp upgrade (kernel_modules_to_unload_before_upgrade).
-...

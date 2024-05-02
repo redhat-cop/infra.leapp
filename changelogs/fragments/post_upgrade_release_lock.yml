@@ -1,5 +1,0 @@
----
-major_changes:
-  - added a boolean to allow users to skip RHSM unlock after leapp upgrade
-  - added a string to allow users to lock RHSM to a specified release after leapp upgrade
-...
