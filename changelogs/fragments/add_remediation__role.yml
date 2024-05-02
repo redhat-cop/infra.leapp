@@ -1,4 +1,0 @@
----
-major_changes:
-  - Add remediation role to remediate the system based on available remediation playbooks.
-...

@@ -1,4 +1,0 @@
----
-major_changes:
-  - Add support for using custom repositories for Leapp upgrades (leapp_upgrade_type == "custom").
-...

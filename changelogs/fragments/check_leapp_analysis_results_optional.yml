@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Add variable check_leapp_analysis_results which if set to false (true by default) allows to not check previous leapp analysis json results for inhibitors.
-...

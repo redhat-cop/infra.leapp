@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Capture leapp_inhibitors via set_stats for job artifacts.
-...
