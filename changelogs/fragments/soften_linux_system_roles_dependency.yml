@@ -1,4 +1,5 @@
 ---
+major_changes:
+  - Move collection dependencies from galaxy.yml to requirements.yml
 minor_changes:
-  - Remove hard dependency on fedora.linux_system_roles
   - Add infra_leapp_upgrade_system_roles_collection variable for specifying fedora.linux_system_roles or redhat.rhel_system_roles
