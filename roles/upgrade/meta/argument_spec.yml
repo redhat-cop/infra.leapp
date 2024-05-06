@@ -13,4 +13,5 @@ argument_specs:
           - 'fedora.linux_system_roles'
           - 'redhat.rhel_system_roles'
         required: false
-        type: str 
+        type: str
+...
