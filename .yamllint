@@ -12,6 +12,7 @@ rules:
     require-starting-space: true
     ignore-shebangs: true
     min-spaces-from-content: 1
+  comments-indentation: false
   colons:
     max-spaces-before: 0
     max-spaces-after: -1
