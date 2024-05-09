@@ -26,8 +26,5 @@ build_ignore:
   # https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_distributing.html#ignoring-files-and-folders
   - .gitignore
   - changelogs/.plugin-cache.yaml
-dependencies:
-  ansible.posix: ">=1.5.1"
-  fedora.linux_system_roles: ">=1.21.0"
-  community.general: ">=6.6.0"
+dependencies: {}
 ...

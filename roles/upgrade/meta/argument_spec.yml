@@ -1,0 +1,17 @@
+---
+argument_specs:
+  main:
+    short_description: Variables for infra.leapp.upgrade
+    options:
+      infra_leapp_upgrade_system_roles_collection:
+        default: 'fedora.linux_system_roles'
+        description:
+          - Set which Ansible Collection to use for the Linux System Roles.
+          - For community/upstream, use 'fedora.linux_system_roles'
+          - For the RHEL System Roles, use 'redhat.rhel_system_roles'
+        choices:
+          - 'fedora.linux_system_roles'
+          - 'redhat.rhel_system_roles'
+        required: false
+        type: str
+...
