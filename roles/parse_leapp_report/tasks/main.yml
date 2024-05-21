@@ -21,7 +21,9 @@
 - name: Check for inhibitors
   ansible.builtin.set_fact:
     upgrade_inhibited: true
-  when: "'inhibitor' in item.flags"
+  when:
+    - "'inhibitor' in item.flags"
+    - item.key not in leapp_known_inhibitors
   loop: "{{ leapp_report_json.entries }}"
 
 # Not all inhibitors are high.

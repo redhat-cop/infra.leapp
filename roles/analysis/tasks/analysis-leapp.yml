@@ -96,6 +96,8 @@
 - name: analysis-leapp | Capture inhibitors in a list leapp_inhibitors
   ansible.builtin.set_fact:
     leapp_inhibitors: "{{ leapp_inhibitors | default([]) + [item] }}"
-  when: "'inhibitor' in item.flags"
+  when:
+    - "'inhibitor' in item.flags"
+    - item.key not in leapp_known_inhibitors
   loop: "{{ leapp_report_json.entries }}"
 ...
