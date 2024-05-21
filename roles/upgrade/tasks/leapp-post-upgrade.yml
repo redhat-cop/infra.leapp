@@ -66,7 +66,7 @@
     subscription-manager release --unset
   when:
     - leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
-    - post_upgrade_unset_release
+    - post_upgrade_unset_release | bool
     - post_upgrade_release | length == 0
   changed_when: true
 
@@ -100,7 +100,7 @@
 
 - name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
-  when: post_upgrade_update
+  when: post_upgrade_update | bool
 
 # TODO: Validate RHEL OS versions again?
 
@@ -120,5 +120,5 @@
 
 - name: leapp-post-upgrade | Include tasks for leapp post upgrade crypto policies
   ansible.builtin.include_tasks: leapp-post-upgrade-crypto.yml
-  when: set_crypto_policies
+  when: set_crypto_policies | bool
 ...
