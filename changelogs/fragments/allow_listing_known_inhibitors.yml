@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - Allow listing known inhibitors for which remediations are available
