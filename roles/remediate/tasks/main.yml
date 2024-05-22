@@ -8,9 +8,9 @@
   tags: remediate
 
 - name: Remediate the system
-  ansible.builtin.include_tasks: "{{ remediation }}.yml"
+  ansible.builtin.include_tasks: "{{ remediation_item }}.yml"
   loop: "{{ remediation_playbooks }}"
   loop_control:
-    loop_var: remediation
-  when: remediation in remediation_todo
+    loop_var: remediation_item
+  when: remediation_item in remediation_todo
 ...
