@@ -4,6 +4,20 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.3.0
+======
+
+Major Changes
+-------------
+
+- Move collection dependencies from galaxy.yml to requirements.yml
+
+Minor Changes
+-------------
+
+- Add infra_leapp_upgrade_system_roles_collection variable for specifying fedora.linux_system_roles or redhat.rhel_system_roles
+- Allow listing known inhibitors for which remediations are available
+
 v1.2.0
 ======
 
