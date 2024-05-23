@@ -83,3 +83,15 @@ releases:
     - reboot_and_upgrade_timeoutes.yml
     - set_stats_leapp_inhibitors.yml
     release_date: '2024-05-02'
+  1.3.0:
+    changes:
+      major_changes:
+      - Move collection dependencies from galaxy.yml to requirements.yml
+      minor_changes:
+      - Add infra_leapp_upgrade_system_roles_collection variable for specifying fedora.linux_system_roles
+        or redhat.rhel_system_roles
+      - Allow listing known inhibitors for which remediations are available
+    fragments:
+    - allow_listing_known_inhibitors.yml
+    - soften_linux_system_roles_dependency.yml
+    release_date: '2024-05-23'
