@@ -22,14 +22,16 @@
   ansible.builtin.set_fact:
     upgrade_inhibited: true
   when:
-    - "'inhibitor' in item.flags"
     - item.key not in leapp_known_inhibitors
+    - (leapp_high_sev_as_inhibitors | bool and item.severity == 'high') or
+      'inhibitor' in item.flags
   loop: "{{ leapp_report_json.entries }}"
 
-# Not all inhibitors are high.
 - name: Collect inhibitors
+  vars:
+    high_filter: "{{ '|Risk Factor: high' if leapp_high_sev_as_inhibitors | bool else '' }}"
   ansible.builtin.command:
-    cmd: awk '/\(inhibitor\)/,/^-------/' {{ result_filename }}
+    cmd: awk '/\(inhibitor\){{ high_filter }}/,/^-------/' {{ result_filename }}
   register: results_inhibitors
   changed_when: false
   failed_when: false

@@ -39,6 +39,7 @@ See comments in defaults/main.yml for additional details.
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | leapp_answerfile | Multi-line String |  | If defined, this is written to `/var/log/leapp/answerfile` before generating the pre-upgrade report. |
 | leapp_preupg_opts | String | | Optional string to define command line options to be passed to the `leapp` command when running the pre-upgrade. |
+| leapp_high_sev_as_inhibitors | Boolean | False | Treat all high severity findings as inhibitors. |
 | leapp_known_inhibitors | List | [] | List of keys of known inhibitors ignored when setting upgrade_inhibited and leapp_inhibitors. |
 | os_path | String | $PATH | Option string to override the $PATH variable used on the target node |
 | async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)

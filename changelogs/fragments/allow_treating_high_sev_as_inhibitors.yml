@@ -1,0 +1,2 @@
+minor_changes:
+  - Allow treating all high severity findings as inhibitors
