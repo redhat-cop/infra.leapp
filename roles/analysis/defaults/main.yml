@@ -52,6 +52,9 @@ leapp_repos_enabled: []
 # leapp_repos_enabled:
 #   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
 
+# Treat all high risk findings as inhibitors, not just those exclusively marked as inhibitors by Leapp
+leapp_high_sev_as_inhibitors: false
+
 # List of keys of known inhibitors which will be excluded when setting upgrade_inhibited and leapp_inhibitors
 # This allows ignoring inhibitors for which remediations are available and require no further attention
 leapp_known_inhibitors: []

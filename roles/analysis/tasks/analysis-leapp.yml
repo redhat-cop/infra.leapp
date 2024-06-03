@@ -97,7 +97,8 @@
   ansible.builtin.set_fact:
     leapp_inhibitors: "{{ leapp_inhibitors | default([]) + [item] }}"
   when:
-    - "'inhibitor' in item.flags"
     - item.key not in leapp_known_inhibitors
+    - (leapp_high_sev_as_inhibitors | bool and item.severity == 'high') or
+      'inhibitor' in item.flags
   loop: "{{ leapp_report_json.entries }}"
 ...
