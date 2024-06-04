@@ -36,7 +36,7 @@
     state: directory
     owner: root
     group: root
-    mode: "0755"
+    mode: "0700"
 
 - name: analysis-leapp | Populate leapp_answers file
   ansible.builtin.copy:
