@@ -33,4 +33,4 @@ for path in "${paths[@]}"; do
   fi
 done
 
-exit $badinitio
+exit "$badinitio"
