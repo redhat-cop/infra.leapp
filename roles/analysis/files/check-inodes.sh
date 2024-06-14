@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 # Total count of local files
 total_inodes=$(df -P --local --inodes --total | tail -1 | awk '{print $3}')
