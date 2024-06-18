@@ -17,7 +17,7 @@ galaxy_info:
   # - CC-BY-4.0
   license: license MIT
 
-  min_ansible_version: "2.11"
+  min_ansible_version: 2.11.0
 
   # If this a Container Enabled role, provide the minimum Ansible Container version.
   # min_ansible_container_version:

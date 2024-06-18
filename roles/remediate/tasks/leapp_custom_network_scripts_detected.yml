@@ -27,7 +27,7 @@
         dest: /etc/NetworkManager/dispatcher.d/20-if-local
         mode: +x
         content: >
-          #!/bin/bash
+          #!/bin/bash -eu
 
           test -n "$DEVICE_IFACE" || exit 0
 
