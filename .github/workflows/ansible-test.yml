@@ -41,12 +41,12 @@ jobs:
           '${{ needs.sanity.result }}',
           '${{ needs.ansible-lint.result }}'
           ])"
-          # python -c "assert 'failure' not in
-          # set([
-          # '${{ needs.changelog.result }}',
-          # '${{ needs.integration.result }}',
-          # '${{ needs.sanity.result }}',
-          # '${{ needs.unit-galaxy.result }}'
-          # '${{ needs.ansible-lint.result }}'
-          # ])"
+        # python -c "assert 'failure' not in
+        # set([
+        # '${{ needs.changelog.result }}',
+        # '${{ needs.integration.result }}',
+        # '${{ needs.sanity.result }}',
+        # '${{ needs.unit-galaxy.result }}'
+        # '${{ needs.ansible-lint.result }}'
+        # ])"
 ...
