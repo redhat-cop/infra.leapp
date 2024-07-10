@@ -1,5 +1,6 @@
 ---
 # defaults file for common
+os_path: $PATH
 log_directory: /var/log/ripu
 log_file: "{{ log_directory }}/ripu.log"
 
