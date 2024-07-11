@@ -6,11 +6,13 @@
   register: preupg
   changed_when: false
   failed_when: false
+  when: check_leapp_analysis_results
 
 - name: redhat-upgrade-tool-upgrade | Assert that preupg was successful
   ansible.builtin.assert:
     that: not preupg_return_codes[preupg.rc].inhibited
     msg: "{{ preupg_return_codes[preupg.rc].msg }}"
+  when: check_leapp_analysis_results
 
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: redhat-upgrade-tool-upgrade | Register to leapp activation key
