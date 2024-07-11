@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/bash -eu
+
+badinitio=0
 
 # Total count of local files
 total_inodes=$(df -P --local --inodes --total | tail -1 | awk '{print $3}')
@@ -33,4 +35,4 @@ for path in "${paths[@]}"; do
   fi
 done
 
-exit $badinitio
+exit "$badinitio"
