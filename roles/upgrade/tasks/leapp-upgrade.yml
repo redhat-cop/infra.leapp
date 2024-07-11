@@ -2,6 +2,7 @@
 - name: leapp-upgrade | Include the parse_leapp_report role to check for inhibitors
   ansible.builtin.include_role:
     name: infra.leapp.parse_leapp_report
+  when: check_leapp_analysis_results
 
 - name: leapp-upgrade | Verify no inhibitor results found during preupgrade
   ansible.builtin.assert:
