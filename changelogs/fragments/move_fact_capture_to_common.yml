@@ -1,0 +1,2 @@
+minor_changes:
+  - Move fact capture from analysis to ensure that facts are representative of the system immediately before upgrade.

@@ -29,4 +29,47 @@
     mode: "0644"
   notify:
     - Archive log file
+
+- name: /etc/ansible/facts.d directory exists
+  ansible.builtin.file:
+    path: /etc/ansible/facts.d
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+
+- name: Capture current ansible_facts for validation after upgrade
+  ansible.builtin.copy:
+    content: "{{ ansible_facts | ansible.builtin.combine({'ansible_local': {}}) }}"
+    dest: /etc/ansible/facts.d/pre_ripu.fact
+    mode: "0644"
+    owner: root
+    group: root
+
+- name: Capture a list of non-rhel versioned packages
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail;
+      export PATH={{ os_path }};
+      rpm -qa | grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |
+      grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
+      sort
+  register: unsigned_packages_pre
+  changed_when: false
+  failed_when:
+    - unsigned_packages_pre.rc != 0
+    - unsigned_packages_pre.stderr != ""
+
+- name: Create fact with the non-rhel versioned packages list
+  ansible.builtin.set_fact:
+    non_rhel_packages: "{{ unsigned_packages_pre.stdout_lines }}"
+
+- name: Capture the list of non-rhel versioned packages in a separate fact file
+  ansible.builtin.copy:
+    content: "{{ non_rhel_packages }}"
+    dest: /etc/ansible/facts.d/non_rhel_packages.fact
+    mode: "0644"
+    owner: root
+    group: root
+
 ...
