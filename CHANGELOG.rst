@@ -4,6 +4,23 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.3.1
+======
+
+Minor Changes
+-------------
+
+- Allow treating all high severity findings as inhibitors
+- Do not try to read analysis report when check_leapp_analysis_results is false.
+- Fix check-inodes.sh script introduced error.
+- Move fact capture from analysis to ensure that facts are representative of the system immediately before upgrade.
+
+Bugfixes
+--------
+
+- Correct /var/log/leapp mode to 0700
+- Fix regressions impacting upgrade role
+
 v1.3.0
 ======
 
