@@ -1,2 +1,0 @@
-minor_changes:
-  - Do not try to read analysis report when check_leapp_analysis_results is false.

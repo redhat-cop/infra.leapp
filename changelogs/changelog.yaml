@@ -95,3 +95,22 @@ releases:
     - allow_listing_known_inhibitors.yml
     - soften_linux_system_roles_dependency.yml
     release_date: '2024-05-23'
+  1.3.1:
+    changes:
+      bugfixes:
+      - Correct /var/log/leapp mode to 0700
+      - Fix regressions impacting upgrade role
+      minor_changes:
+      - Allow treating all high severity findings as inhibitors
+      - Do not try to read analysis report when check_leapp_analysis_results is false.
+      - Fix check-inodes.sh script introduced error.
+      - Move fact capture from analysis to ensure that facts are representative of
+        the system immediately before upgrade.
+    fragments:
+    - allow_treating_high_sev_as_inhibitors.yml
+    - fix_check_inodes.yml
+    - fix_check_leapp_analysis_results.yml
+    - fix_mode.yml
+    - fix_upgrade.yml
+    - move_fact_capture_to_common.yml
+    release_date: '2024-07-16'

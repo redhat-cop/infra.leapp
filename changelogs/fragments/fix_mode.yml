@@ -1,2 +1,0 @@
-bugfixes:
-  - Correct /var/log/leapp mode to 0700
