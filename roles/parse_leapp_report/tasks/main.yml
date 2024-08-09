@@ -21,10 +21,12 @@
 - name: Check for inhibitors
   ansible.builtin.set_fact:
     upgrade_inhibited: true
+    leapp_inhibitors: "{{ leapp_inhibitors | default([]) + [item] }}"
   when:
     - item.key not in leapp_known_inhibitors | default([], true)
     - (leapp_high_sev_as_inhibitors | default(false, true) | bool and item.severity == 'high') or
-      'inhibitor' in item.flags
+      'inhibitor' in item.groups or
+      'error' in item.groups
   loop: "{{ leapp_report_json.entries }}"
 
 - name: Collect inhibitors
@@ -42,28 +44,5 @@
   register: results_errors
   changed_when: false
   failed_when: false
-
-- name: Block for handling leapp-report.txt errors
-  when: results_errors.stdout_lines | length > 0
-  block:
-    - name: Update upgrade_inhibited to true
-      ansible.builtin.set_fact:
-        upgrade_inhibited: true
-
-    - name: Construct a data structure to add high errors to leapp_report_json
-      ansible.builtin.set_fact:
-        __results_errors:
-          entries:
-            - audience: sysadmin
-              flags:
-                - inhibitor
-              severity: high
-              summary: "{{ results_errors.stdout }}"
-              title: "Likely issues found with high (error) severity found, see summary."
-              hostname: "{{ ansible_fqdn }}"
-
-    - name: Add errors as inhibitors to leapp_report_json
-      ansible.builtin.set_fact:
-        leapp_report_json: "{{ leapp_report_json | ansible.builtin.combine(__results_errors, list_merge='append') }}"
 
 ...
