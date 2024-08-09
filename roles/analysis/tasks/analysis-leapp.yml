@@ -68,7 +68,7 @@
   ansible.builtin.shell: >
     set -o pipefail;
     export PATH={{ os_path }};
-    leapp preupgrade
+    leapp preupgrade --report-schema=1.2.0
     {{ leapp_preupg_opts }}
     {{ leapp_enable_repos_args }}
     2>&1 | tee -a {{ log_file }}
@@ -93,12 +93,4 @@
   ansible.builtin.include_role:
     name: infra.leapp.parse_leapp_report
 
-- name: analysis-leapp | Capture inhibitors in a list leapp_inhibitors
-  ansible.builtin.set_fact:
-    leapp_inhibitors: "{{ leapp_inhibitors | default([]) + [item] }}"
-  when:
-    - item.key not in leapp_known_inhibitors
-    - (leapp_high_sev_as_inhibitors | bool and item.severity == 'high') or
-      'inhibitor' in item.flags
-  loop: "{{ leapp_report_json.entries }}"
 ...
