@@ -25,8 +25,8 @@
   when:
     - item.key not in leapp_known_inhibitors | default([], true)
     - (leapp_high_sev_as_inhibitors | default(false, true) | bool and item.severity == 'high') or
-      'inhibitor' in item.groups or
-      'error' in item.groups
+      'inhibitor' in item.groups | default([], true) or
+      'error' in item.groups | default([], true)
   loop: "{{ leapp_report_json.entries }}"
 
 - name: Collect inhibitors
