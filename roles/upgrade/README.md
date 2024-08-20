@@ -17,6 +17,8 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete.     |
 | upgrade_timeout         | 14400                 | Integer for maximum seconds to wait for reboot to complete during upgrade reboot.     |
 | post_reboot_delay       | 120                   | Integer to pass to the reboot post_reboot_delay option. |
+| leapp_resume_retries    | 360                   | Integer for maximum retries to wait for leapp_resume service no longer exists. |
+| leapp_resume_delay      | 10                    | Integer for seconds between each attempt to check leapp_resume service no longer exists. |
 | update_grub_to_grub_2   | false                 | Boolean to control whether grub gets upgraded to grub 2 in post RHEL 6 to 7 upgrade. |
 | os_path                 | $PATH                 | Variable used to override the default $PATH environmental variable on the target node
 | async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
