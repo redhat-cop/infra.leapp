@@ -124,6 +124,9 @@ reboot_timeout: 7200
 upgrade_timeout: 14400
 post_reboot_delay: 120
 
+leapp_resume_retries: 360
+leapp_resume_delay: 10
+
 os_path: $PATH
 
 async_timeout_maximum: 7200
