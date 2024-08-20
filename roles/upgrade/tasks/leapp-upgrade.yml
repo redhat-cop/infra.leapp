@@ -113,8 +113,8 @@
   register: leapp_resume_result
   ignore_errors: true
   until: leapp_resume_result.failed
-  retries: 360
-  delay: 10
+  retries: "{{ leapp_resume_retries }}"
+  delay: "{{ leapp_resume_delay }}"
 
 - name: leapp-upgrade | Block to handle grub_boot_device option
   when: grub_boot_device is defined
