@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Added variables to the leapp_resume task to control task retries and delays.
+...
