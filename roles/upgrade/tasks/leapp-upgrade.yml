@@ -62,6 +62,7 @@
       ansible.builtin.shell: >
         set -o pipefail;
         export PATH={{ os_path }};
+        ulimit -n 16384;
         leapp upgrade --report-schema=1.2.0
         {{ leapp_upgrade_opts }}
         {{ leapp_enable_repos_args }}
