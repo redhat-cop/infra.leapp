@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Run leapp with increased per-process file descriptor limit
-...

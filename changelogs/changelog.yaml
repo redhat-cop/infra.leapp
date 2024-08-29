@@ -114,3 +114,16 @@ releases:
     - fix_upgrade.yml
     - move_fact_capture_to_common.yml
     release_date: '2024-07-16'
+  1.4.0:
+    changes:
+      bugfixes:
+      - Run leapp with increased per-process file descriptor limit
+      major_changes:
+      - Change Leapp report schema from default (1.0.0) to new 1.2.0 for analysis and upgrade.
+      minor_changes:
+      - Added variables to the leapp_resume task to control task retries and delays.
+    fragments:
+    - add_leapp_resume_variables.yml
+    - fix_ulimit.yml
+    - use_new_report_schema.yml
+    release_date: '2024-08-28'
