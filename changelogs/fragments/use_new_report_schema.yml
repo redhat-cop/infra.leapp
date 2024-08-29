@@ -1,4 +1,0 @@
----
-major_changes:
-  - Change Leapp report schema from default (1.0.0) to new 1.2.0 for analysis and upgrade.
-...

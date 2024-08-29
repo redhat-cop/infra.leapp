@@ -4,6 +4,24 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.4.0
+======
+
+Major Changes
+-------------
+
+- Change Leapp report schema from default (1.0.0) to new 1.2.0 for analysis and upgrade.
+
+Minor Changes
+-------------
+
+- Added variables to the leapp_resume task to control task retries and delays.
+
+Bugfixes
+--------
+
+- Run leapp with increased per-process file descriptor limit
+
 v1.3.1
 ======
 
