@@ -54,6 +54,12 @@ You can also include it in a `requirements.yml` file and install it with `ansibl
 ---
 collections:
   - name: infra.leapp
+  - name: ansible.posix
+    version: ">=1.5.1"
+  - name: community.general
+    version: ">=6.6.0"
+  - name: fedora.linux_system_roles # or redhat.rhel_system_roles see upgrade readme for more details
+    version: ">=1.21.0"
 ```
 
 Note that if you install the collection from Ansible Galaxy, it will not be upgraded automatically when you upgrade the `ansible` package. To upgrade the collection to the latest available version, run the following command:
