@@ -69,6 +69,7 @@ local_repos_pre_leapp: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     # state: present # Defaults to present
 #   - name: rhel-server-7-rpms
@@ -77,6 +78,7 @@ local_repos_pre_leapp: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     # state: present # Defaults to present
 
@@ -91,12 +93,14 @@ local_repos_leapp: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 #   - name: rhel-8-for-x86_64-appstream-rpms
 #     description: Red Hat 8.8 App Stream
 #     baseurl: http://repo01.example.com/8.8/rhel-8-for-x86_64-baseos-rpms
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 
 # For leapp_upgrade_type == "custom"
 # Used to return repos to previous state after leapp analysis if necessary.
@@ -108,6 +112,7 @@ local_repos_post_analysis: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     state: absent # Defaults to present
 #   - name: rhel-server-7-rpms
@@ -116,6 +121,7 @@ local_repos_post_analysis: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     state: absent # Defaults to present
 #   - name: rhel-server-7-rpms
@@ -124,6 +130,7 @@ local_repos_post_analysis: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     # state: present # Defaults to present
 #   - name: rhel-server-7-rpms
@@ -132,6 +139,7 @@ local_repos_post_analysis: []
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
+#     # repo_gpgcheck: 0 # Default omit.
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     # state: present # Defaults to present
 

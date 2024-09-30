@@ -6,6 +6,8 @@
     baseurl: "{{ item.baseurl }}"
     enabled: "{{ item.enabled | default(1) }}"
     gpgcheck: "{{ item.gpgcheck | default(0) }}"
+    gpgkey: "{{ item.gpgkey | default(omit) }}"
+    repo_gpgcheck: "{{ item.repo_gpgcheck | default(omit) }}"
     file: "{{ item.file | default('local') }}"
     state: "{{ item.state | default('present') }}"
     owner: root
