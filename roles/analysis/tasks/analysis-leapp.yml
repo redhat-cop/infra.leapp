@@ -54,6 +54,8 @@
     baseurl: "{{ item.baseurl }}"
     enabled: "{{ item.enabled | default(1) }}"
     gpgcheck: "{{ item.gpgcheck | default(0) }}"
+    gpgkey: "{{ item.gpgkey | default(omit) }}"
+    repo_gpgcheck: "{{ item.repo_gpgcheck | default(omit) }}"
     file: /etc/leapp/files/leapp_upgrade_repositories
     state: present
     owner: root
