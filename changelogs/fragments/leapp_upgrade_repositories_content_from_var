@@ -1,0 +1,2 @@
+minor_changes:
+- Ensure leapp_upgrade_repositories.repo only has content from local_repos_leapp variable

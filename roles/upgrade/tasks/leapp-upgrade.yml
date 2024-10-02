@@ -30,6 +30,14 @@
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
+- name: leapp-upgrade | Remove old /etc/leapp/files/leapp_upgrade_repositories.repo
+  ansible.builtin.file:
+    path: /etc/leapp/files/leapp_upgrade_repositories.repo
+    state: absent
+  when:
+    - leapp_upgrade_type == 'custom'
+    - local_repos_leapp | length > 0
+
 - name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
   ansible.builtin.yum_repository:
     name: "{{ item.name }}"

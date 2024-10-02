@@ -47,6 +47,14 @@
     mode: "0644"
   when: leapp_answerfile is defined
 
+- name: analysis-leapp | Remove old /etc/leapp/files/leapp_upgrade_repositories.repo
+  ansible.builtin.file:
+    path: /etc/leapp/files/leapp_upgrade_repositories.repo
+    state: absent
+  when:
+    - leapp_upgrade_type == 'custom'
+    - local_repos_leapp | length > 0
+
 - name: analysis-leapp | Create /etc/leapp/files/leapp_upgrade_repositories.repo
   ansible.builtin.yum_repository:
     name: "{{ item.name }}"
