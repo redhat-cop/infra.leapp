@@ -1,0 +1,5 @@
+---
+minor_changes:
+- Consolidate analysis and upgrade custom-local-repos.yml task files to infra.leapp.common custom_local_repos.yml.
+- Use infra.leapp.common custom_local_repos.yml to generate all repository files.
+- Ensure leapp_upgrade_repositories.repo only has content from the current run of local_repos_leapp variable.

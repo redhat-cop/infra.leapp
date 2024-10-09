@@ -21,29 +21,24 @@
     - satellite_organization is defined
     - satellite_activation_key_leapp is defined
 
-- name: leapp-upgrade | Include custom-local-repos.yml local_repos_pre_leapp
+- name: leapp-upgrade | Include custom_local_repos for local_repos_pre_leapp
   vars:
-    __local_repos: "{{ local_repos_pre_leapp }}"
-  ansible.builtin.include_tasks: custom-local-repos.yml
+    __repos: "{{ local_repos_pre_leapp }}"
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
 - name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
-  ansible.builtin.yum_repository:
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
-    baseurl: "{{ item.baseurl }}"
-    enabled: "{{ item.enabled | default(1) }}"
-    gpgcheck: "{{ item.gpgcheck | default(0) }}"
-    gpgkey: "{{ item.gpgkey | default(omit) }}"
-    repo_gpgcheck: "{{ item.repo_gpgcheck | default(omit) }}"
-    file: /etc/leapp/files/leapp_upgrade_repositories
-    owner: root
-    group: root
-    mode: "0644"
-  loop: "{{ local_repos_leapp }}"
+  vars:
+    __repos: "{{ local_repos_leapp }}"
+    __leapp_repo_file: /etc/leapp/files/leapp_upgrade_repositories
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: custom_local_repos
   when:
     - leapp_upgrade_type == 'custom'
     - local_repos_leapp | length > 0
