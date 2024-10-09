@@ -1,5 +1,12 @@
 ---
-- name: custom-local-repos | Enable custom upgrade yum repositories
+- name: custom_local_repos | Remove old /etc/leapp/files/leapp_upgrade_repositories.repo
+  ansible.builtin.file:
+    path: /etc/leapp/files/leapp_upgrade_repositories.repo
+    state: absent
+  when:
+    - __leapp_repo_file is defined
+
+- name: custom_local_repos | Enable custom upgrade yum repositories
   ansible.builtin.yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
@@ -8,11 +15,11 @@
     gpgcheck: "{{ item.gpgcheck | default(0) }}"
     gpgkey: "{{ item.gpgkey | default(omit) }}"
     repo_gpgcheck: "{{ item.repo_gpgcheck | default(omit) }}"
-    file: "{{ item.file | default('local') }}"
+    file: "{{ __leapp_repo_file | default(item.file) | default('local') }}"
     state: "{{ item.state | default('present') }}"
     owner: root
     group: root
     mode: "0644"
-  loop: "{{ __local_repos }}"
+  loop: "{{ __repos }}"
 
 ...
