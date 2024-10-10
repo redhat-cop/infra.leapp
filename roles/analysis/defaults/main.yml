@@ -88,15 +88,15 @@ local_repos_pre_leapp: []
 local_repos_leapp: []
 # local_repos_leapp:
 #   - name: rhel-8-for-x86_64-baseos-rpms
-#     description: Red Hat 8.8 Base OS
-#     baseurl: http://repo01.example.com/8.8/rhel-8-for-x86_64-baseos-rpms
+#     description: Red Hat 10 Base OS
+#     baseurl: http://repo01.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.
 #     # repo_gpgcheck: 0 # Default omit.
 #   - name: rhel-8-for-x86_64-appstream-rpms
-#     description: Red Hat 8.8 App Stream
-#     baseurl: http://repo01.example.com/8.8/rhel-8-for-x86_64-baseos-rpms
+#     description: Red Hat 8.10 App Stream
+#     baseurl: http://repo01.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
 #     # enabled: 1 # Default 1
 #     # gpgcheck: 0 # Default 0
 #     # gpgkey: XXX # Default omit.

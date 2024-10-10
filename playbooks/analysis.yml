@@ -14,7 +14,7 @@
     # analysis_repos_el7: rhel-7-server-extras-rpms
     # Optionally override the default analysis_repos_el7 to use the upstream copr leapp repository:
     # analysis_repos_el7: copr:copr.fedorainfracloud.org:group_oamg:leapp
-    leapp_preupg_opts: --target 8.8
+    leapp_preupg_opts: --target 8.10
     leapp_answerfile: |
       [remove_pam_pkcs11_module_check]
       confirm = True
