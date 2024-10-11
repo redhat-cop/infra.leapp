@@ -31,6 +31,7 @@
 
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
+  when: pre_upgrade_update | bool
 
 - name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
   vars:

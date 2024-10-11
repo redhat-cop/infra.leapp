@@ -24,6 +24,7 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
 | async_poll_interval     | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
 | check_leapp_analysis_results| true              | Allows for running remediation and going straight to upgrade without re-running analysis. |
+| pre_upgrade_update      | true                  | Boolean to decide if an update and reboot on the running pre-upgrade operating system will run. |
 | post_upgrade_update     | true                   | Boolean to decide if after the upgrade is performed a dnf update will run|
 | post_upgrade_unset_release| true                | Boolean used to control whether Leapp's RHSM release lock is unset.
 | post_upgrade_release    |                       | Optional string used to set a specific RHSM release lock after the Leapp upgrade, but before the final update pass.
