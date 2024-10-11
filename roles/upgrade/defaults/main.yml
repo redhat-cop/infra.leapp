@@ -113,11 +113,9 @@ crypto_policy: DEFAULT
 # crypto_policy: FUTURE
 # crypto_policy: DEFAULT:SHA1
 
-# Whether or not to skip the pre upgrade update and reboot of the operating system
-skip_pre_upgrade_update_reboot: false
-
 # Whether or not to update from legacy grub to grub2 in post-upgrade steps from RHEL 6 -> 7.
 update_grub_to_grub_2: false
+pre_upgrade_update: true
 post_upgrade_update: true
 post_upgrade_unset_release: true
 post_upgrade_release: ""

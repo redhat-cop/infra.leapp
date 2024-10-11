@@ -29,7 +29,7 @@
 
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
-  when: skip_pre_upgrade_update_reboot is not defined or not skip_pre_upgrade_update_reboot|bool
+  when: pre_upgrade_update | bool
 
 - name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
   ansible.builtin.yum_repository:
