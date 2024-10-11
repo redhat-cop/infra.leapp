@@ -53,7 +53,7 @@ See comments in defaults/main.yml for additional details.
 | local_repos_pre_leapp  | List of dicts   | [] | Used to configure repos for yum update before running leapp upgrade (current version).|
 | local_repos_leapp  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo.
 | local_repos_post_upgrade  | List of dicts   | [] | Used to configure next version repos post upgrade (can be set to local_repos_leapp if the same)
-| repo_files_to_remove_at_upgrade  | List   | [] | Simpler way to remove /etc/yum.repo.d files before leapp upgrade is run.
+| repo_files_to_remove_at_upgrade  | List   | [] | Simpler way to remove /etc/yum.repos.d files before leapp upgrade is run.
 
 ## Example playbook
 
