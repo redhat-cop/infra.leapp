@@ -15,11 +15,13 @@
 
 - name: Parse report results
   ansible.builtin.set_fact:
+    cacheable: "{{ cache_facts }}"
     leapp_report_txt: "{{ results_txt.content | b64decode | split('\n') }}"
     leapp_report_json: "{{ results_json.content | b64decode | from_json }}"
 
 - name: Check for inhibitors
   ansible.builtin.set_fact:
+    cacheable: "{{ cache_facts }}"
     upgrade_inhibited: true
     leapp_inhibitors: "{{ leapp_inhibitors | default([]) + [item] }}"
   when:
