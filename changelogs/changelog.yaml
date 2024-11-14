@@ -119,7 +119,8 @@ releases:
       bugfixes:
       - Run leapp with increased per-process file descriptor limit
       major_changes:
-      - Change Leapp report schema from default (1.0.0) to new 1.2.0 for analysis and upgrade.
+      - Change Leapp report schema from default (1.0.0) to new 1.2.0 for analysis
+        and upgrade.
       minor_changes:
       - Added variables to the leapp_resume task to control task retries and delays.
     fragments:
@@ -127,3 +128,26 @@ releases:
     - fix_ulimit.yml
     - use_new_report_schema.yml
     release_date: '2024-08-28'
+  1.4.1:
+    changes:
+      minor_changes:
+      - Add leapp_env_vars optional variable for defining leapp environment variables
+      - Add option to skip the initial update and reboot of the pre-upgraded server
+      - Add optional parameter for allowing caching of facts within AAP
+      - Consolidate analysis and upgrade custom-local-repos.yml task files to infra.leapp.common
+        custom_local_repos.yml.
+      - Ensure leapp_upgrade_repositories.repo only has content from the current run
+        of local_repos_leapp variable.
+      - Fix minor documentation typo for /etc/yum.repos.d
+      - Support optional gpgkey and repo_gpgcheck yum repository attributes
+      - Update example playbooks and variables from 8.8 to 8.10.
+      - Use infra.leapp.common custom_local_repos.yml to generate all repository files.
+    fragments:
+    - add_cachable_variable.yml
+    - custom_local_repos.yml
+    - documentation-yum-repos-d.yml
+    - leapp_env_vars.yml
+    - option_to_skip_pre_upgrade_update_boot.yml
+    - support_gpgkey_and_repo_gpgcheck.yml
+    - update_8_8_to_8_10.yml
+    release_date: '2024-11-14'

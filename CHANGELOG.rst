@@ -4,6 +4,22 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.4.1
+======
+
+Minor Changes
+-------------
+
+- Add leapp_env_vars optional variable for defining leapp environment variables
+- Add option to skip the initial update and reboot of the pre-upgraded server
+- Add optional parameter for allowing caching of facts within AAP
+- Consolidate analysis and upgrade custom-local-repos.yml task files to infra.leapp.common custom_local_repos.yml.
+- Ensure leapp_upgrade_repositories.repo only has content from the current run of local_repos_leapp variable.
+- Fix minor documentation typo for /etc/yum.repos.d
+- Support optional gpgkey and repo_gpgcheck yum repository attributes
+- Update example playbooks and variables from 8.8 to 8.10.
+- Use infra.leapp.common custom_local_repos.yml to generate all repository files.
+
 v1.4.0
 ======
 

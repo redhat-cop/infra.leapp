@@ -1,2 +1,0 @@
-minor_changes:
-- Support optional gpgkey and repo_gpgcheck yum repository attributes
