@@ -69,6 +69,7 @@
     {{ leapp_preupg_opts }}
     {{ leapp_enable_repos_args }}
     2>&1 | tee -a {{ log_file }}
+  environment: "{{ leapp_env_vars }}"
   changed_when: true
   register: leapp
   args:

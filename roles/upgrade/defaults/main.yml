@@ -98,6 +98,12 @@ local_repos_post_upgrade: []
 #     # repo_gpgcheck: 0 # Default omit.
 #     # state: present # Defaults to present.
 
+# Dict of env vars to be used when the leapp command is run
+leapp_env_vars: {}
+# leapp_env_vars:
+#   LEAPP_UNSUPPORTED: 1
+#   LEAPP_DEVEL_DATABASE_SYNC_OFF: 1
+
 # Desired selinux mode post Leapp upgrade.
 # selinux_mode: enforcing
 # selinux_mode: permissive
