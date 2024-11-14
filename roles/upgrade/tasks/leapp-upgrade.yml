@@ -65,6 +65,7 @@
         {{ leapp_upgrade_opts }}
         {{ leapp_enable_repos_args }}
         2>&1 | tee -a {{ log_file }}
+      environment: "{{ leapp_env_vars }}"
       args:
         executable: /bin/bash
       async: "{{ async_timeout_maximum | int }}"
