@@ -1,0 +1,4 @@
+---
+minor_changes:
+- groups no longer in leapp_report - changed to flags
+
