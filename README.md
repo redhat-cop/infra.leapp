@@ -25,6 +25,7 @@ The collection supports RHEL in-place upgrades for the following RHEL versions:
 - RHEL 6 to RHEL 7 (RUT)
 - RHEL 7 to RHEL 8 (Leapp)
 - RHEL 8 to RHEL 9 (Leapp)
+- RHEL 9 to RHEL 10 (Leapp)
 
 The collection may be used for the RHEL upgrade paths and minor versions supported by the indicated upgrade utilities (Leapp or RUT). Refer the to Red Hat knowledge solution article [Supported in-place upgrade paths for Red Hat Enterprise Linux](https://access.redhat.com/articles/4263361) for the latest support details.
 
