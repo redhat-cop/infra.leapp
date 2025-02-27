@@ -1,5 +1,6 @@
 ---
 - name: leapp_firewalld_allowzonedrifting | Set the "AllowZoneDrifting" in firewalld.conf to "no"
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
   block:
     - name: leapp_firewalld_allowzonedrifting | Set the "AllowZoneDrifting" in firewalld.conf to "no"
       ansible.builtin.lineinfile:

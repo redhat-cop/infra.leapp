@@ -1,5 +1,6 @@
 ---
 - name: leapp_custom_network_scripts_detected | Move custom network-scripts to NetworkManager dispatcher scripts
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
   block:
     - name: leapp_custom_network_scripts_detected | Create /opt/network-scripts/ directory if it does not exist
       ansible.builtin.file:

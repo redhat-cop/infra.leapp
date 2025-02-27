@@ -1,5 +1,6 @@
 ---
 - name: leapp_non_standard_openssl_config | Adjust openssl.cnf configuration for default_modules
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
   block:
     - name: leapp_non_standard_openssl_config | Check if openssl.cnf exists
       ansible.builtin.stat:

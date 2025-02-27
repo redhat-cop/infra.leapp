@@ -3,6 +3,7 @@
   vars:
     leapp_report_location: /var/log/leapp/leapp-report.json
     entry_title: Detected RPMs with RSA/SHA1 signature
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
   block:
     - name: leapp_rpms_with_rsa_sha1_detected | Check that the leapp-report.json exists
       ansible.builtin.stat:

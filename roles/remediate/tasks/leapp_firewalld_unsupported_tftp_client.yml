@@ -3,6 +3,7 @@
   vars:
     entry_title: Firewalld Service tftp-client Is Unsupported
     leapp_report_location: /var/log/leapp/leapp-report.json
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
   block:
     - name: leapp_firewalld_unsupported_tftp_client | Check that the leapp-report.json exists
       ansible.builtin.stat:

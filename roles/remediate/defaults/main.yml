@@ -21,6 +21,7 @@ remediation_playbooks:
   - leapp_non_persistent_partitions
   - leapp_non_standard_openssl_config
   - leapp_old_postgresql_data
+  - leapp_pam_tally2
   - leapp_partitions_with_noexec
   - leapp_relative_symlinks
   - leapp_rpms_with_rsa_sha1_detected

@@ -16,7 +16,7 @@ These are the roles included in the collection. Follow the links below to see th
 - [`common`](./roles/common/) - used for local logging, mutex locking, and common vars
 - [`parse_leapp_report`](./roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
 - [`upgrade`](./roles/upgrade/) - executes the Leapp OS upgrade
-- [`remediate`](./roles/remediate/) - assists in the remediation of a system (RHEL 8 only)
+- [`remediate`](./roles/remediate/) - assists in the remediation of a system (RHEL 7->8 and 8->9 only)
 
 ## Supported RHEL versions
 
@@ -29,6 +29,13 @@ The collection supports RHEL in-place upgrades for the following RHEL versions:
 The collection may be used for the RHEL upgrade paths and minor versions supported by the indicated upgrade utilities (Leapp or RUT). Refer the to Red Hat knowledge solution article [Supported in-place upgrade paths for Red Hat Enterprise Linux](https://access.redhat.com/articles/4263361) for the latest support details.
 
 The roles in this collection have been successfully used in a number of different environments including on-prem bare metal servers and VMs pulling RHEL packages from Red Hat CDN repos, Satellite content views, or mirrored repos internal to disconnected networks. Upgrading RHEL on Amazon EC2 instances pulling from bring-your-own-subscription CDN repos or pay-as-you-go RHUI repos have also been tested. Upgrading RHEL on other public clouds should be possible as well after setting the documented role variables as required.
+
+> [!IMPORTANT]
+> Targeting RHEL 6 nodes requires an Ansible-core version <= 2.12
+>
+> Targeting RHEL 7 nodes requires an Ansible-core version <= 2.16
+>
+> See [this knowledgebase article](https://access.redhat.com/articles/6977724) for details
 
 ## Not in scope
 

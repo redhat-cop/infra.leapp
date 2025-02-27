@@ -4,6 +4,21 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.5.0
+======
+
+Major Changes
+-------------
+
+- Added support for RHEL 7 -> 8 in the infra.leapp.remediate role
+
+Minor Changes
+-------------
+
+- Added pam_tally2 remediation for RHEL 7
+- Updated remediate playbooks to support both RHEL 7 and RHEL 8
+- Updated documentation in support of the extended remediate role
+
 v1.4.1
 ======
 
