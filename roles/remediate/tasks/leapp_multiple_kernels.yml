@@ -27,7 +27,7 @@
       when: installed_kernels.stdout_lines[0] != current_kernel.stdout
 
     - name: leapp_multiple_kernels | Remove old kernels
-      ansible.builtin.dnf:
+      ansible.builtin.package:
         name: kernel-core-{{ item }}
         state: absent
       loop: "{{ installed_kernels.stdout_lines[1:] }}"
