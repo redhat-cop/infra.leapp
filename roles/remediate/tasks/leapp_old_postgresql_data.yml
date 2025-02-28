@@ -7,8 +7,9 @@
       register: pgsql_data_stat
 
     - name: leapp_old_postgresql_data | End play if /var/lib/psql/data does not exist
-      ansible.builtin.meta: end_host
-      when: not pgsql_data_stat.stat.exists
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: not pgsql_data_stat.stat.exists
 
     - name: leapp_old_postgresql_data | Set backup filename with timestamp
       ansible.builtin.set_fact:
@@ -29,5 +30,11 @@
       ansible.builtin.file:
         path: /var/lib/pgsql/data
         state: absent
+
+  rescue:
+    - name: leapp_old_postgresql_data | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing
 
 ...

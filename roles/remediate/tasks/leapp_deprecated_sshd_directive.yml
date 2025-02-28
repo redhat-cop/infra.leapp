@@ -11,8 +11,9 @@
       register: leapp_report_stat
 
     - name: leapp_deprecated_sshd_directive | End execution of playbook if leapp report does not exist (not possible to remediate)
-      ansible.builtin.meta: end_host
-      when: leapp_report_stat.stat.exists is false
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: leapp_report_stat.stat.exists is false
 
     - name: leapp_deprecated_sshd_directive | Read leapp report
       ansible.builtin.slurp:
@@ -30,8 +31,9 @@
       when: item.title == entry_title and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
 
     - name: leapp_deprecated_sshd_directive | End execution of playbook if no entry found in leapp report
-      ansible.builtin.meta: end_host
-      when: remediation is not defined
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: remediation is not defined
 
     - name: leapp_deprecated_sshd_directive | Output command to be executed
       ansible.builtin.debug:
@@ -42,5 +44,11 @@
       when: remediation is defined
       register: remediation_command_output
       changed_when: remediation_command_output.rc == 0
+
+  rescue:
+    - name: leapp_deprecated_sshd_directive | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing
 
 ...

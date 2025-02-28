@@ -11,8 +11,9 @@
       register: leapp_report_stat
 
     - name: leapp_rpms_with_rsa_sha1_detected | End play if no leapp report exists
-      ansible.builtin.meta: end_host
-      when: leapp_report_stat.stat.exists is false
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: leapp_report_stat.stat.exists is false
 
     - name: leapp_rpms_with_rsa_sha1_detected | Read leapp report
       ansible.builtin.slurp:
@@ -30,8 +31,9 @@
       when: item.title is match(entry_title) and (item.summary | length > 0)
 
     - name: leapp_rpms_with_rsa_sha1_detected | End execution of playbook if no entry found in leapp report
-      ansible.builtin.meta: end_host
-      when: summary is not defined
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: summary is not defined
 
     - name: leapp_rpms_with_rsa_sha1_detected | Parse bad_pkgs
       ansible.builtin.set_fact:
@@ -42,5 +44,11 @@
         name: "{{ item }}"
         state: absent
       loop: "{{ bad_pkgs }}"
+
+  rescue:
+    - name: leapp_rpms_with_rsa_sha1_detected | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing
 
 ...

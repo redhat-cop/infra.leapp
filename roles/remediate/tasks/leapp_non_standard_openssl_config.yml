@@ -8,8 +8,9 @@
       register: openssl_cnf_stat
 
     - name: leapp_non_standard_openssl_config | End execution of playbook if openssl.cnf does not exist
-      ansible.builtin.meta: end_host
-      when: openssl_cnf_stat.stat.exists is false
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: openssl_cnf_stat.stat.exists is false
 
     - name: leapp_non_standard_openssl_config | Get content of openssl.cnf
       ansible.builtin.slurp:
@@ -57,5 +58,11 @@
           .include /etc/crypto-policies/back-ends/opensslcnf.config
         state: present
         marker: "# {mark} ANSIBLE MANAGED BLOCK - LEAPP NON STANDARD OPENSSL CONFIG - default_modules"
+
+  rescue:
+    - name: leapp_non_standard_openssl_config | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing
 
 ...
