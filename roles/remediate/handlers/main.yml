@@ -2,7 +2,13 @@
 # handlers file for remedations
 
 # Keep this last so it's easy to find in the job output.
+- name: "Restart sshd"
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
 - name: The remediations are now complete
   ansible.builtin.debug:
     msg: The remediations are now complete.
+
 ...

@@ -70,6 +70,9 @@ The list of available remediation playbooks with their corresponding inhibitors 
   - **Solves:** Detected partitions mounted with the `noexec` option, preventing a successful in-place upgrade.
 - `leapp_relative_symlinks`
   - **Solves:** Upgrade requires links in root directory to be relative
+- `leapp_remote_using_root`
+  - RHEL 7 Only
+  - **Solves:** Possible problems with remote login using root account
 - `leapp_rpms_with_rsa_sha1_detected`
   - RHEL 8 Only
   - **Solves:** Detected RPMs with RSA/SHA1 signature.

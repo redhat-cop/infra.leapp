@@ -1,0 +1,17 @@
+---
+- name: leapp_remote_using_root | Fix potential issues with remote login using root
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 7
+  block:
+    - name: leapp_remote_using_root | Configure sshd to prohibit-passwords on root login
+      ansible.builtin.lineinfile:
+        path: "/etc/ssh/sshd_config"
+        regex: "^(#)?{{ item.key }}"
+        line: "{{ item.key }} {{ item.value }}"
+        state: present
+      loop:
+        - {key: "PermitRootLogin", value: "prohibit-password"}
+        - {key: "PasswordAuthentication", value: "no"}
+      notify:
+        - Restart sshd
+
+...
