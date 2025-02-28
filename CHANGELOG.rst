@@ -3,6 +3,7 @@ Ansible Leapp Collection Release Notes
 ======================================
 
 .. contents:: Topics
+
 v1.4.1
 ======
 
