@@ -14,7 +14,7 @@
 
     - name: leapp_pam_tally2 | Comment out all instances of pam_tally2 # noqa: command-instead-of-module
       ansible.builtin.command:
-        cmd: "sed '/^#/! {/pam_tally2/ s/^/#/}' < {{ item }}"
+        cmd: "sed -i '/^#/! {/pam_tally2/ s/^/#/}' {{ item }}"
       loop: "{{ file_list.files | map(attribute='path') | list }}"
       changed_when: file_list.stderr | length > 0
 ...
