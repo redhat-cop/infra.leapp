@@ -10,23 +10,23 @@
     - name: leapp_non_persistent_partitions | Get /var/lib/leapp mount device
       ansible.builtin.command: findmnt -nr -o SOURCE /var/lib/leapp
       register: mount_device_output
-      changed_when: true
+      changed_when: false
 
     - name: leapp_non_persistent_partitions | Get /var/lib/leapp mount filesystem type
       ansible.builtin.command: findmnt -nr -o FSTYPE /var/lib/leapp
       register: mount_filesystem_output
-      changed_when: true
+      changed_when: false
 
     - name: leapp_non_persistent_partitions | Get /var/lib/leapp mount options
       ansible.builtin.command: findmnt -nr -o OPTIONS /var/lib/leapp
       register: mount_options_output
-      changed_when: true
+      changed_when: false
 
     - name: leapp_non_persistent_partitions | Get UUID for the device
       ansible.builtin.command: blkid -s UUID -o value {{ mount_device_output.stdout }}
       register: uuid_output
       failed_when: true
-      changed_when: true
+      changed_when: false
 
     - name: leapp_non_persistent_partitions | Add /var/lib/leapp to /etc/fstab
       ansible.builtin.lineinfile:

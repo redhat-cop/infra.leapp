@@ -6,12 +6,12 @@
         set -o pipefail
         sudo rpm -q kernel --queryformat '%{version}-%{release}.%{arch}\n' | sort -Vr
       register: installed_kernels
-      changed_when: true
+      changed_when: false
 
     - name: leapp_multiple_kernels | Check current kernel version
       ansible.builtin.command: uname -r
       register: current_kernel
-      changed_when: true
+      changed_when: false
 
     - name: leapp_multiple_kernels | Set default kernel to latest
       ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
