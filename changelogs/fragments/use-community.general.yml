@@ -1,0 +1,3 @@
+---
+minor_changes:
+- Use community.general.modprobe in leapp_loaded_removed_kernel_drivers.yml remediation
