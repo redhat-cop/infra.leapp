@@ -4,8 +4,12 @@
     - name: leapp_non_persistent_partitions | Check if /var/lib/leapp exists in /etc/fstab
       ansible.builtin.command: grep '/var/lib/leapp' /etc/fstab
       register: fstab_output
-      failed_when: true
       changed_when: fstab_output.stdout is defined
+
+    - name: leapp_non_persistent_partitions | End play if no leapp report exists
+      ansible.builtin.set_fact:
+        leapp_mount_missing: true
+      failed_when: fstab_output.stdout is undefined
 
     - name: leapp_non_persistent_partitions | Get /var/lib/leapp mount device
       ansible.builtin.command: findmnt -nr -o SOURCE /var/lib/leapp
@@ -37,5 +41,11 @@
         - uuid_output.stdout is defined
         - mount_filesystem_output.stdout is defined
         - mount_options_output.stdout is defined
+    
+  rescue:
+    - name: leapp_non_persistent_partitions | Continue when /var/lib/leapp is missing
+      ansible.builtin.debug:
+        msg: "/var/lib/leapp mount point not found. Skipping this task."
+      when: leapp_mount_missing is defined and leapp_mount_missing is true    
 
 ...
