@@ -21,6 +21,7 @@
     - name: leapp_custom_network_scripts_detected | Move scripts in /sbin to /opt/network-scripts/, end playbook if this fails
       ansible.builtin.command: mv /sbin/if*-local /opt/network-scripts/
       register: move_scripts
+      when: pre_up is defined or pre_down is defined
       changed_when: move_scripts.rc == 0
 
     - name: leapp_custom_network_scripts_detected | Create /etc/NetworkManager/dispatcher.d/20-if-local
