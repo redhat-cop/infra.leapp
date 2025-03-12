@@ -80,6 +80,6 @@
     - name: leapp_firewalld_unsupported_tftp_client | Continue when leapp report is missing
       ansible.builtin.debug:
         msg: "Leapp report missing or did not contain any matches. Skipping this task."
-      when: leapp_report_missing
+      when: leapp_report_missing is defined and leapp_report_missing is true
 
 ...
