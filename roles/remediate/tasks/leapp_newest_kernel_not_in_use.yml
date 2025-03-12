@@ -8,6 +8,18 @@
       register: installed_kernels
       changed_when: false
 
+    - name: leapp_newest_kernel_not_in_use | Get the default kernel
+      ansible.builtin.command: grubby --default-kernel | sed 's/^\/boot\/vmlinuz\-//'
+      register: default_kernel_version
+      changed_when: false
+
+    # If the two strings are the same, fail out to the rescue block
+    - name: leapp_newest_kernel_not_in_use | Check the kernel versions
+      ansible.builtin.set_fact:
+        leapp_newest_kernel_in_use: true
+      when: installed_kernels.stdout_lines[0] == default_kernel_version.stdout
+      failed_when: installed_kernels.stdout_lines[0] == default_kernel_version.stdout
+
     - name: leapp_newest_kernel_not_in_use | Set default kernel to latest
       ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
       register: set_default_kernel
@@ -18,5 +30,11 @@
         reboot_timeout: "{{ reboot_timeout }}"
         post_reboot_delay: "{{ post_reboot_delay }}"
       timeout: "{{ reboot_timeout }}"
+
+  rescue:
+    - name: leapp_newest_kernel_not_in_use | Continue when the latest version is the default
+      ansible.builtin.debug:
+        msg: "The newest kernel is already in use. Skipping this task."
+      when: leapp_newest_kernel_in_use is defined and leapp_newest_kernel_in_use is true
 
 ...
