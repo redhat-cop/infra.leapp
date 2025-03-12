@@ -9,7 +9,9 @@
       changed_when: false
 
     - name: leapp_newest_kernel_not_in_use | Get the default kernel
-      ansible.builtin.shell: grubby --default-kernel | sed 's/^\/boot\/vmlinuz\-//'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grubby --default-kernel | sed 's/^\/boot\/vmlinuz\-//'
       register: default_kernel_version
       changed_when: false
 

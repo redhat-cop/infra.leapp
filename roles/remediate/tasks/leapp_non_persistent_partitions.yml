@@ -41,11 +41,11 @@
         - uuid_output.stdout is defined
         - mount_filesystem_output.stdout is defined
         - mount_options_output.stdout is defined
-    
+
   rescue:
     - name: leapp_non_persistent_partitions | Continue when /var/lib/leapp is missing
       ansible.builtin.debug:
         msg: "/var/lib/leapp mount point not found. Skipping this task."
-      when: leapp_mount_missing is defined and leapp_mount_missing is true    
+      when: leapp_mount_missing is defined and leapp_mount_missing is true
 
 ...
