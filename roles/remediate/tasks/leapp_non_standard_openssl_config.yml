@@ -18,22 +18,22 @@
       register: openssl_cnf_stat
 
     - name: leapp_non_standard_openssl_config | Comment out old openssl_conf line
-      ansible.builtin.command: sudo sed -i 's/^openssl_conf/#openssl_conf/g' /etc/pki/tls/openssl.cnf
+      ansible.builtin.command: sed -i 's/^openssl_conf/#openssl_conf/g' /etc/pki/tls/openssl.cnf
       register: openssl_conf_comment_out
       changed_when: openssl_conf_comment_out.rc == 0
 
     - name: leapp_non_standard_openssl_config | Comment out old [ default_modules ] block
-      ansible.builtin.shell: sudo sed -i '/^\s*\[\s*default_modules\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*default_modules\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
+      ansible.builtin.shell: sed -i '/^\s*\[\s*default_modules\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*default_modules\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
       register: default_modules_comment_out
       changed_when: default_modules_comment_out.rc == 0
 
     - name: leapp_non_standard_openssl_config | Comment out old [ ssl_module ] block
-      ansible.builtin.shell: sudo sed -i '/^\s*\[\s*ssl_module\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*ssl_module\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
+      ansible.builtin.shell: sed -i '/^\s*\[\s*ssl_module\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*ssl_module\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
       register: ssl_module_comment_out
       changed_when: ssl_module_comment_out.rc == 0
 
     - name: leapp_non_standard_openssl_config | Comment out old [ crypto_policy ] block
-      ansible.builtin.shell: sudo sed -i '/^\s*\[\s*crypto_policy\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*crypto_policy\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
+      ansible.builtin.shell: sed -i '/^\s*\[\s*crypto_policy\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*crypto_policy\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
       register: crypto_policy_comment_out
       changed_when: crypto_policy_comment_out.rc == 0
 
