@@ -18,7 +18,8 @@
         src: /etc/pki/tls/openssl.cnf
         dest: /etc/pki/tls/openssl.cnf.rhel8-bkup
         remote_src: true
-        
+        mode: 0644
+
     - name: leapp_non_standard_openssl_config | Remove openssl.cnf
       ansible.builtin.file:
         path: /etc/pki/tls/openssl.cnf
