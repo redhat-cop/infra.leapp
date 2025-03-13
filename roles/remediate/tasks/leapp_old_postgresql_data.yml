@@ -29,6 +29,7 @@
         format: gz
         force_archive: true
         remove: true
+        mode: "0755"
 
   rescue:
     - name: leapp_old_postgresql_data | Continue when leapp report is missing
