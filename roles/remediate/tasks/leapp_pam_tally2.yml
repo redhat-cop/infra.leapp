@@ -16,6 +16,7 @@
       ansible.builtin.command:
         cmd: "sed -i '/^#/! {/pam_tally2/ s/^/#/}' {{ item }}"
       loop: "{{ file_list.files | map(attribute='path') | list }}"
-      changed_when: file_list.stderr | length > 0
+      when: file_list.files | length > 0
+      changed_when: file_list.files | length > 0
 
 ...

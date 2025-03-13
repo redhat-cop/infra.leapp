@@ -1,9 +1,28 @@
 ---
+# kde is not available in RHEL 8
+# We will only install the gnome desktop environment if KDE is installed
 - name: leapp_unavailable_kde | Install the GNOME desktop environment to be able to upgrade
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 7
   block:
-    - name: leapp_unavailable_kde | Install the GNOME desktop environment
-      ansible.builtin.dnf:
-        name: "@^graphical-server-environment"
+    - name: leapp_unavailable_kde | Check if the KDE desktop environment is installed
+      ansible.builtin.command:
+        cmd: "rpm -qa kde-workspace"
+      register: kde_install
+      changed_when: false
+
+    - name: leapp_unavailable_kde | Check if the Gnome desktop environment is installed
+      ansible.builtin.command:
+        cmd: "rpm -qa gnome-desktop3"
+      register: gnome_install
+      changed_when: false
+
+    - name: leapp_unavailable_kde | Install the GNOME desktop environment if KDE is installed
+      ansible.builtin.package:
+        name: "{{ item }}"
         state: present
+      loop:
+        - "@^graphical-server-environment"
+        - gnome-desktop3
+      when: kde_install.stdout | length > 0 and gnome_install.stdout | length == 0
 
 ...

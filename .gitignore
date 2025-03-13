@@ -131,3 +131,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Local collection testing builds
+*.tar.gz
