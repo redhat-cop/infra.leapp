@@ -9,6 +9,7 @@
     - name: leapp_non_persistent_partitions | End play if no leapp report exists
       ansible.builtin.set_fact:
         leapp_mount_missing: true
+      when: fstab_output.stdout is undefined
       failed_when: fstab_output.stdout is undefined
 
     - name: leapp_non_persistent_partitions | Get /var/lib/leapp mount device

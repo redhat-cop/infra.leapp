@@ -13,6 +13,7 @@
     - name: leapp_firewalld_unsupported_tftp_client | End play if no leapp report exists
       ansible.builtin.set_fact:
         leapp_report_missing: true
+      when: leapp_report_stat.stat.exists is false
       failed_when: leapp_report_stat.stat.exists is false
 
     - name: leapp_firewalld_unsupported_tftp_client | Read leapp report

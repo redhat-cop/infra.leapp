@@ -10,6 +10,7 @@
     - name: leapp_non_standard_openssl_config | End execution of playbook if openssl.cnf does not exist
       ansible.builtin.set_fact:
         leapp_report_missing: true
+      when: openssl_cnf_stat.stat.exists is false
       failed_when: openssl_cnf_stat.stat.exists is false
 
     - name: leapp_non_standard_openssl_config | Get content of openssl.cnf

@@ -16,7 +16,7 @@
       register: gnome_install
       changed_when: false
 
-    - name: leapp_unavailable_kde | Install the GNOME desktop environment if KDE is installed
+    - name: leapp_unavailable_kde | Install the GNOME desktop environment if KDE is installed and gnome is not
       ansible.builtin.package:
         name: "{{ item }}"
         state: present

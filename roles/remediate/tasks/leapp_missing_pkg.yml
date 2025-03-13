@@ -12,6 +12,7 @@
     - name: leapp_missing_pkg | End play if no leapp report exists
       ansible.builtin.set_fact:
         leapp_report_missing: true
+      when: leapp_report_stat.stat.exists is false
       failed_when: leapp_report_stat.stat.exists is false
 
     - name: leapp_missing_pkg | Read leapp report
