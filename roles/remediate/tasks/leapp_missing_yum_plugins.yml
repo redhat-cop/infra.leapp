@@ -10,8 +10,10 @@
       register: leapp_report_stat
 
     - name: leapp_missing_yum_plugins | End execution of playbook if leapp report does not exist (not possible to remediate)
-      ansible.builtin.meta: end_host
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
       when: leapp_report_stat.stat.exists is false
+      failed_when: leapp_report_stat.stat.exists is false
 
     - name: leapp_missing_yum_plugins | Read leapp report
       ansible.builtin.slurp:
@@ -37,5 +39,11 @@
       when: remediation is defined
       register: remediation_command_output
       changed_when: remediation_command_output.rc == 0
+
+  rescue:
+    - name: leapp_missing_yum_plugins | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing is defined and leapp_report_missing is true
 
 ...

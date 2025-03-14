@@ -10,8 +10,10 @@
       register: leapp_report_stat
 
     - name: leapp_loaded_removed_kernel_drivers | End execution of playbook if leapp report does not exist
-      ansible.builtin.meta: end_host
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
       when: leapp_report_stat.stat.exists is false
+      failed_when: leapp_report_stat.stat.exists is false
 
     - name: leapp_loaded_removed_kernel_drivers | Read leapp report
       ansible.builtin.slurp:
@@ -29,8 +31,9 @@
       when: item.title is match(entry_title_pattern)
 
     - name: leapp_loaded_removed_kernel_drivers | End execution of playbook if no entry found in leapp report
-      ansible.builtin.meta: end_host
-      when: leapp_entry is not defined
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: leapp_entry is not defined
 
     - name: leapp_loaded_removed_kernel_drivers | Parse summary to obtain list of modules
       ansible.builtin.set_fact:
@@ -48,5 +51,11 @@
       loop: "{{ unsupported_modules }}"
       when: unsupported_modules is defined
       changed_when: unsupported_modules is defined
+
+  rescue:
+    - name: leapp_loaded_removed_kernel_drivers | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing is defined and leapp_report_missing is true
 
 ...

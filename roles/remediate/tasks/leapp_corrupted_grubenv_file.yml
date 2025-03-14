@@ -10,8 +10,10 @@
       register: leapp_report_stat
 
     - name: leapp_corrupted_grubenv_file | End play if no leapp report exists
-      ansible.builtin.meta: end_host
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
       when: leapp_report_stat.stat.exists is false
+      failed_when: leapp_report_stat.stat.exists is false
 
     - name: leapp_corrupted_grubenv_file | Read leapp report
       ansible.builtin.slurp:
@@ -29,8 +31,9 @@
       when: item.title is match(entry_title) and (item.detail.remediations | selectattr('type', 'eq', 'hint') | length > 0)
 
     - name: leapp_corrupted_grubenv_file | End execution of playbook if no entry found in leapp report
-      ansible.builtin.meta: end_host
-      when: hint is not defined
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: hint is not defined
 
     - name: leapp_corrupted_grubenv_file | Extract file(s) using regex
       ansible.builtin.set_fact:
@@ -65,4 +68,9 @@
       register: grub_mkconfig
       changed_when: grub_mkconfig.rc == 0
 
+  rescue:
+    - name: leapp_corrupted_grubenv_file | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing is defined and leapp_report_missing is true
 ...

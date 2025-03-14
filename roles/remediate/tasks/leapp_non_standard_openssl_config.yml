@@ -1,5 +1,6 @@
 ---
 - name: leapp_non_standard_openssl_config | Adjust openssl.cnf configuration for default_modules
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
   block:
     - name: leapp_non_standard_openssl_config | Check if openssl.cnf exists
       ansible.builtin.stat:
@@ -7,54 +8,27 @@
       register: openssl_cnf_stat
 
     - name: leapp_non_standard_openssl_config | End execution of playbook if openssl.cnf does not exist
-      ansible.builtin.meta: end_host
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
       when: openssl_cnf_stat.stat.exists is false
+      failed_when: openssl_cnf_stat.stat.exists is false
 
-    - name: leapp_non_standard_openssl_config | Get content of openssl.cnf
-      ansible.builtin.slurp:
+    - name: leapp_non_standard_openssl_config | Back up openssl.cnf
+      ansible.builtin.copy:
         src: /etc/pki/tls/openssl.cnf
-      register: openssl_cnf_stat
+        dest: /etc/pki/tls/openssl.cnf.rhel8-bkup
+        remote_src: true
+        mode: "0644"
 
-    - name: leapp_non_standard_openssl_config | Comment out old openssl_conf line
-      ansible.builtin.command: sudo sed -i 's/^openssl_conf/#openssl_conf/g' /etc/pki/tls/openssl.cnf
-      register: openssl_conf_comment_out
-      changed_when: openssl_conf_comment_out.rc == 0
-
-    - name: leapp_non_standard_openssl_config | Comment out old [ default_modules ] block
-      ansible.builtin.shell: sudo sed -i '/^\s*\[\s*default_modules\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*default_modules\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
-      register: default_modules_comment_out
-      changed_when: default_modules_comment_out.rc == 0
-
-    - name: leapp_non_standard_openssl_config | Comment out old [ ssl_module ] block
-      ansible.builtin.shell: sudo sed -i '/^\s*\[\s*ssl_module\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*ssl_module\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
-      register: ssl_module_comment_out
-      changed_when: ssl_module_comment_out.rc == 0
-
-    - name: leapp_non_standard_openssl_config | Comment out old [ crypto_policy ] block
-      ansible.builtin.shell: sudo sed -i '/^\s*\[\s*crypto_policy\s*\]/,/\[/ { /^\[/!s/^/#/; /^\s*\[\s*crypto_policy\s*\]/s/^/#/ }' /etc/pki/tls/openssl.cnf
-      register: crypto_policy_comment_out
-      changed_when: crypto_policy_comment_out.rc == 0
-
-    - name: leapp_non_standard_openssl_config | Add new openssl_conf line
-      ansible.builtin.blockinfile:
+    - name: leapp_non_standard_openssl_config | Remove openssl.cnf
+      ansible.builtin.file:
         path: /etc/pki/tls/openssl.cnf
-        insertbefore: BOF
-        block: |
-          openssl_conf = default_modules
-        state: present
-        marker: "# {mark} ANSIBLE MANAGED BLOCK - LEAPP NON STANDARD OPENSSL CONFIG - openssl_conf"
+        state: absent
 
-    - name: leapp_non_standard_openssl_config | Add new openssl_conf line and [ default_modules ] block
-      ansible.builtin.blockinfile:
-        path: /etc/pki/tls/openssl.cnf
-        block: |
-          [ default_modules ]
-          ssl_conf = ssl_module
-          [ ssl_module ]
-          system_default = crypto_policy
-          [ crypto_policy ]
-          .include /etc/crypto-policies/back-ends/opensslcnf.config
-        state: present
-        marker: "# {mark} ANSIBLE MANAGED BLOCK - LEAPP NON STANDARD OPENSSL CONFIG - default_modules"
+  rescue:
+    - name: leapp_non_standard_openssl_config | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing is defined and leapp_report_missing is true
 
 ...

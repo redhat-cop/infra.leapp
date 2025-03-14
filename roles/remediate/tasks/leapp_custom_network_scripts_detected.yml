@@ -1,12 +1,7 @@
 ---
 - name: leapp_custom_network_scripts_detected | Move custom network-scripts to NetworkManager dispatcher scripts
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
   block:
-    - name: leapp_custom_network_scripts_detected | Create /opt/network-scripts/ directory if it does not exist
-      ansible.builtin.file:
-        path: /opt/network-scripts/
-        state: directory
-        mode: "0755"
-
     - name: leapp_custom_network_scripts_detected | Check if pre up script exists
       ansible.builtin.stat:
         path: /sbin/ifup-pre-local
@@ -17,9 +12,23 @@
         path: /sbin/ifdown-pre-local
       register: pre_down
 
+    # If neither script exists, fail out and do not create unnecessary directories
+    - name: leapp_custom_network_scripts_detected | Skip playbook if no custom scripts are found
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      when: pre_down.stat.exists is false and pre_up.stat.exists is false
+      failed_when: pre_down.stat.exists is false and pre_up.stat.exists is false
+
+    - name: leapp_custom_network_scripts_detected | Create /opt/network-scripts/ directory if it does not exist
+      ansible.builtin.file:
+        path: /opt/network-scripts/
+        state: directory
+        mode: "0755"
+
     - name: leapp_custom_network_scripts_detected | Move scripts in /sbin to /opt/network-scripts/, end playbook if this fails
       ansible.builtin.command: mv /sbin/if*-local /opt/network-scripts/
       register: move_scripts
+      when: pre_up.stat.exists or pre_down.stat.exists
       changed_when: move_scripts.rc == 0
 
     - name: leapp_custom_network_scripts_detected | Create /etc/NetworkManager/dispatcher.d/20-if-local
@@ -76,5 +85,11 @@
         dest: /etc/NetworkManager/dispatcher.d/pre-down.d/20-if-local
         state: link
       when: pre_down.stat.exists
+
+  rescue:
+    - name: leapp_custom_network_scripts_detected | Continue when no custom scripts are found
+      ansible.builtin.debug:
+        msg: "No custom network scripts detected. Skipping this task."
+      when: leapp_custom_scripts_missing is defined and leapp_custom_scripts_missing is true
 
 ...

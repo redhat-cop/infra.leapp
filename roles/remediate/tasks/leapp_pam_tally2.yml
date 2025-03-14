@@ -1,0 +1,22 @@
+---
+- name: leapp_pam_tally2 | Remove pam_tally2 modules
+  # pam_tally2 only existed in RHEL 5-7, skip if this is not a RHEL 7 upgrade
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 7
+  block:
+    - name: leapp_pam_tally2 | Find all instances of pam_tally2 in /etc/pam.d/
+      ansible.builtin.find:
+        paths: /etc/pam.d/
+        file_type: file
+        contains: "pam_tally2.so"
+        read_whole_file: true
+        recurse: true
+      register: file_list
+
+    - name: leapp_pam_tally2 | Comment out all instances of pam_tally2 # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: "sed -i '/^#/! {/pam_tally2/ s/^/#/}' {{ item }}"
+      loop: "{{ file_list.files | map(attribute='path') | list }}"
+      when: file_list.files | length > 0
+      changed_when: file_list.files | length > 0
+
+...

@@ -2,7 +2,7 @@
 - name: leapp_missing_efibootmgr | Install efibootmgr package - required on EFI systems
   block:
     - name: leapp_missing_efibootmgr | Install efibootmgr package
-      ansible.builtin.dnf:
+      ansible.builtin.package:
         name: efibootmgr
         state: present
 

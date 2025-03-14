@@ -1,0 +1,7 @@
+---
+major_changes:
+- Added support for RHEL 7 -> 8 in the infra.leapp.remediate role
+- Rewrote the remediate playbooks to use conditional logic and skip tasks that do not need to run
+minor_changes:
+- Added pam_tally2 remediation for RHEL 7
+- Updated documentation in support of the extended remediate role

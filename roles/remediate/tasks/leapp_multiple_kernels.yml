@@ -4,14 +4,14 @@
     - name: leapp_multiple_kernels | Get list of installed kernels packages sorted by the newest version
       ansible.builtin.shell: |
         set -o pipefail
-        sudo rpm -q kernel --queryformat '%{version}-%{release}.%{arch}\n' | sort -Vr
+        rpm -q kernel --queryformat '%{version}-%{release}.%{arch}\n' | sort -Vr
       register: installed_kernels
-      changed_when: true
+      changed_when: false
 
     - name: leapp_multiple_kernels | Check current kernel version
       ansible.builtin.command: uname -r
       register: current_kernel
-      changed_when: true
+      changed_when: false
 
     - name: leapp_multiple_kernels | Set default kernel to latest
       ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
@@ -27,7 +27,7 @@
       when: installed_kernels.stdout_lines[0] != current_kernel.stdout
 
     - name: leapp_multiple_kernels | Remove old kernels
-      ansible.builtin.dnf:
+      ansible.builtin.package:
         name: kernel-core-{{ item }}
         state: absent
       loop: "{{ installed_kernels.stdout_lines[1:] }}"
