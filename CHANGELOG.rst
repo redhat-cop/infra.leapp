@@ -4,6 +4,22 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.5.0
+======
+
+Major Changes
+-------------
+
+- Added support for RHEL 7 -> 8 in the infra.leapp.remediate role
+- Rewrote the remediate playbooks to use conditional logic and skip tasks that do not need to run
+
+Minor Changes
+-------------
+
+- Added pam_tally2 remediation for RHEL 7
+- Updated documentation in support of the extended remediate role
+- Use community.general.modprobe in leapp_loaded_removed_kernel_drivers.yml remediation
+
 v1.4.1
 ======
 

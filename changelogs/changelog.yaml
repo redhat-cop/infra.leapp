@@ -151,3 +151,18 @@ releases:
     - support_gpgkey_and_repo_gpgcheck.yml
     - update_8_8_to_8_10.yml
     release_date: '2024-11-14'
+  1.5.0:
+    changes:
+      major_changes:
+      - Added support for RHEL 7 -> 8 in the infra.leapp.remediate role
+      - Rewrote the remediate playbooks to use conditional logic and skip tasks that
+        do not need to run
+      minor_changes:
+      - Added pam_tally2 remediation for RHEL 7
+      - Updated documentation in support of the extended remediate role
+      - Use community.general.modprobe in leapp_loaded_removed_kernel_drivers.yml
+        remediation
+    fragments:
+    - rhel7-remediate.yml
+    - use-community.general.yml
+    release_date: '2025-03-26'
