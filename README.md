@@ -12,11 +12,11 @@ This collection provides Ansible roles you can use to perform RHEL in-place upgr
 
 These are the roles included in the collection. Follow the links below to see the detailed documentation and example playbooks for each role.
 
-- [`analysis`](./roles/analysis/) - executes the Leapp pre-upgrade phase
-- [`common`](./roles/common/) - used for local logging, mutex locking, and common vars
-- [`parse_leapp_report`](./roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
-- [`upgrade`](./roles/upgrade/) - executes the Leapp OS upgrade
-- [`remediate`](./roles/remediate/) - assists in the remediation of a system (RHEL 7->8 and 8->9 only)
+- [`analysis`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/analysis) - executes the Leapp pre-upgrade phase
+- [`common`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/common/) - used for local logging, mutex locking, and common vars
+- [`parse_leapp_report`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/parse_leapp_report/) - reads pre-upgrade results and checks for inhibitors
+- [`upgrade`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/upgrade/) - executes the Leapp OS upgrade
+- [`remediate`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/remediate/) - assists in the remediation of a system (RHEL 7->8 and 8->9 only)
 
 ## Supported RHEL versions
 
@@ -45,7 +45,7 @@ Having said that, many application workloads will benefit from [RHEL Application
 
 ## Example playbooks
 
-Example playbooks can be found [here](./playbooks/).
+Example playbooks can be found [here](https://github.com/redhat-cop/infra.leapp/tree/main/playbooks).
 
 ## Installing the collection from Ansible Galaxy
 
