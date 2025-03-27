@@ -1,0 +1,5 @@
+---
+major_changes:
+- Implement post-upgrade release version set/unset for 'RHUI' upgrade type.
+  By default, RHUI repositories are no longer version-locked after an upgrade
+  and will be updated to the latest available content.

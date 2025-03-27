@@ -79,7 +79,25 @@
     - post_upgrade_release | length > 0
   changed_when: true
 
-# TODO: Unset rhui release.
+- name: leapp-post-upgrade | Unset release via yum variable for RHUI upgrades
+  ansible.builtin.file:
+    path: /etc/yum/vars/releasever
+    state: absent
+  when:
+    - leapp_upgrade_type == 'rhui'
+    - post_upgrade_unset_release | bool
+    - post_upgrade_release | length == 0
+
+- name: leapp-post-upgrade | Set release via yum variable for RHUI upgrades
+  ansible.builtin.copy:
+    content: "{{ post_upgrade_release }}\n"
+    dest: /etc/yum/vars/releasever
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - leapp_upgrade_type == 'rhui'
+    - post_upgrade_release | length > 0
 
 - name: leapp-post-upgrade | "Register to post leapp activation key"
   community.general.redhat_subscription:
