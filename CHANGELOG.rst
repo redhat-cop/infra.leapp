@@ -4,6 +4,14 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.5.1
+======
+
+Minor Changes
+-------------
+
+- Update release workflow to build changelog first
+
 v1.5.0
 ======
 
