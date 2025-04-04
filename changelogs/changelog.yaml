@@ -166,3 +166,10 @@ releases:
     - rhel7-remediate.yml
     - use-community.general.yml
     release_date: '2025-03-26'
+  1.5.1:
+    changes:
+      minor_changes:
+      - Update release workflow to build changelog first
+    fragments:
+    - release_workflow.yml
+    release_date: '2025-04-04'
