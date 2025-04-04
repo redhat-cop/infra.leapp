@@ -134,3 +134,4 @@ dmypy.json
 
 # Local collection testing builds
 *.tar.gz
+.ansible/
