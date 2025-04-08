@@ -58,7 +58,7 @@ See comments in defaults/main.yml for additional details.
 
 ## Example playbook
 
-See [`upgrade.yml`](../../playbooks/upgrade.yml).
+See [`upgrade.yml`](https://github.com/redhat-cop/infra.leapp/tree/main/playbooks/upgrade.yml).
 
 ## Authors:
 Bob Mader, Mike Savage, Jeffrey Cutter, David Danielsson, Scott Vick

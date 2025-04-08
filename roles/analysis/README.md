@@ -48,7 +48,7 @@ See comments in defaults/main.yml for additional details.
 
 ## Example playbook
 
-See [`analysis.yml`](../../playbooks/analysis.yml)
+See [`analysis.yml`](https://github.com/redhat-cop/infra.leapp/tree/main/playbooks/analysis.yml)
 
 ## Authors
 

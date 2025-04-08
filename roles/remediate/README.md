@@ -84,7 +84,7 @@ The list of available remediation playbooks with their corresponding inhibitors 
 
 ## Example playbook
 
-See [`remediate.yml`](../../playbooks/remediate.yml).
+See [`remediate.yml`](https://github.com/redhat-cop/infra.leapp/tree/main/playbooks/remediate.yml).
 
 ## Authors
 
