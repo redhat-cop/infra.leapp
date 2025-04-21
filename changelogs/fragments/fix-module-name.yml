@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - Fix incorrect module name in remediate role
+...
