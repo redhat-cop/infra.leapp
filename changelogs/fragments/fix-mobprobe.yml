@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - fixed typo 'community.generalbuiltin.modprobe' to 'community.general.modprobe'
+...
