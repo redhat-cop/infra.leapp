@@ -45,7 +45,7 @@
         var: unsupported_modules
 
     - name: leapp_loaded_removed_kernel_drivers | Unload unsupported modules
-      community.generalbuiltin.modprobe:
+      community.general.modprobe:
         name: "{{ item }}"
         state: absent
       loop: "{{ unsupported_modules }}"
