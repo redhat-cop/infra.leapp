@@ -138,6 +138,7 @@
     export PATH={{ os_path }};
     /usr/lib/kernel/install.d/51-dracut-rescue.install add "$(uname -r)" /boot "/boot/vmlinuz-$(uname -r)"
   when: __rescue_kernel_files.files | length > 0
+  changed_when: true
 
 - name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
