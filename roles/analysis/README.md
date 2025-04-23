@@ -30,8 +30,8 @@ See comments in defaults/main.yml for additional details.
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | local_repos_pre_leapp  | List of dicts   | [] | Used to configure repos before running leapp analysis / installing leapp packages.|
-| local_repos_leapp  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo.
-| local_repos_post_analysis  | List of dicts   | [] | Used to return repos to previous state after leapp analysis if necessary.
+| local_repos_leapp  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo. |
+| local_repos_post_analysis  | List of dicts   | [] | Used to return repos to previous state after leapp analysis if necessary. |
 
 ## Optional variables
 
@@ -43,8 +43,8 @@ See comments in defaults/main.yml for additional details.
 | leapp_known_inhibitors | List | [] | List of keys of known inhibitors ignored when setting upgrade_inhibited and leapp_inhibitors. |
 | leapp_env_vars | Dict | {} | Environment variables to use when running `leapp` command. See defaults/main.yml for example. |
 | os_path | String | $PATH | Option string to override the $PATH variable used on the target node |
-| async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
-| async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
+| async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds) |
+| async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds) |
 
 ## Example playbook
 
