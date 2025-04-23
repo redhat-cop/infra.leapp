@@ -1,0 +1,5 @@
+---
+major_changes:
+  - Add removal of previous version RHEL packages as the default based upon current RHEL 8 to 9 upgrade documentation.
+  - Add update of rescue kernel if an old one is present.
+  - Add check for /boot/loader/entries for old RHEL version kernels to post upgrade to RHEL 8+.
