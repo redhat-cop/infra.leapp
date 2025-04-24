@@ -15,7 +15,8 @@ The `parse_leapp_report` role is used by the `analysis` or `upgrade` roles to ch
 
 This is a common role included by the `analysis` and `upgrade` roles. It does not need to be explicitly included in your playbook.
 
-## Authors:
+## Authors
+
 Bob Mader, Mike Savage, David Danielsson
 
 ## License
