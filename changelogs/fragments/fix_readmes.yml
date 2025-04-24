@@ -1,0 +1,4 @@
+---
+trivial:
+  - Fix markdownlint issues with analysis, common, parse_leapp_report, and update roles README.md files.
+...
