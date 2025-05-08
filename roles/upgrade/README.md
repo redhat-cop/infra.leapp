@@ -14,24 +14,24 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | selinux_mode            | same as before upgrade | Define this variable to the desired SELinux mode to be set after the OS upgrade, i.e., enforcing, permissive, or disabled. By default, the SELinux mode will be set to what was found during the pre-upgrade analysis. |
 | set_crypto_policies     | true                  | Boolean to define if system-wide cryptographic policies should be set after the OS upgrade |
 | crypto_policy           | "DEFAULT"             | System-wide cryptographic to set, e.g., "FUTURE", "DEFAULT:SHA1", etc. Refer to the crypto-policies (7) man page for more information. |
-| reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete.     |
-| upgrade_timeout         | 14400                 | Integer for maximum seconds to wait for reboot to complete during upgrade reboot.     |
+| reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete. |
+| upgrade_timeout         | 14400                 | Integer for maximum seconds to wait for reboot to complete during upgrade reboot. |
 | post_reboot_delay       | 120                   | Integer to pass to the reboot post_reboot_delay option. |
 | leapp_resume_retries    | 360                   | Integer for maximum retries to wait for leapp_resume service no longer exists. |
 | leapp_resume_delay      | 10                    | Integer for seconds between each attempt to check leapp_resume service no longer exists. |
 | update_grub_to_grub_2   | false                 | Boolean to control whether grub gets upgraded to grub 2 in post RHEL 6 to 7 upgrade. |
-| os_path                 | $PATH                 | Variable used to override the default $PATH environmental variable on the target node
-| async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds)
-| async_poll_interval     | 60                    | Variable used to set the asynchronous task polling internal value (in seconds)
+| os_path                 | $PATH                 | Variable used to override the default $PATH environmental variable on the target node. |
+| async_timeout_maximum   | 7200                  | Variable used to set the asynchronous task timeout value (in seconds) |
+| async_poll_interval     | 60                    | Variable used to set the asynchronous task polling internal value (in seconds) |
 | check_leapp_analysis_results| true              | Allows for running remediation and going straight to upgrade without re-running analysis. |
 | pre_upgrade_update      | true                  | Boolean to decide if an update and reboot on the running pre-upgrade operating system will run. |
-| post_upgrade_update     | true                   | Boolean to decide if after the upgrade is performed a dnf update will run|
-| post_upgrade_unset_release| true                | Boolean used to control whether Leapp's RHSM release lock is unset.
-| post_upgrade_release    |                       | Optional string used to set a specific RHSM release lock after the Leapp upgrade, but before the final update pass.
+| post_upgrade_update     | true                   | Boolean to decide if after the upgrade is performed a dnf update will run. |
+| post_upgrade_unset_release| true                | Boolean used to control whether Leapp's RHSM release lock is unset. |
+| post_upgrade_release    |                       | Optional string used to set a specific RHSM release lock after the Leapp upgrade, but before the final update pass. |
 | kernel_modules_to_unload_before_upgrade | []    | A list of kernel modules to be unloaded prior to running leapp. |
 | post_7_to_8_python_interpreter | /usr/libexec/platform-python | For RHEL 7 to 8 upgrades, /usr/bin/python is discovered but not available post upgrade. For 7 to 8 upgrades, ansible_python_interpreter is set to this value post upgrade reboot prior to reconnecting. |
 | infra_leapp_upgrade_system_roles_collection | fedora.linux_system_roles | Can be one of:<br>- 'fedora.linux_system_roles'<br>- 'redhat.rhel_system_roles' |
-
+| remove_old_rhel_packages | true                 | Boolean to control whether the previous version RHEL packages should be removed. Change to false to maintain behavior of infra.leapp prior to  release 1.6.0. |
 
 ## Satellite variables
 
@@ -54,13 +54,14 @@ See comments in defaults/main.yml for additional details.
 | local_repos_leapp  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo.
 | local_repos_post_upgrade  | List of dicts   | [] | Used to configure next version repos post upgrade (can be set to local_repos_leapp if the same)
 | repo_files_to_remove_at_upgrade  | List   | [] | Simpler way to remove /etc/yum.repos.d files before leapp upgrade is run.
-+| leapp_env_vars | Dict | {} | Environment variables to use when running `leapp` command. See defaults/main.yml for example. |
+| leapp_env_vars | Dict | {} | Environment variables to use when running `leapp` command. See defaults/main.yml for example. |
 
 ## Example playbook
 
 See [`upgrade.yml`](https://github.com/redhat-cop/infra.leapp/tree/main/playbooks/upgrade.yml).
 
-## Authors:
+## Authors
+
 Bob Mader, Mike Savage, Jeffrey Cutter, David Danielsson, Scott Vick
 
 ## License

@@ -158,4 +158,6 @@ post_7_to_8_python_interpreter: /usr/libexec/platform-python
 # - redhat.rhel_system_roles
 infra_leapp_upgrade_system_roles_collection: fedora.linux_system_roles
 
+remove_old_rhel_packages: true
+
 ...

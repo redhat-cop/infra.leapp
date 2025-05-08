@@ -28,8 +28,8 @@
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
-- name: redhat-upgrade-tool-post-upgrade | Include check-for-old-packages.yml
-  ansible.builtin.include_tasks: check-for-old-packages.yml
+- name: redhat-upgrade-tool-post-upgrade | Include handle-old-packages.yml
+  ansible.builtin.include_tasks: handle-old-packages.yml
 
 - name: redhat-upgrade-tool-post-upgrade | Include grub2-upgrade.yml
   ansible.builtin.include_tasks: grub2-upgrade.yml

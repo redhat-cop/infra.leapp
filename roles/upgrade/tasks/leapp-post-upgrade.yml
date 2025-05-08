@@ -41,8 +41,8 @@
         state: absent
       loop: "{{ old_kernels.files }}"
 
-- name: leapp-post-upgrade | Include check-for-old-packages.yml
-  ansible.builtin.include_tasks: check-for-old-packages.yml
+- name: leapp-post-upgrade | Include handle-old-packages.yml
+  ansible.builtin.include_tasks: handle-old-packages.yml
 
 - name: leapp-post-upgrade | Remove leapp related packages
   ansible.builtin.package:
@@ -118,6 +118,28 @@
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
+- name: leapp-post-upgrade | Find old rescue kernel files
+  ansible.builtin.find:
+    paths:
+      - /boot
+    patterns:
+      - vmlinuz-*rescue*
+      - initramfs-*rescue*
+  register: __rescue_kernel_files
+
+- name: leapp-post-upgrade | Remove old rescue kernel files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ __rescue_kernel_files.files }}"
+
+- name: leapp-post-upgrade | Reinstall the rescue kernel files when old ones were found
+  ansible.builtin.shell: >
+    export PATH={{ os_path }};
+    /usr/lib/kernel/install.d/51-dracut-rescue.install add "$(uname -r)" /boot "/boot/vmlinuz-$(uname -r)"
+  when: __rescue_kernel_files.files | length > 0
+  changed_when: true
+
 - name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
   when: post_upgrade_update | bool
@@ -125,7 +147,7 @@
 # TODO: Validate RHEL OS versions again?
 
 # Only found in RHEL 7 to 8 documentation
-- name: leapp-post-upgrade |  Old kernels have been removed from the bootloader entry for RHEL 7 to 8
+- name: leapp-post-upgrade | Old kernels have been removed from the bootloader entry for RHEL 7 to 8
   ansible.builtin.shell: |
     set -o pipefail;
     export PATH={{ os_path }};
@@ -134,6 +156,21 @@
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
   changed_when: false
   failed_when: grubby_check.stdout != 'Old kernels are not present in the bootloader.'
+
+# Only found in RHEL 8 to 9 documentation (maybe 9 to 10).
+# This fails on RHEL 8 to 9 if old kernel packages are not removed.
+# For RHEL 7 to 8, in my testing, no RHEL 7 kernels remain after leapp.
+- name: leapp-post-upgrade | No previous RHEL kernels are present in /boot/loader/entry files
+  ansible.builtin.shell: |
+    set -o pipefail;
+    export PATH={{ os_path }};
+    grep -r ".el{{ ansible_facts.ansible_local.pre_ripu.distribution_major_version }}" "/boot/loader/entries/" || echo "Everything seems ok."
+  register: boot_loader_entries
+  when:
+    - remove_old_rhel_packages # This will fail if the old kernel packages weren't removed.
+    - ansible_facts.ansible_local.pre_ripu.distribution_major_version | int >= 8
+  changed_when: false
+  failed_when: boot_loader_entries.stdout != 'Everything seems ok.'
 
 - name: leapp-post-upgrade | Include tasks for leapp post upgrade selinux
   ansible.builtin.include_tasks: leapp-post-upgrade-selinux.yml
