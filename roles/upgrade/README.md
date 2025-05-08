@@ -31,7 +31,7 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | kernel_modules_to_unload_before_upgrade | []    | A list of kernel modules to be unloaded prior to running leapp. |
 | post_7_to_8_python_interpreter | /usr/libexec/platform-python | For RHEL 7 to 8 upgrades, /usr/bin/python is discovered but not available post upgrade. For 7 to 8 upgrades, ansible_python_interpreter is set to this value post upgrade reboot prior to reconnecting. |
 | infra_leapp_upgrade_system_roles_collection | fedora.linux_system_roles | Can be one of:<br>- 'fedora.linux_system_roles'<br>- 'redhat.rhel_system_roles' |
-| remove_old_rhel_packages | true                 | Boolean to control whether the previous version RHEL packages should be removed. |
+| remove_old_rhel_packages | true                 | Boolean to control whether the previous version RHEL packages should be removed. Change to false to maintain behavior of infra.leapp prior to  release 1.6.0. |
 
 ## Satellite variables
 
