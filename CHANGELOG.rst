@@ -4,6 +4,27 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.6.0
+======
+
+Major Changes
+-------------
+
+- Add check for /boot/loader/entries for old RHEL version kernels to post upgrade to RHEL 8+ based upon current RHEL 8 to 9 upgrade documentation.
+- Add removal of previous version RHEL packages as the default based upon current RHEL 8 to 9 upgrade documentation.
+- Add update of rescue kernel if an old one is present based upon current RHEL 7 to 8 and 8 to 9 upgrade documentation.
+- Implement post-upgrade release version set/unset for 'RHUI' upgrade type. By default, RHUI repositories are no longer version-locked after an upgrade and will be updated to the latest available content.
+
+Minor Changes
+-------------
+
+- fixing readme's links so they work outside of github.
+
+Bugfixes
+--------
+
+- fixed typo 'community.generalbuiltin.modprobe' to 'community.general.modprobe'
+
 v1.5.1
 ======
 
