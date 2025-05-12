@@ -1,4 +1,0 @@
----
-trivial:
-  - removing flush_handlers which appears to be unused role, likely it wasn't meant to be added
-...

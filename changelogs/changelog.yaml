@@ -173,3 +173,27 @@ releases:
     fragments:
     - release_workflow.yml
     release_date: '2025-04-04'
+  1.6.0:
+    changes:
+      bugfixes:
+      - fixed typo 'community.generalbuiltin.modprobe' to 'community.general.modprobe'
+      major_changes:
+      - Add check for /boot/loader/entries for old RHEL version kernels to post upgrade
+        to RHEL 8+ based upon current RHEL 8 to 9 upgrade documentation.
+      - Add removal of previous version RHEL packages as the default based upon current
+        RHEL 8 to 9 upgrade documentation.
+      - Add update of rescue kernel if an old one is present based upon current RHEL
+        7 to 8 and 8 to 9 upgrade documentation.
+      - Implement post-upgrade release version set/unset for 'RHUI' upgrade type.
+        By default, RHUI repositories are no longer version-locked after an upgrade
+        and will be updated to the latest available content.
+      minor_changes:
+      - fixing readme's links so they work outside of github.
+    fragments:
+    - fix-mobprobe.yml
+    - fix_readmes.yml
+    - links.yaml
+    - remove-flush_handlers.yaml
+    - unset-rhui-release.yml
+    - update_post_upgrade.yaml
+    release_date: '2025-05-12'
