@@ -1,6 +1,6 @@
 ---
 name: Yaml and Ansible Lint
-on: [push, pull_request, workflow_call]  # yamllint disable-line rule:truthy
+on: [workflow_call] # [push, pull_request, workflow_call]  # yamllint disable-line rule:truthy
 jobs:
   build:
     name: Ansible Lint # Naming the build is important to use it as a status check
