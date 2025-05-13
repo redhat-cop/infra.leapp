@@ -19,8 +19,8 @@ jobs:
     if: github.event_name == 'pull_request'
   ansible-lint:
     uses: ansible/ansible-content-actions/.github/workflows/ansible_lint.yaml@main
-    with:
-      working_directory: /home/runner/collections
+    # with:
+    #   working_directory: /home/runner/collections
   sanity:
     uses: ansible/ansible-content-actions/.github/workflows/sanity.yaml@main
   build-import:
