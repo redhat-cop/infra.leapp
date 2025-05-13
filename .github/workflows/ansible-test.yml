@@ -21,6 +21,8 @@ jobs:
     uses: ansible/ansible-content-actions/.github/workflows/ansible_lint.yaml@main
   sanity:
     uses: ansible/ansible-content-actions/.github/workflows/sanity.yaml@main
+  build-import:
+    uses: ansible/ansible-content-actions/.github/workflows/build_import.yaml@main
   # unit-galaxy:
   #   uses: ansible/ansible-content-actions/.github/workflows/unit.yaml@main
   # integration:
