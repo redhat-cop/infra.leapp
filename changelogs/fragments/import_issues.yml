@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - Adding required collections as dependencies to galaxy.yml file now that is working better
+  - Also adding all community.general modules to ansible-lint config to mock them so they do not error at import time
+...

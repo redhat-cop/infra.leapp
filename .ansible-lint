@@ -11,6 +11,7 @@ profile: production # min, basic, moderate,safety, shared, production
 # option are parsed relative to the CWD of execution.
 exclude_paths:
   - .github/
+  - "**/*.cache/*"
   - changelogs/
   - docs/
   - collections/
@@ -20,8 +21,14 @@ exclude_paths:
 # verbosity: 1
 
 # Mock modules or roles in order to pass ansible-playbook --syntax-check
+# Mocking these modules so they do not give errors due to the galaxy importer 
+# not being able to pull community.general (not being validated)
 mock_modules:
-  - community.vmware.vmware_guest_snapshot
+  - community.general.redhat_subscription
+  - community.general.modprobe
+  - community.general.archive
+  - community.general.yum_versionlock
+  - community.general.rhsm_repository
 
 # mock_roles:
 #   - mocked_role

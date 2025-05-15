@@ -1,6 +1,6 @@
 ---
 name: Yaml and Ansible Lint
-on: [push, pull_request, workflow_call]  # yamllint disable-line rule:truthy
+on: [workflow_call] # [push, pull_request, workflow_call]  # yamllint disable-line rule:truthy
 jobs:
   build:
     name: Ansible Lint # Naming the build is important to use it as a status check
@@ -22,8 +22,8 @@ jobs:
         shell: bash
         working-directory: ${{ vars.GITHUB_PATH }}
 
-      - name: Install collection dependencies
-        run: ansible-galaxy collection install -r requirements.yml
+      # - name: Install collection dependencies
+      #   run: ansible-galaxy collection install -r requirements.yml
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@main # or version tag instead of 'main'
