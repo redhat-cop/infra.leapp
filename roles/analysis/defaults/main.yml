@@ -23,12 +23,19 @@ analysis_packages_el8:
   # TODO: only w/ rhui for aws
   # - leapp-rhui-aws
 
+analysis_packages_el9:
+  - leapp-upgrade
+
 analysis_repos_el6:
   - rhel-6-server-extras-rpms
   - rhel-6-server-optional-rpms
 
 analysis_repos_el7:
   - rhel-7-server-extras-rpms
+
+analysis_repos_el8: []
+
+analysis_repos_el9: []
 
 # If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.
 # leapp_answerfile: |
