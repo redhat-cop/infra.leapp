@@ -21,7 +21,7 @@ exclude_paths:
 # verbosity: 1
 
 # Mock modules or roles in order to pass ansible-playbook --syntax-check
-# Mocking these modules so they do not give errors due to the galaxy importer 
+# Mocking these modules so they do not give errors due to the galaxy importer
 # not being able to pull community.general (not being validated)
 mock_modules:
   - community.general.redhat_subscription
@@ -29,6 +29,8 @@ mock_modules:
   - community.general.archive
   - community.general.yum_versionlock
   - community.general.rhsm_repository
+  - ansible.posix.selinux
+  - ansible.posix.mount
 
 # mock_roles:
 #   - mocked_role
