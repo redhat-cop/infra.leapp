@@ -4,6 +4,20 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.6.1
+======
+
+Minor Changes
+-------------
+
+- Introduce support for upgrading from RHEL 9 to 10.
+
+Bugfixes
+--------
+
+- Adding required collections as dependencies to galaxy.yml file now that is working better
+- Also adding all community.general modules to ansible-lint config to mock them so they do not error at import time
+
 v1.6.0
 ======
 

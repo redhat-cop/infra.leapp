@@ -197,3 +197,16 @@ releases:
     - unset-rhui-release.yml
     - update_post_upgrade.yaml
     release_date: '2025-05-12'
+  1.6.1:
+    changes:
+      bugfixes:
+      - Adding required collections as dependencies to galaxy.yml file now that is
+        working better
+      - Also adding all community.general modules to ansible-lint config to mock them
+        so they do not error at import time
+      minor_changes:
+      - Introduce support for upgrading from RHEL 9 to 10.
+    fragments:
+    - import_issues.yml
+    - rhel_9_to_10.yml
+    release_date: '2025-07-14'
