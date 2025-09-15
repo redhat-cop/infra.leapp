@@ -1,0 +1,10 @@
+summary: Prepare managed node
+framework: beakerlib
+test: ./prep_managed_node.sh
+duration: 10m
+tag: prep_managed_node
+require:
+    - beakerlib
+    - type: library
+      url: https://github.com/linux-system-roles/tft-tests
+      name: /library/upstream_library

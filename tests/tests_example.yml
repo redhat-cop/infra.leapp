@@ -1,0 +1,4 @@
+- name: Test
+  hosts: all
+  roles:
+    - infra.leapp.analysis
