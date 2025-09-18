@@ -29,6 +29,27 @@
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
+- name: leapp-upgrade | Install packages for upgrade from RHEL 7
+  ansible.builtin.package:
+    name: "{{ upgrade_packages_el7 }}"
+    enablerepo: "{{ upgrade_repos_el7 }}"
+    state: latest # noqa package-latest
+  when: ansible_distribution_major_version|int == 7
+
+- name: leapp-upgrade | Install packages for upgrade from RHEL 8
+  ansible.builtin.package:
+    name: "{{ upgrade_packages_el8 }}"
+    enablerepo: "{{ upgrade_repos_el8 }}"
+    state: latest # noqa package-latest
+  when: ansible_distribution_major_version|int == 8
+
+- name: leapp-upgrade | Install packages for upgrade from RHEL 9
+  ansible.builtin.package:
+    name: "{{ upgrade_packages_el9 }}"
+    enablerepo: "{{ upgrade_repos_el9 }}"
+    state: latest # noqa package-latest
+  when: ansible_distribution_major_version|int == 9
+
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
   when: pre_upgrade_update | bool
