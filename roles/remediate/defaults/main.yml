@@ -15,6 +15,7 @@ remediation_playbooks:
   - leapp_missing_efibootmgr
   - leapp_missing_pkg
   - leapp_missing_yum_plugins
+  - leapp_move_usr_directory
   - leapp_multiple_kernels
   - leapp_newest_kernel_not_in_use
   - leapp_nfs_detected
