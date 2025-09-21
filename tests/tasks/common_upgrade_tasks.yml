@@ -1,0 +1,62 @@
+---
+# Common upgrade test tasks that can be included in any upgrade test
+
+- name: Run first analysis
+  ansible.builtin.include_role:
+    name: infra.leapp.analysis
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Show all inhibitors collected by analysis
+  debug:
+    var: leapp_inhibitors
+
+- name: Extract inhibitor titles
+  set_fact:
+    inhibitor_titles: "{{ leapp_inhibitors | map(attribute='title') | list }}"
+
+- name: Initialize remediation_todo
+  set_fact:
+    remediation_todo: []
+
+- name: Map inhibitors to remediation_todo
+  set_fact:
+    remediation_todo: "{{ remediation_todo + [title_map[map_key]] }}"
+  loop: "{{ inhibitor_titles }}"
+  loop_control:
+    loop_var: inhibitor_title
+  vars:
+    map_key: "{{ title_map.keys() | select('in', inhibitor_title) | first | default('') }}"
+  when: map_key != ''
+
+- name: Debug remediation_todo
+  debug:
+    var: remediation_todo
+
+- name: Run remediation
+  ansible.builtin.include_role:
+    name: infra.leapp.remediate
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Reinstall linux-firmware via dnf (remove)
+  ansible.builtin.command: dnf remove -y linux-firmware
+
+- name: Reinstall linux-firmware via dnf (install)
+  ansible.builtin.command: dnf install -y linux-firmware
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Run analysis after remediation
+  ansible.builtin.include_role:
+    name: infra.leapp.analysis
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Run upgrade role
+  ansible.builtin.include_role:
+    name: infra.leapp.upgrade

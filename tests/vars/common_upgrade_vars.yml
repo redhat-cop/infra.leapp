@@ -1,0 +1,42 @@
+---
+# Common variables for upgrade testing
+common_title_map:
+  "Use of CIFS detected. Upgrade can't proceed": leapp_cifs_detected
+  "Detected a corrupted grubenv file": leapp_corrupted_grubenv_file
+  "custom network-scripts detected. RHEL 9 does not support the legacy network-scripts package that was deprecated in RHEL 8": leapp_custom_network_scripts_detected
+  "A deprecated directive in the sshd configuration": leapp_deprecated_sshd_directive
+  "Firewalld Configuration AllowZoneDrifting Is Unsupported": leapp_firewalld_allowzonedrifting
+  "Firewalld Service tftp-client Is Unsupported": leapp_firewalld_unsupported_tftp_client
+  "Leapp detected loaded kernel drivers which have been removed in RHEL 8. Upgrade cannot proceed": leapp_loaded_removed_kernel_drivers
+  "efibootmgr package is required on EFI systems": leapp_missing_efibootmgr
+  "Leapp detected missing packages": leapp_missing_pkg
+  "Required DNF plugins are not being loaded.": leapp_missing_yum_plugins
+  "Multiple kernels installed": leapp_multiple_kernels
+  "Newest installed kernel not in use": leapp_newest_kernel_not_in_use
+  "Use of NFS detected. Upgrade can't proceed": leapp_nfs_detected
+  "Detected partitions mounted in a non-persistent fashion, preventing a successful in-place upgrade": leapp_non_persistent_partitions
+  "Non-standard configuration of openssl.cnf": leapp_non_standard_openssl_config
+  "Old PostgreSQL data found in `/var/lib/pgsql/data`": leapp_old_postgresql_data
+  "The pam_tally2 pam module(s) no longer available": leapp_pam_tally2
+  "Detected partitions mounted with the `noexec` option, preventing a successful in-place upgrade": leapp_partitions_with_noexec
+  "Upgrade requires links in root directory to be relative": leapp_relative_symlinks
+  "Possible problems with remote login using root account": leapp_remote_using_root
+  "Detected RPMs with RSA/SHA1 signature": leapp_rpms_with_rsa_sha1_detected
+  "The installed KDE environment is unavailable on RHEL 8": leapp_unavailable_kde
+  "Cannot perform the VDO check of block devices": leapp_vdo_check_needed
+
+common_leapp_answerfile: |
+  [remove_pam_pkcs11_module_check]
+  confirm = True
+
+# Repository URL templates
+repo_urls:
+  rhel8:
+    base_url: "http://download.eng.brq.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10/compose"
+    latest_version: "8.10"
+  rhel9:
+    base_url: "http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.6/compose"
+    latest_version: "9.6"
+  rhel10:
+    base_url: "http://download.eng.brq.redhat.com/rhel-10/nightly/RHEL-10/latest-RHEL-10.0/compose"
+    latest_version: "10.0"

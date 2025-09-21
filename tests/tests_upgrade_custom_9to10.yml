@@ -1,0 +1,81 @@
+---
+- name: Test RHEL 9 to 10 Custom Repository Upgrade
+  hosts: all
+  vars_files:
+    - vars/common_upgrade_vars.yml
+  vars:
+    leapp_upgrade_type: custom
+    leapp_upgrade_opts: "--no-rhsm"
+    local_repos_pre_leapp:
+      - name: rhel-9-for-x86_64-baseos-rpms
+        description: BaseOS for x86_64
+        baseurl: "{{ repo_urls.rhel9.base_url }}/BaseOS/x86_64/os/"
+        state: present
+      - name: rhel-9-for-x86_64-appstream-rpms
+        description: AppStream for x86_64
+        baseurl: "{{ repo_urls.rhel9.base_url }}/AppStream/x86_64/os/"
+        state: present
+    local_repos_leapp:
+      - name: rhel-10-for-x86_64-baseos-rpms
+        description: BaseOS for x86_64
+        baseurl: "{{ repo_urls.rhel10.base_url }}/BaseOS/x86_64/os/"
+        file: /etc/leapp/files/leapp_upgrade_repositories
+        state: present
+      - name: rhel-10-for-x86_64-appstream-rpms
+        description: AppStream for x86_64
+        baseurl: "{{ repo_urls.rhel10.base_url }}/AppStream/x86_64/os/"
+        file: /etc/leapp/files/leapp_upgrade_repositories
+        state: present
+    title_map: "{{ common_title_map }}"
+    leapp_answerfile: "{{ common_leapp_answerfile }}"
+  tasks:
+    - name: Check if leapp upgrade log exists
+      ansible.builtin.stat:
+        path: /var/log/leapp/leapp-upgrade.log
+      register: leapp_log_stat
+
+    - name: Skip test if not RHEL 9 or already upgraded
+      ansible.builtin.debug:
+        msg: |
+          Skipping RHEL 9 to 10 upgrade test due to:
+          {% if ansible_distribution != "RedHat" %}
+          - Not running on RedHat (current: {{ ansible_distribution }})
+          {% endif %}
+          {% if ansible_distribution_major_version != "9" %}
+          - Not RHEL 9 (current version: {{ ansible_distribution_major_version }})
+          {% endif %}
+          {% if leapp_upgrade_completed is defined %}
+          - Upgrade already completed in this session
+          {% endif %}
+          {% if leapp_log_stat.stat.exists %}
+          - Leapp upgrade log exists at /var/log/leapp/leapp-upgrade.log
+          {% endif %}
+      when: |
+        ansible_distribution != "RedHat" or
+        ansible_distribution_major_version != "9" or
+        leapp_upgrade_completed is defined or
+        leapp_log_stat.stat.exists
+
+    - name: End play if conditions not met
+      ansible.builtin.meta: end_play
+      when: |
+        ansible_distribution != "RedHat" or
+        ansible_distribution_major_version != "9" or
+        leapp_upgrade_completed is defined or
+        leapp_log_stat.stat.exists
+
+    - name: Include common upgrade tasks
+      ansible.builtin.include_tasks: tasks/common_upgrade_tasks.yml
+
+    - name: Assert that the system has been upgraded to RHEL 10
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "RedHat"
+          - ansible_distribution_major_version == "10"
+        fail_msg: "System was not upgraded to RHEL 10. Current OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+        success_msg: "System successfully upgraded to RHEL 10"
+
+    - name: Mark upgrade as completed
+      ansible.builtin.set_fact:
+        leapp_upgrade_completed: true
+...

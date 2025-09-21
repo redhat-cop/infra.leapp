@@ -1,0 +1,11 @@
+summary: Test a system role
+framework: beakerlib
+test: ./test.sh
+duration: 8h
+tag: test_playbooks
+require:
+    - beakerlib
+    - git
+    - type: library
+      url: https://github.com/linux-system-roles/tft-tests
+      name: /library/upstream_library
