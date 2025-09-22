@@ -35,10 +35,26 @@
       block:
         - name: Check if /usr is mounted on a separate filesystem
           ansible.builtin.set_fact:
-            usr_mount_source: "{{ ansible_mounts | selectattr('mount', 'eq', '/usr') | map(attribute='device') | first | default('') }}"
-            root_mount_source: "{{ ansible_mounts | selectattr('mount', 'eq', '/') | map(attribute='device') | first }}"
-            usr_is_mounted: "{{ ansible_mounts | selectattr('mount', 'eq', '/usr') | list | length > 0 }}"
-            usr_local_is_mounted: "{{ ansible_mounts | selectattr('mount', 'eq', '/usr/local') | list | length > 0 }}"
+            usr_mount_source: "{{ item.device }}"
+          loop: "{{ ansible_mounts }}"
+          when: item.mount == '/usr'
+
+        - name: Check root mount source
+          ansible.builtin.set_fact:
+            root_mount_source: "{{ item.device }}"
+          loop: "{{ ansible_mounts }}"
+          when: item.mount == '/'
+
+        - name: Check if /usr/local is mounted
+          ansible.builtin.set_fact:
+            usr_local_mount_source: "{{ item.device }}"
+          loop: "{{ ansible_mounts }}"
+          when: item.mount == '/usr/local'
+
+        - name: Set mount status facts
+          ansible.builtin.set_fact:
+            usr_is_mounted: "{{ usr_mount_source is defined }}"
+            usr_local_is_mounted: "{{ usr_local_mount_source is defined }}"
     
         - name: leapp_move_usr_directory | Fail if /usr is not on a separate filesystem
           ansible.builtin.fail:
@@ -47,7 +63,9 @@
     
         - name: leapp_move_usr_directory | Get root mount information
           ansible.builtin.set_fact:
-            root_mount_source: "{{ ansible_mounts | selectattr('mount', 'eq', '/') | map(attribute='device') | first }}"
+            root_mount_source: "{{ item.device }}"
+          loop: "{{ ansible_mounts }}"
+          when: item.mount == '/' and root_mount_source is not defined
     
         - name: leapp_move_usr_directory | Skip if /usr is already on root filesystem
           ansible.builtin.meta: end_play
@@ -55,20 +73,25 @@
     
         - name: leapp_move_usr_directory | Check available space on root filesystem
           ansible.builtin.set_fact:
-            root_space: "{{ ansible_mounts | selectattr('mount', 'eq', '/') | map(attribute='block_available') | first * ansible_mounts | selectattr('mount', 'eq', '/') | map(attribute='block_size') | first }}"
+            root_space: "{{ item.block_available * item.block_size }}"
+          loop: "{{ ansible_mounts }}"
+          when: item.mount == '/'
     
         - name: leapp_move_usr_directory | Get /usr size
           ansible.builtin.set_fact:
-            usr_size: "{{ ansible_mounts | selectattr('mount', 'eq', '/usr') | map(attribute='block_available') | first * ansible_mounts | selectattr('mount', 'eq', '/') | map(attribute='block_size') | first }}"
+            usr_size: "{{ item.block_available * item.block_size }}"
+          loop: "{{ ansible_mounts }}"
+          when: item.mount == '/usr'
     
         - name: leapp_move_usr_directory | Get /usr/local size
           ansible.builtin.set_fact:
-            usr_local_size: "{{ ansible_mounts | selectattr('mount', 'eq', '/usr/local') | map(attribute='block_available') | first * ansible_mounts | selectattr('mount', 'eq', '/usr/local') | map(attribute='block_size') | first }}"
-          when: usr_local_is_mounted
+            usr_local_size: "{{ item.block_available * item.block_size }}"
+          loop: "{{ ansible_mounts }}"
+          when: item.mount == '/usr/local' and usr_local_is_mounted
     
         - name: leapp_move_usr_directory | Calculate space needed on root filesystem
           ansible.builtin.set_fact:
-            space_needed: "{{ usr_size | int + usr_local_size | int }}"
+            space_needed: "{{ usr_size | int + (usr_local_size | default(0) | int) }}"
     
         - name: leapp_move_usr_directory | Fail if not enough space on root filesystem
           ansible.builtin.fail:
