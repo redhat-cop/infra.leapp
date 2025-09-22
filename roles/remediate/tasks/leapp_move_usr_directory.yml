@@ -22,16 +22,14 @@
         src: "{{ leapp_report_location }}"
       register: preupgradereport
 
-    - name: leapp_move_usr_directory | Find matching entries in preupgrade report
+    - name: leapp_move_usr_directory | Check if entry exists in preupgrade report
       ansible.builtin.set_fact:
-        summary: "{{ item }}"
-      loop: "{{ (preupgradereport.content | b64decode).split('\n') }}"
-      when: entry_title in item
+        entry_found: "{{ entry_title in (preupgradereport.content | b64decode) }}"
 
     - name: leapp_move_usr_directory | End execution of playbook if no entry found in preupgrade report
       ansible.builtin.set_fact:
         leapp_report_missing: true
-      failed_when: summary is not defined
+      failed_when: not entry_found
 
     - name: leapp_move_usr_directory | Move the /usr directory
       block:
