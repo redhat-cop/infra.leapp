@@ -3,36 +3,38 @@
 - name: leapp_move_usr_directory | Move /usr to root partition if on another disk or partition.
   vars:
     entry_title: The /usr/ directory is located on a separate partition. The in-place upgrade is not possible.
-    leapp_report_location: /var/log/leapp/leapp-report.json
+    leapp_report_location: /root/preupgrade/result.txt
   when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 6
   block:
-    - name: leapp_move_usr_directory | Check that the leapp-report.json exists
+    - name: leapp_move_usr_directory | Check that the preupgrade report exists
       ansible.builtin.stat:
         path: "{{ leapp_report_location }}"
       register: leapp_report_stat
 
-    - name: leapp_move_usr_directory | End play if no leapp report exists
+    - name: leapp_move_usr_directory | End play if no preupgrade report exists
       ansible.builtin.set_fact:
         leapp_report_missing: true
       when: leapp_report_stat.stat.exists is false
       failed_when: leapp_report_stat.stat.exists is false
 
-    - name: leapp_move_usr_directory | Read leapp report
+    - name: leapp_move_usr_directory | Read preupgrade report
       ansible.builtin.slurp:
         src: "{{ leapp_report_location }}"
-      register: leappreport
+      register: preupgradereport
 
-    - name: leapp_move_usr_directory | Parse leapp report to json
+    - name: leapp_move_usr_directory | Find matching entries in preupgrade report
       ansible.builtin.set_fact:
-        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+        summary: "{{ item }}"
+      loop: "{{ preupgradereport.content | b64decode | splitlines | select('match', entry_title) | list }}"
+      when: item is match(entry_title)
 
-    - name: leapp_move_usr_directory | Find matching entries
+    - name: leapp_move_usr_directory | End execution of playbook if no entry found in preupgrade report
       ansible.builtin.set_fact:
-        summary: "{{ item.summary }}"
-      loop: "{{ leappreportdata.entries }}"
-      when: item.title is match(entry_title) and (item.summary | length > 0)
+        leapp_report_missing: true
+      failed_when: summary is not defined
 
-    - name: leapp_move_usr_directory | End execution of playbook if no entry found in leapp report
+
+    - name: leapp_move_usr_directory | End execution of playbook if no entry found in preupgrade report
       ansible.builtin.set_fact:
         leapp_report_missing: true
       failed_when: summary is not defined
