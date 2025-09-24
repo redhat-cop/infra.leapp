@@ -2,6 +2,7 @@
 # defaults file for remedations
 
 reboot_timeout: 7200
+pre_reboot_delay: 60
 post_reboot_delay: 120
 leapp_report_location: /var/log/leapp/leapp-report.json
 remediation_playbooks:
