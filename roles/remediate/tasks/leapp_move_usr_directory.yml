@@ -12,10 +12,9 @@
       register: leapp_report_stat
 
     - name: leapp_move_usr_directory | End play if no preupgrade report exists
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
+      ansible.builtin.fail:
+        msg: "No preupgrade report found. Skipping this task."
       when: not leapp_report_stat.stat.exists
-      failed_when: not leapp_report_stat.stat.exists
 
     - name: leapp_move_usr_directory | Read preupgrade report
       ansible.builtin.slurp:
