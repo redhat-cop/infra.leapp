@@ -30,7 +30,7 @@
         leapp_report_missing: true
       failed_when: not entry_found
 
-    - name: leapp_move_usr_directory | Move the /usr directory
+    - name: leapp_move_usr_directory | Perform pre-move checks
       block:
         - name: leapp_move_usr_directory | Check if /usr is mounted on a separate filesystem
           ansible.builtin.set_fact:
@@ -67,7 +67,8 @@
           when: item.mount == '/' and root_mount_source is not defined
 
         - name: leapp_move_usr_directory | Skip if /usr is already on root filesystem
-          ansible.builtin.meta: end_play
+          ansible.builtin.fail:
+            msg: "/usr is already on root filesystem. Skipping this task."
           when: not usr_is_mounted or usr_mount_source == root_mount_source
 
         - name: leapp_move_usr_directory | Check available space on root filesystem
@@ -97,6 +98,8 @@
             msg: "Not enough space on root filesystem. Need {{ space_needed | int / 1024 }} KB, have {{ root_space | int / 1024 }} KB"
           when: space_needed | int > root_space | int
 
+    - name: leapp_move_usr_directory | Move the /usr directory
+      block:
         - name: leapp_move_usr_directory | Ensure temporary mount directories exist
           ansible.builtin.file:
             path: "{{ item }}"
@@ -178,6 +181,6 @@
   rescue:
     - name: leapp_move_usr_directory | Continue when /usr is not on a separate filesystem
       ansible.builtin.debug:
-        msg: "/usr is not mounted on a separate filesystem. Skipping this task."
+        msg: "Problems found during execution; skipping this task."
       when: not usr_is_mounted
 ...
