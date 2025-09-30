@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Add remediation role to move /usr directory to root partition when upgrading from RHEL 6 to 7.
+...
