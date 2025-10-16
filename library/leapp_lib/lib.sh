@@ -2,36 +2,15 @@
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   lib.sh of /CoreOS/rhel-system-roles/Library/basic
-#   Description: Basic functions for rhel-system-roles testing
-#   Author: David Jez <djez@redhat.com>
+#   Description: Library for leapp Ansible collection tests
+#   Author: Sergei Petrosian <spetrosi@redhat.com>
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-#   Copyright (c) 2020 Red Hat, Inc.
-#
-#   This program is free software: you can redistribute it and/or
-#   modify it under the terms of the GNU General Public License as
-#   published by the Free Software Foundation, either version 2 of
-#   the License, or (at your option) any later version.
-#
-#   This program is distributed in the hope that it will be
-#   useful, but WITHOUT ANY WARRANTY; without even the implied
-#   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#   PURPOSE.  See the GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with this program. If not, see http://www.gnu.org/licenses/.
-#
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   library-prefix = rolesBasic
+#   library-prefix = leapp
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
-
-
-rolesGetAnsibleVersion() {
+# Copied from downstream tests/rhel-system-roles/Library/basic rolesGetAnsibleVersion
+leappGetAnsibleVersion() {
     local ver
     ver="$(ansible --version | grep '^ansible .*[0-9][.]')"
     if [[ "$ver" =~ ^ansible\ ([0-9]+[.][0-9]+) ]]; then
@@ -43,18 +22,18 @@ rolesGetAnsibleVersion() {
     fi
 }
 
-
-rolesInstallAnsible() {
+# Copied from downstream tests/rhel-system-roles/Library/basic library rolesInstallAnsible
+leappInstallAnsible() {
     local ae_version
     ae_version=$1
     local ansible_pkg
     local pkg_cmd
     local baseurl
 
-    if rlIsRHEL ">=8.6" && [ "$ANSIBLE_VER" != "2.9" ]; then
+    if rlIsRHELLike ">=8.6" && [ "$ANSIBLE_VER" != "2.9" ]; then
         pkg_cmd="dnf"
         ansible_pkg="ansible-core"
-    elif rlIsRHEL 8; then
+    elif rlIsRHELLike 8; then
         pkg_cmd="dnf"
         ansible_pkg="ansible"
         baseurl="https://rhsm-pulp.corp.redhat.com/content/dist/layered/rhel8/$(arch)/ansible/$ae_version/os/"
@@ -71,7 +50,7 @@ rolesInstallAnsible() {
         fi
     fi
 
-    if rlIsRHEL ">7"; then
+    if rlIsRHELLike ">7"; then
         if "$pkg_cmd" module info standard-test-roles > /dev/null 2>&1; then
             "$pkg_cmd" -y module disable standard-test-roles
         fi
@@ -92,10 +71,7 @@ priority=1" > /etc/yum.repos.d/lsr-test-ansible.repo
 
     rlRun "$pkg_cmd -y $action $ansible_pkg"
     rlAssertRpm "$ansible_pkg"
-    # set SR_ANSIBLE_VER from ansible
-    SR_ANSIBLE_VER="$(rolesGetAnsibleVersion)"
 }
-
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Verification
@@ -108,7 +84,7 @@ priority=1" > /etc/yum.repos.d/lsr-test-ansible.repo
 #   should return 0 only when the library is ready to serve.
 #
 #   This library does not do anything, it is only a list of functions, so simply returning 0
-rolesBasicLibraryLoaded() {
+leappLibraryLoaded() {
     rlLog "Library loaded!"
     return 0
 }

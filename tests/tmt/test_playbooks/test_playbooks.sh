@@ -10,6 +10,7 @@
 # SR_REPO_NAME
 #   Name of the role repository to test.
 [ -n "$REPO_NAME" ] && export SR_REPO_NAME="$REPO_NAME"
+SR_REPO_NAME="${SR_REPO_NAME:-infra.leapp}"
 #
 # SR_TEST_LOCAL_CHANGES
 #   Optional: When true, tests from local changes. When false, test from a repository PR number (when SR_PR_NUM is set) or main branch.
@@ -36,7 +37,7 @@ SR_TEST_LOCAL_CHANGES="${SR_TEST_LOCAL_CHANGES:-false}"
 # SR_GITHUB_ORG
 #   Optional: GitHub org to fetch test repository from. Default: linux-system-roles. Can be set to a fork for test purposes.
 [ -n "$GITHUB_ORG" ] && export SR_GITHUB_ORG="$GITHUB_ORG"
-SR_GITHUB_ORG="${SR_GITHUB_ORG:-linux-system-roles}"
+SR_GITHUB_ORG="${SR_GITHUB_ORG:-redhat-cop}"
 # SR_LSR_SSH_KEY
 #   Optional: When provided, test uploads artifacts to SR_LSR_DOMAIN instead of uploading them with rlFileSubmit "$logfile".
 #   A Single-line SSH key.
@@ -64,7 +65,6 @@ SR_PYTHON_VERSION="${SR_PYTHON_VERSION:-3.12}"
 SR_SKIP_TAGS="--skip-tags tests::nvme,tests::infiniband,tests::bootc-e2e"
 # SR_TFT_DEBUG
 #   Print output of ansible playbooks to terminal in addition to printing it to logfile
-SR_TFT_DEBUG=true
 [ -n "$LSR_TFT_DEBUG" ] && export SR_TFT_DEBUG="$LSR_TFT_DEBUG"
 #   TMT sets True, False with capital letters, need to reset it to bash style
 [ "$LSR_TFT_DEBUG" = True ] && export LSR_TFT_DEBUG=true
@@ -83,7 +83,7 @@ fi
 SR_ANSIBLE_GATHERING="${SR_ANSIBLE_GATHERING:-implicit}"
 # SR_REQUIRED_VARS
 #   Env variables required by this test
-SR_REQUIRED_VARS=("SR_ANSIBLE_VER" "SR_REPO_NAME")
+SR_REQUIRED_VARS=("SR_ANSIBLE_VER")
 # SR_ANSIBLE_VERBOSITY
 #   Default is "-vv" - user can locally edit tft.yml in role to increase this for debugging
 [ -n "$LSR_ANSIBLE_VERBOSITY" ] && export SR_ANSIBLE_VERBOSITY="$LSR_ANSIBLE_VERBOSITY"
@@ -113,24 +113,25 @@ echo "~~~ Environment Variables Definition - END"
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "rlImport upstream_library"
-        rlRun "rlImport utils"
-        # lsrLabBosRepoWorkaround
+        rlRun "rlImport /library/upstream_library"
 
-        # for required_var in "${SR_REQUIRED_VARS[@]}"; do
-        #     if [ -z "${!required_var}" ]; then
-        #         rlDie "This required variable is unset: $required_var "
-        #     fi
-        # done
-        rolesInstallAnsible "$SR_ANSIBLE_VER"
-        #lsrInstallAnsible
-        infra_leapp_path="infra.leapp"
-        #rlRun "git clone -q https://github.com/redhat-cop/infra.leapp.git  --depth 1"
-        rlRun "mkdir -p ~/.ansible/collections/ansible_collections/infra/leapp"
-        rlRun "cp -r ../../* ~/.ansible/collections/ansible_collections/infra/leapp/"
+        rlRun "rlImport leapp_lib"
+
+        for required_var in "${SR_REQUIRED_VARS[@]}"; do
+            if [ -z "${!required_var}" ]; then
+                rlDie "This required variable is unset: $required_var "
+            fi
+        done
+
+        leappInstallAnsible "$SR_ANSIBLE_VER"
+        coll_path=~/.ansible/collections/ansible_collections/infra/leapp
+        mkdir -p "$coll_path"
+        if [ -d "$coll_path" ]; then
+            rlRun "rm -rf $coll_path"
+        fi
+        rlRun "git clone -q https://github.com/$SR_GITHUB_ORG/$SR_REPO_NAME.git $coll_path --depth 1"
         if [ -n "$SR_PR_NUM" ]; then
-            # git on EL7 doesn't support -C option
-            pushd "$infra_leapp_path" || exit
+            pushd "$coll_path" || exit
             rlRun "git fetch origin pull/$SR_PR_NUM/head"
             rlRun "git checkout FETCH_HEAD"
             popd || exit
@@ -138,50 +139,22 @@ rlJournalStart
         else
             rlLog "Test from the main branch"
         fi
-        # mkdir -p ~/.ansible/collections/ansible_collections/infra
-        # cp -r "$infra_leapp_path" ~/.ansible/collections/ansible_collections/infra/leapp
 
-        rlRun "ansible-galaxy collection install -r ../../meta/collection-requirements.yml"
+        rlWaitForCmd "ansible-galaxy collection install -r $coll_path/meta/collection-requirements.yml -vv" -m 5
 
-        # if [ "${SR_ANSIBLE_VER:-}" = 2.9 ]; then
-        #     # does not work with 2.9
-        #     GET_PYTHON_MODULES=false
-        # fi
-        # lsrGetRoleDir "$SR_REPO_NAME"
-        # # role_path is defined in lsrGetRoleDir
-        # # shellcheck disable=SC2154
-        # legacy_test_path="$role_path"/tests
-        # test_playbooks=$(lsrGetTests "$legacy_test_path")
-        # rlLogInfo "Test playbooks: $test_playbooks"
         # if lsrVaultRequired "$legacy_test_path"; then
         #     for test_playbook in $test_playbooks; do
         #         lsrHandleVault "$test_playbook"
         #     done
         # fi
         # lsrSetAnsibleGathering "$SR_ANSIBLE_GATHERING"
-        # lsrGetCollectionPath
-        # collection_path is defined in lsrGetCollectionPath
-        # shellcheck disable=SC2154
-        # lsrInstallDependencies "$role_path" "$collection_path"
-        # lsrEnableCallbackPlugins "$collection_path"
-        # lsrConvertToCollection "$role_path" "$collection_path" "$SR_REPO_NAME"
         lsrPrepareNodesInventories
-        # tests_path="$collection_path"/ansible_collections/fedora/linux_system_roles/tests/"$SR_REPO_NAME"/
-        tests_path=~/.ansible/collections/ansible_collections/infra/leapp/tests
-        # test_playbooks=$(lsrGetTests "$tests_path")
-        # if [ "${GET_PYTHON_MODULES:-}" = true ]; then
-        #     # shellcheck disable=SC2086
-        #     lsrSetupGetPythonModules "$test_playbooks"
-        # fi
+        tests_path="$coll_path"/tests
 
         managed_nodes=$(lsrGetManagedNodes)
-        # for managed_node in $managed_nodes; do
-        #     lsrGenerateTestDisks "$tests_path" start disk_provisioner.sh "$managed_node"
-        # done
     rlPhaseEnd
     rlPhaseStartTest
         for test_playbook in "$tests_path"/tests_*.yml; do
-            LOGFILE=leapp-"${test_playbook%.*}"-ANSIBLE-"$SR_ANSIBLE_VER"
             LOGFILE="leapp-$(basename "${test_playbook%.*}")-ANSIBLE-$SR_ANSIBLE_VER"
             lsrRunPlaybook "$test_playbook" "" "$SKIP_TAGS" "$managed_nodes" "$LOGFILE" "$SR_ANSIBLE_VERBOSITY"
         done

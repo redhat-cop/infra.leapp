@@ -1,6 +1,6 @@
-summary: Test a system role
+summary: Run test playbooks from control_node
 framework: beakerlib
-test: ./test.sh
+test: ./test_playbooks.sh
 duration: 8h
 tag: test_playbooks
 require:

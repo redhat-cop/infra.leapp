@@ -1,9 +1,0 @@
----
-summary: Basic functions for rhel-system-roles testing
-recommend:
-  - rhel-system-roles
-  - git
-  - python-yaml
-  - python3-yaml
-extra-summary: /CoreOS/rhel-system-roles/Library/basic
-extra-task: /CoreOS/rhel-system-roles/Library/basic
