@@ -16,7 +16,7 @@ SR_GITHUB_ORG="${SR_GITHUB_ORG:-linux-system-roles}"
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun "rlImport upstream_library"
+        rlRun "rlImport /library/upstream_library"
         # lsrLabBosRepoWorkaround
         for required_var in "${SR_REQUIRED_VARS[@]}"; do
             if [ -z "${!required_var}" ]; then

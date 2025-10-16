@@ -1,5 +1,5 @@
-summary: A general test for a system role
-tag: general
+summary: Test Ansible playbooks from control node against managed nodes
+tag: test_playbook
 provision:
   - name: control-node1
     role: control_node

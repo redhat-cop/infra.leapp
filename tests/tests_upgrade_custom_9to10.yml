@@ -35,34 +35,12 @@
       register: leapp_log_stat
 
     - name: Skip test if not RHEL 9 or already upgraded
-      ansible.builtin.debug:
-        msg: |
-          Skipping RHEL 9 to 10 upgrade test due to:
-          {% if ansible_distribution != "RedHat" %}
-          - Not running on RedHat (current: {{ ansible_distribution }})
-          {% endif %}
-          {% if ansible_distribution_major_version != "9" %}
-          - Not RHEL 9 (current version: {{ ansible_distribution_major_version }})
-          {% endif %}
-          {% if leapp_upgrade_completed is defined %}
-          - Upgrade already completed in this session
-          {% endif %}
-          {% if leapp_log_stat.stat.exists %}
-          - Leapp upgrade log exists at /var/log/leapp/leapp-upgrade.log
-          {% endif %}
-      when: |
-        ansible_distribution != "RedHat" or
-        ansible_distribution_major_version != "9" or
-        leapp_upgrade_completed is defined or
-        leapp_log_stat.stat.exists
-
-    - name: End play if conditions not met
+      when: >-
+          ansible_distribution not in ['CentOS', 'RedHat']
+          or ansible_distribution_major_version != "9"
+          or leapp_upgrade_completed is defined
+          or leapp_log_stat.stat.exists
       ansible.builtin.meta: end_play
-      when: |
-        ansible_distribution != "RedHat" or
-        ansible_distribution_major_version != "9" or
-        leapp_upgrade_completed is defined or
-        leapp_log_stat.stat.exists
 
     - name: Include common upgrade tasks
       ansible.builtin.include_tasks: tasks/common_upgrade_tasks.yml
@@ -70,7 +48,7 @@
     - name: Assert that the system has been upgraded to RHEL 10
       ansible.builtin.assert:
         that:
-          - ansible_distribution == "RedHat"
+          - ansible_distribution in ['CentOS', 'RedHat']
           - ansible_distribution_major_version == "10"
         fail_msg: "System was not upgraded to RHEL 10. Current OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
         success_msg: "System successfully upgraded to RHEL 10"
