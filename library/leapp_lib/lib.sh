@@ -73,6 +73,43 @@ priority=1" > /etc/yum.repos.d/lsr-test-ansible.repo
     rlAssertRpm "$ansible_pkg"
 }
 
+# declare -A leapp_test_playbooks
+
+leappGetTests() {
+    local -n test_playbooks=$1
+    local coll_path=$2
+    # local roles test_type_name type_test_playbooks_all type_test_playbooks_all
+
+    roles=("$coll_path"/roles/*)
+    for test_type in "$coll_path" "${roles[@]}"; do
+        test_type_name=$(basename "$test_type")
+        type_test_playbooks_all=$(
+            find "$test_type"/tests -maxdepth 1 -type f -name "tests_*.yml" | sort | xargs
+        )
+
+        if [[ -n $SR_ONLY_TESTS && $SR_ONLY_TESTS == *"$test_type_name"/* ]]; then
+            if [[ $SR_ONLY_TESTS == *"$test_type_name"/\** ]]; then
+                type_test_playbooks="$type_test_playbooks_all"
+            else
+                for test_playbook in $type_test_playbooks_all; do
+                    playbook_basename=$(basename "$test_playbook")
+                    if [[ $SR_ONLY_TESTS == *"$test_type_name"/"$playbook_basename"* ]]; then
+                        type_test_playbooks+=" $test_playbook"
+                    fi
+                done
+            fi
+        else
+            type_test_playbooks="$type_test_playbooks_all"
+        fi
+
+        test_playbooks[$test_type_name]="$type_test_playbooks_all"
+    done
+
+    if [ -z "${test_playbooks[*]}" ]; then
+        rlDie "No test playbooks found"
+    fi
+}
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Verification
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

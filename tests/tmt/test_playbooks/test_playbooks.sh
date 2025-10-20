@@ -113,6 +113,9 @@ echo "~~~ Environment Variables Definition - END"
 
 rlJournalStart
     rlPhaseStartSetup
+        PR_NUM=3
+        SR_GITHUB_ORG=spetrosi
+
         rlRun "rlImport /library/upstream_library"
 
         rlRun "rlImport leapp_lib"
@@ -149,17 +152,16 @@ rlJournalStart
         # fi
         # lsrSetAnsibleGathering "$SR_ANSIBLE_GATHERING"
         lsrPrepareNodesInventories
-        tests_path="$coll_path"/tests
-
         managed_nodes=$(lsrGetManagedNodes)
     rlPhaseEnd
     rlPhaseStartTest
-        for test_playbook in "$tests_path"/tests_*.yml; do
-            LOGFILE="leapp-$(basename "${test_playbook%.*}")-ANSIBLE-$SR_ANSIBLE_VER"
-            lsrRunPlaybook "$test_playbook" "" "$SKIP_TAGS" "$managed_nodes" "$LOGFILE" "$SR_ANSIBLE_VERBOSITY"
+        roles=("$coll_path"/roles/*)
+        for test_type in "$coll_path" "${roles[@]}"; do
+            test_playbooks=$(lsrGetTests "$test_type/tests")
+            lsrRunPlaybooksParallel "$SR_SKIP_TAGS" "$test_playbooks" "$managed_nodes" "true" "$SR_ANSIBLE_VERBOSITY"
         done
-        # lsrRunPlaybooksParallel "$SR_SKIP_TAGS" "$test_playbooks" "$managed_nodes" "false" "$SR_ANSIBLE_VERBOSITY"
-        # lsrSubmitManagedNodesLogs
+
+        lsrSubmitManagedNodesLogs
         lsrReserveSystems "$SR_RESERVE_SYSTEMS"
     rlPhaseEnd
 rlJournalEnd
