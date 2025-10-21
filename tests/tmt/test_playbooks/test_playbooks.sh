@@ -113,9 +113,6 @@ echo "~~~ Environment Variables Definition - END"
 
 rlJournalStart
     rlPhaseStartSetup
-        PR_NUM=3
-        SR_GITHUB_ORG=spetrosi
-
         rlRun "rlImport /library/upstream_library"
 
         rlRun "rlImport leapp_lib"
