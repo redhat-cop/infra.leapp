@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 

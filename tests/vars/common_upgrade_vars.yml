@@ -40,3 +40,4 @@ repo_urls:
   rhel10:
     base_url: "http://download.eng.brq.redhat.com/rhel-10/nightly/RHEL-10/latest-RHEL-10.0/compose"
     latest_version: "10.0"
+...

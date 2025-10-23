@@ -4,3 +4,4 @@ collections:
   - ansible.posix
   - community.general
   - fedora.linux_system_roles
+...

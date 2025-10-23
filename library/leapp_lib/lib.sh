@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # vim: dict+=/usr/share/beakerlib/dictionary.vim cpt=.,w,b,u,t,i,k
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
@@ -102,7 +102,7 @@ leappGetTests() {
             type_test_playbooks="$type_test_playbooks_all"
         fi
 
-        test_playbooks[$test_type_name]="$type_test_playbooks_all"
+        test_playbooks["$test_type_name"]="$type_test_playbooks_all"
     done
 
     if [ -z "${test_playbooks[*]}" ]; then
