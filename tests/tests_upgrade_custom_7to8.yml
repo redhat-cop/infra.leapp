@@ -1,0 +1,56 @@
+---
+- name: Test RHEL 7 to 8 Custom Repository Upgrade
+  hosts: all
+  vars_files:
+    - vars/common_upgrade_vars.yml
+  vars:
+    leapp_upgrade_type: custom
+    leapp_upgrade_opts: "--no-rhsm"
+    local_repos_pre_leapp:
+      - name: rhel-7-server-extras-rpms
+        description: RHEL 7 Server Extras
+        baseurl: "https://download.eng.brq.redhat.com/rhel-7/nightly/EXTRAS-7/latest-EXTRAS-7.9-RHEL-7/compose/Server/x86_64/os/"
+        file: rhel7_extras
+        state: present
+    local_repos_leapp:
+      - name: rhel-8-for-x86_64-baseos-rpms
+        description: BaseOS for x86_64
+        baseurl: "{{ repo_urls.rhel8.base_url }}/BaseOS/x86_64/os/"
+        file: /etc/leapp/files/leapp_upgrade_repositories
+        state: present
+      - name: rhel-8-for-x86_64-appstream-rpms
+        description: AppStream for x86_64
+        baseurl: "{{ repo_urls.rhel8.base_url }}/AppStream/x86_64/os/"
+        file: /etc/leapp/files/leapp_upgrade_repositories
+        state: present
+    title_map: "{{ common_title_map }}"
+    leapp_answerfile: "{{ common_leapp_answerfile }}"
+  tasks:
+    - name: Check if leapp upgrade log exists
+      ansible.builtin.stat:
+        path: /var/log/leapp/leapp-upgrade.log
+      register: leapp_log_stat
+
+    - name: Skip test if not RHEL 7 or already upgraded
+      when: >-
+          ansible_distribution not in ['CentOS', 'RedHat']
+          or ansible_distribution_major_version != "7"
+          or leapp_upgrade_completed is defined
+          or leapp_log_stat.stat.exists
+      ansible.builtin.meta: end_play
+
+    - name: Include common upgrade tasks
+      ansible.builtin.include_tasks: tasks/common_upgrade_tasks.yml
+
+    - name: Assert that the system has been upgraded to RHEL 8
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution in ['CentOS', 'RedHat']
+          - ansible_distribution_major_version == "8"
+        fail_msg: "System was not upgraded to RHEL 8. Current OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+        success_msg: "System successfully upgraded to RHEL 8"
+
+    - name: Mark upgrade as completed
+      ansible.builtin.set_fact:
+        leapp_upgrade_completed: true
+...

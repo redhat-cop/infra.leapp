@@ -1,0 +1,11 @@
+summary: Run test playbooks from control_node
+framework: beakerlib
+test: ./test_playbooks.sh
+duration: 8h
+tag: test_playbooks
+require:
+    - beakerlib
+    - git
+    - type: library
+      url: https://github.com/linux-system-roles/tft-tests
+      name: /library/upstream_library

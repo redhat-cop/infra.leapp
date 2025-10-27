@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: Tomas Fratrik <tfratrik@redhat.com>
+  description: Collection of roles to run Leapp
+  company: Red Hat, Inc.
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+        - "8"
+        - "7"
+  galaxy_tags:
+    - centos
+    - rhel
+    - el7
+    - el8
+    - el9
+dependencies: []
+...

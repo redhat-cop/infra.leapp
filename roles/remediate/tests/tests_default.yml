@@ -2,8 +2,7 @@
 # tests file for upgrade
 
 - name: Test
-  hosts: localhost
-  remote_user: root
+  hosts: all
   roles:
     - remediate
 ...
