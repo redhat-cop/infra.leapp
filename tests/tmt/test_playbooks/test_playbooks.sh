@@ -14,11 +14,10 @@ SR_REPO_NAME="${SR_REPO_NAME:-infra.leapp}"
 #
 # SR_TEST_LOCAL_CHANGES
 #   Optional: When true, tests from local changes. When false, test from a repository PR number (when SR_PR_NUM is set) or main branch.
-[ -n "$TEST_LOCAL_CHANGES" ] && export SR_TEST_LOCAL_CHANGES="$TEST_LOCAL_CHANGES"
 SR_TEST_LOCAL_CHANGES="${SR_TEST_LOCAL_CHANGES:-false}"
 #   TMT sets True, False with capital letters, need to reset it to bash style
-[ "$TEST_LOCAL_CHANGES" = True ] && export TEST_LOCAL_CHANGES=true
-[ "$TEST_LOCAL_CHANGES" = False ] && export TEST_LOCAL_CHANGES=false
+[ "$SR_TEST_LOCAL_CHANGES" = True ] && export SR_TEST_LOCAL_CHANGES=true
+[ "$SR_TEST_LOCAL_CHANGES" = False ] && export SR_TEST_LOCAL_CHANGES=false
 
 #
 # SR_PR_NUM
@@ -129,15 +128,20 @@ rlJournalStart
         if [ -d "$coll_path" ]; then
             rlRun "rm -rf $coll_path"
         fi
-        rlRun "git clone -q https://github.com/$SR_GITHUB_ORG/$SR_REPO_NAME.git $coll_path --depth 1"
-        if [ -n "$SR_PR_NUM" ]; then
-            pushd "$coll_path" || exit
-            rlRun "git fetch origin pull/$SR_PR_NUM/head"
-            rlRun "git checkout FETCH_HEAD"
-            popd || exit
-            rlLog "Test from the pull request $SR_PR_NUM"
+        if [ "$SR_TEST_LOCAL_CHANGES" == true ]; then
+            local_infra_leapp_path=$TMT_TREE_DISCOVER/Run-test-playbooks-from-control_node/tests
+            rlRun "cp -r $local_infra_leapp_path/. $coll_path/"
         else
-            rlLog "Test from the main branch"
+            rlRun "git clone -q https://github.com/$SR_GITHUB_ORG/$SR_REPO_NAME.git $coll_path --depth 1"
+            if [ -n "$SR_PR_NUM" ]; then
+                pushd "$coll_path" || exit
+                rlRun "git fetch origin pull/$SR_PR_NUM/head"
+                rlRun "git checkout FETCH_HEAD"
+                popd || exit
+                rlLog "Test from the pull request $SR_PR_NUM"
+            else
+                rlLog "Test from the main branch"
+            fi
         fi
 
         rlWaitForCmd "ansible-galaxy collection install -r $coll_path/meta/collection-requirements.yml -vv" -m 5
