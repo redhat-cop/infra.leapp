@@ -15,7 +15,7 @@ environment:
     SR_REPO_NAME: ""
     SR_PYTHON_VERSION: 3.12
     SR_ONLY_TESTS: ""
-    SR_TEST_LOCAL_CHANGES: false
+    SR_TEST_LOCAL_CHANGES: true
     SR_PR_NUM: ""
     SR_LSR_USER: ""
     SR_LSR_DOMAIN: ""
