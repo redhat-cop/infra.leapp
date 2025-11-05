@@ -23,19 +23,17 @@ You can run tests locally with the `tmt try` cli or remotely in Testing Farm.
 1. Install `tmt` as described in [Installation](https://tmt.readthedocs.io/en/stable/stories/install.html).
 2. Change to the role repository directory.
 3. Optionally, modify `plans/test_playbooks_parallel.fmf` to modify variables to suit your requirements.
-    1. Due to [issue #3138](https://github.com/teemtee/tmt/issues/3138), keep a single managed node.
-    2. By default, `SR_TFT_DEBUG=true` is set to run from the changes that you have locally in the roles code, the CI overwrites it.
-4. Enter `tmt try -p /plans/test_playbooks <platform>`.
-    This command identifies the `plans/test_playbooks_parallel.fmf` plan and provisions local VMs, a control node and a managed node.
-    `<platform>` can be rhel9@minute
+    Due to [issue #3138](https://github.com/teemtee/tmt/issues/3138), keep a single managed node.
+4. Enter `tmt -c COMPOSE_MANAGED_NODE=<platform> try -p /plans/test_playbooks <platform>`.
+    This command identifies the `plans/test_playbooks_parallel.fmf` plan and provisions VMs in 1minutetip, and runs tests defined in the plan.
+    `<platform>` is a platform from 1minutetip list, can be e.g. rhel8.
 
 ### Running in Testing Farm
 
 1. Install `testing-farm` as described in [Installation](https://gitlab.com/testing-farm/cli/-/blob/main/README.adoc#user-content-installation).
 2. Change to the role repository directory.
 3. If you want to run tests with edits in your branch, you need to commit and push changes first to some branch.
-4. You can uncomment "Inject your ssh public key to test systems" discover step in the plan if you want to troubleshoot tests by SSHing into test systems in Testing Farm.
-5. Enter `testing-farm request`.
+4. Enter `testing-farm request`.
     Edit to your needs.
 
     ```bash
