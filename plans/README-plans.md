@@ -26,7 +26,7 @@ You can run tests locally with the `tmt try` cli or remotely in Testing Farm.
     Due to [issue #3138](https://github.com/teemtee/tmt/issues/3138), keep a single managed node.
 4. Enter `tmt -c COMPOSE_MANAGED_NODE=<platform> try -p /plans/test_playbooks`.
     This command identifies the `plans/test_playbooks_parallel.fmf` plan and provisions VMs in 1minutetip, and runs tests defined in the plan.
-    `<platform>` is a platform from 1minutetip list, can be e.g. rhel8.
+    `<platform>` can be `rhel7`, `rhel8`, or `rhel9`.
 
 ### Running in Testing Farm
 

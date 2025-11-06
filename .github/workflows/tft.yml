@@ -189,14 +189,13 @@ jobs:
             SR_TEST_LOCAL_CHANGES=false;\
             SR_LSR_USER=${{ vars.SR_LSR_USER }};\
             SR_TEST_LOCAL_CHANGES=false;\
-            SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
-          tmt_context: "COMPOSE_CONTROLLER=${{ matrix.compose_controller }};\
+            COMPOSE_CONTROLLER=${{ matrix.compose_controller }};\
             COMPOSE_MANAGED_NODE=${{ matrix.compose_managed_node }};\
-            initiator=testing-farm"
+            SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
+          tmt_context: "initiator=testing-farm"
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
           secrets: "SR_LSR_DOMAIN=${{ secrets.SR_LSR_DOMAIN }};\
             SR_LSR_SSH_KEY=${{ secrets.SR_LSR_SSH_KEY }}"
-          compose: ${{ matrix.compose_managed_node }}
           # There are two blockers for using public ranch:
           # 1. multihost is not supported in public https://github.com/teemtee/tmt/issues/2620
           # 2. Security issue that leaks long secrets - Jira TFT-2698
