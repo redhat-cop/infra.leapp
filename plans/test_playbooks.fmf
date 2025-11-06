@@ -1,7 +1,7 @@
 summary: Test Ansible playbooks from control node against managed nodes
 tag: test_playbook
 adjust:
-  - when: initiator != testing-farm
+  - when: initiator is not defined
     provision+:
       - name: control-node01
         role: control_node
