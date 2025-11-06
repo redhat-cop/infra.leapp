@@ -77,16 +77,16 @@ jobs:
             done
           fi
           if yq '.galaxy_info.galaxy_tags[]' "$meta_main" | grep -qi el7; then
-            supported_platforms+=" CentOS-7-latest"
-            supported_platforms+=" RHEL-7-LatestUpdated"
+            supported_platforms+=" CentOS-7"
+            supported_platforms+=" RHEL-7"
           fi
           if yq '.galaxy_info.galaxy_tags[]' "$meta_main" | grep -qi el8; then
             supported_platforms+=" CentOS-Stream-8"
-            supported_platforms+=" RHEL-8.10.0-Nightly"
+            supported_platforms+=" RHEL-8"
           fi
           if yq '.galaxy_info.galaxy_tags[]' "$meta_main" | grep -qi el9; then
             supported_platforms+=" CentOS-Stream-9"
-            supported_platforms+=" RHEL-9.7.0-Nightly"
+            supported_platforms+=" RHEL-9"
           fi
           echo "supported_platforms=$supported_platforms" >> $GITHUB_OUTPUT
 
@@ -124,8 +124,27 @@ jobs:
           echo "ARTIFACTS_DIR=$ARTIFACTS_DIR" >> $GITHUB_OUTPUT
           echo "ARTIFACTS_URL=$ARTIFACTS_URL" >> $GITHUB_OUTPUT
 
+      - name: Check if compose is supported
+        id: platform_check
+        run: |
+          platforms="${{ needs.prepare_vars.outputs.supported_platforms }}"
+          compose="${{ matrix.compose_managed_node }}"
+          is_supported="false"
+
+          # Loop through each word in the "platforms" string
+          for platform in $platforms; do
+            # Check if the compose name (e.g., "RHEL-7-LatestUpdated")
+            # contains the platform substring (e.g., "RHEL-7")
+            if [[ "$compose" == *"$platform"* ]]; then
+              is_supported="true"
+              break
+            fi
+          done
+
+          echo "is_supported=$is_supported" >> $GITHUB_OUTPUT
+
       - name: Set commit status as pending
-        if: contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)
+        if: steps.platform_check.outputs.is_supported == 'true'
         uses: myrotvorets/set-commit-status-action@master
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
@@ -135,7 +154,7 @@ jobs:
           targetUrl: ""
 
       - name: Set commit status as success with a description that platform is skipped
-        if: "!contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)"
+        if: steps.platform_check.outputs.is_supported == 'false'
         uses: myrotvorets/set-commit-status-action@master
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
@@ -171,7 +190,7 @@ jobs:
             SR_LSR_USER=${{ vars.SR_LSR_USER }};\
             SR_TEST_LOCAL_CHANGES=false;\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
-          context: "COMPOSE_CONTROLLER=${{ matrix.compose_controller }};\
+          tmt_context: "COMPOSE_CONTROLLER=${{ matrix.compose_controller }};\
             COMPOSE_MANAGED_NODE=${{ matrix.compose_managed_node }};\
             initiator=testing-farm"
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
