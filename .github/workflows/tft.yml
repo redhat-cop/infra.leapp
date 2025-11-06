@@ -33,7 +33,6 @@ jobs:
     outputs:
       supported_platforms: ${{ steps.supported_platforms.outputs.supported_platforms }}
       head_sha: ${{ steps.head_sha.outputs.head_sha }}
-      memory: ${{ steps.memory.outputs.memory }}
     steps:
       - name: Dump github context
         run:   echo "$GITHUB_CONTEXT"
@@ -111,11 +110,6 @@ jobs:
             compose_controller: RHEL-9-Nightly
             compose_managed_node: RHEL-9.6.0-Nightly
     runs-on: ubuntu-latest
-    env:
-      ARTIFACTS_DIR_NAME: "tf_${{ github.event.repository.name }}-${{ github.event.issue.number }}_\
-        ${{ matrix.compose_managed_node }}-${{ matrix.ansible_version }}_\
-        ${{ needs.prepare_vars.outputs.datetime }}/artifacts"
-      ARTIFACT_TARGET_DIR: /srv/pub/alt/${{ vars.SR_LSR_USER }}/logs
     steps:
       - name: Set variables with DATETIME and artifact location
         id: set_vars
@@ -177,10 +171,9 @@ jobs:
             SR_LSR_USER=${{ vars.SR_LSR_USER }};\
             SR_TEST_LOCAL_CHANGES=false;\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
-          context:
-            COMPOSE_CONTROLLER: ${{ matrix.compose_controller }}
-            COMPOSE_MANAGED_NODE: ${{ matrix.compose_managed_node }}
-            initiator: testing-farm
+          context: "COMPOSE_CONTROLLER=${{ matrix.compose_controller }};\
+            COMPOSE_MANAGED_NODE=${{ matrix.compose_managed_node }};\
+            initiator=testing-farm"
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
           secrets: "SR_LSR_DOMAIN=${{ secrets.SR_LSR_DOMAIN }};\
             SR_LSR_SSH_KEY=${{ secrets.SR_LSR_SSH_KEY }}"
