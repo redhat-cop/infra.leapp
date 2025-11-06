@@ -1,15 +1,40 @@
 summary: Test Ansible playbooks from control node against managed nodes
 tag: test_playbook
-provision:
-  - name: control-node1
-    role: control_node
-    # TF uses `how: artemis`, tmt try uses `how: virtual`. No need to define `how`
-    # `connection: system` is for `how: virtual` to make VMs get a real IP to configure ssh easily
-    # This setting is ignored on artemis so we can keep it
-    connection: system
-  - name: managed-node1
-    role: managed_node
-    connection: system
+adjust:
+  - when: initiator != testing-farm
+    provision+:
+      - name: control-node01
+        role: control_node
+        how: minute
+        image: rhel9
+      - name: managed-node01
+        role: managed_node
+        how: minute
+        image: ${COMPOSE_MANAGED_NODE}
+  - when: initiator == testing-farm
+    provision+:
+      - name: control-node01
+        role: control_node
+        how: artemis
+        image: ${COMPOSE_CONTROLLER}
+        # In case we want to use different arch, we can use the following var:
+        # arch: ${ARCH_CONTROLLER}
+        arch: x86_64
+      - name: managed-node01
+        role: managed_node
+        how: artemis
+        image: ${COMPOSE_MANAGED_NODE}
+        arch: x86_64
+      - name: managed-node02
+        role: managed_node
+        how: artemis
+        image: ${COMPOSE_MANAGED_NODE}
+        arch: x86_64
+      - name: managed-node03
+        role: managed_node
+        how: artemis
+        image: ${COMPOSE_MANAGED_NODE}
+        arch: x86_64
 environment:
     SR_ANSIBLE_VER: 2.17
     SR_REPO_NAME: ""

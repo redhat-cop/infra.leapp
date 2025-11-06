@@ -95,22 +95,25 @@ jobs:
         run: echo "supported_platforms=${{ steps.supported_platforms.outputs.supported_platforms }}"
 
   testing-farm:
-    name: ${{ matrix.platform }}/ansible-${{ matrix.ansible_version }}
+    name: ${{ matrix.compose_managed_node }}/ansible-${{ matrix.ansible_version }}
     needs: prepare_vars
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: RHEL-7-LatestUpdated
-            ansible_version: 2.9
-          - platform: RHEL-8.10.0-Nightly
-            ansible_version: 2.16
-          - platform: RHEL-9.8.0-Nightly
-            ansible_version: 2.16
+          - ansible_version: 2.14
+            compose_controller: RHEL-9-Nightly
+            compose_managed_node: RHEL-7-LatestUpdated
+          - ansible_version: 2.16
+            compose_controller: RHEL-9-Nightly
+            compose_managed_node: RHEL-8.10.0-Nightly
+          - ansible_version: 2.17
+            compose_controller: RHEL-9-Nightly
+            compose_managed_node: RHEL-9.6.0-Nightly
     runs-on: ubuntu-latest
     env:
       ARTIFACTS_DIR_NAME: "tf_${{ github.event.repository.name }}-${{ github.event.issue.number }}_\
-        ${{ matrix.platform }}-${{ matrix.ansible_version }}_\
+        ${{ matrix.compose_managed_node }}-${{ matrix.ansible_version }}_\
         ${{ needs.prepare_vars.outputs.datetime }}/artifacts"
       ARTIFACT_TARGET_DIR: /srv/pub/alt/${{ vars.SR_LSR_USER }}/logs
     steps:
@@ -119,7 +122,7 @@ jobs:
         run: |
           printf -v DATETIME '%(%Y%m%d-%H%M%S)T' -1
           ARTIFACTS_DIR_NAME="tf_${{ github.event.repository.name }}-${{ github.event.issue.number }}_\
-          ${{ matrix.platform }}-${{ matrix.ansible_version }}_$DATETIME/artifacts"
+          ${{ matrix.compose_managed_node }}-${{ matrix.ansible_version }}_$DATETIME/artifacts"
           ARTIFACTS_TARGET_DIR=/srv/pub/alt/${{ vars.SR_LSR_USER }}/logs
           ARTIFACTS_DIR=$ARTIFACTS_TARGET_DIR/$ARTIFACTS_DIR_NAME
           ARTIFACTS_URL=https://dl.fedoraproject.org/pub/alt/${{ vars.SR_LSR_USER }}/logs/$ARTIFACTS_DIR_NAME
@@ -128,22 +131,22 @@ jobs:
           echo "ARTIFACTS_URL=$ARTIFACTS_URL" >> $GITHUB_OUTPUT
 
       - name: Set commit status as pending
-        if: contains(needs.prepare_vars.outputs.supported_platforms, matrix.platform)
+        if: contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)
         uses: myrotvorets/set-commit-status-action@master
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: pending
-          context: ${{ matrix.platform }}|ansible-${{ matrix.ansible_version }}
+          context: ${{ matrix.compose_managed_node }}|ansible-${{ matrix.ansible_version }}
           description: Test started
           targetUrl: ""
 
       - name: Set commit status as success with a description that platform is skipped
-        if: "!contains(needs.prepare_vars.outputs.supported_platforms, matrix.platform)"
+        if: "!contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)"
         uses: myrotvorets/set-commit-status-action@master
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: success
-          context: ${{ matrix.platform }}|ansible-${{ matrix.ansible_version }}
+          context: ${{ matrix.compose_managed_node }}|ansible-${{ matrix.ansible_version }}
           description: The role does not support this platform. Skipping.
           targetUrl: ""
 
@@ -159,7 +162,7 @@ jobs:
 
       - name: Run test in testing farm
         uses: sclorg/testing-farm-as-github-action@v4
-        if: contains(needs.prepare_vars.outputs.supported_platforms, matrix.platform)
+        if: contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)
         with:
           git_ref: main
           pipeline_settings: '{ "type": "tmt-multihost" }'
@@ -174,10 +177,14 @@ jobs:
             SR_LSR_USER=${{ vars.SR_LSR_USER }};\
             SR_TEST_LOCAL_CHANGES=false;\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
+          context:
+            COMPOSE_CONTROLLER: ${{ matrix.compose_controller }}
+            COMPOSE_MANAGED_NODE: ${{ matrix.compose_managed_node }}
+            initiator: testing-farm
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
           secrets: "SR_LSR_DOMAIN=${{ secrets.SR_LSR_DOMAIN }};\
             SR_LSR_SSH_KEY=${{ secrets.SR_LSR_SSH_KEY }}"
-          compose: ${{ matrix.platform }}
+          compose: ${{ matrix.compose_managed_node }}
           # There are two blockers for using public ranch:
           # 1. multihost is not supported in public https://github.com/teemtee/tmt/issues/2620
           # 2. Security issue that leaks long secrets - Jira TFT-2698
@@ -187,10 +194,10 @@ jobs:
 
       - name: Set final commit status
         uses: myrotvorets/set-commit-status-action@master
-        if: always() && contains(needs.prepare_vars.outputs.supported_platforms, matrix.platform)
+        if: always() && contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: ${{ job.status }}
-          context: ${{ matrix.platform }}|ansible-${{ matrix.ansible_version }}
+          context: ${{ matrix.compose_managed_node }}|ansible-${{ matrix.ansible_version }}
           description: Test finished
           targetUrl: ${{ steps.set_vars.outputs.ARTIFACTS_URL }}
