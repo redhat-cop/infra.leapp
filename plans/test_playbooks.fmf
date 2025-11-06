@@ -7,10 +7,24 @@ adjust:
         role: control_node
         how: minute
         image: rhel9
+  - when: initiator is not defined and COMPOSE_MANAGED_NODE=rhel7
+    provision+:
       - name: managed-node01
         role: managed_node
         how: minute
-        image: ${COMPOSE_MANAGED_NODE}
+        image: rhel7
+  - when: initiator is not defined and COMPOSE_MANAGED_NODE=rhel8
+    provision+:
+      - name: managed-node01
+        role: managed_node
+        how: minute
+        image: rhel8
+  - when: initiator is not defined and COMPOSE_MANAGED_NODE=rhel9
+    provision+:
+      - name: managed-node01
+        role: managed_node
+        how: minute
+        image: rhel-9.6
   - when: initiator == testing-farm
     provision+:
       - name: control-node01
