@@ -175,7 +175,7 @@ jobs:
 
       - name: Run test in testing farm
         uses: sclorg/testing-farm-as-github-action@v4
-        if: contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)
+        if: steps.platform_check.outputs.is_supported == 'true'
         with:
           git_ref: main
           pipeline_settings: '{ "type": "tmt-multihost" }'
@@ -206,7 +206,8 @@ jobs:
 
       - name: Set final commit status
         uses: myrotvorets/set-commit-status-action@master
-        if: always() && contains(needs.prepare_vars.outputs.supported_platforms, matrix.compose_managed_node)
+        # always() is to run the step even if the previous step failed
+        if: always() && steps.platform_check.outputs.is_supported == 'true'
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: ${{ job.status }}
