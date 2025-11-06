@@ -196,6 +196,7 @@ jobs:
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
           secrets: "SR_LSR_DOMAIN=${{ secrets.SR_LSR_DOMAIN }};\
             SR_LSR_SSH_KEY=${{ secrets.SR_LSR_SSH_KEY }}"
+          compose: null
           # There are two blockers for using public ranch:
           # 1. multihost is not supported in public https://github.com/teemtee/tmt/issues/2620
           # 2. Security issue that leaks long secrets - Jira TFT-2698
