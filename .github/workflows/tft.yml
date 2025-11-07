@@ -174,7 +174,10 @@ jobs:
           TF_API_KEY_RH: ${{ secrets.TF_API_KEY_RH }}
 
       - name: Run test in testing farm
-        uses: sclorg/testing-farm-as-github-action@v4
+        # Change to the original action once this PR is merged:
+        # https://github.com/sclorg/testing-farm-as-github-action/pull/326
+        # uses: sclorg/testing-farm-as-github-action@v4
+        uses: spetrosi/testing-farm-as-github-action@compose-null-omit
         if: steps.platform_check.outputs.is_supported == 'true'
         with:
           git_ref: main
