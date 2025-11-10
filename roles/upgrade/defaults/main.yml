@@ -165,7 +165,13 @@ check_leapp_analysis_results: true
 
 kernel_modules_to_unload_before_upgrade: []
 
-post_upgrade_python_interpreter: "{{ ( ansible_distribution_major_version == '7' and post_7_to_8_python_interpreter is defined) | ternary(post_7_to_8_python_interpreter, '/usr/libexec/platform-python') }}"
+
+# Note: Leaving the deprecated 'post_7_to_8_python_interpreter' variable functional for now.
+post_upgrade_python_interpreter: >-
+  {{ post_7_to_8_python_interpreter
+     if (ansible_distribution_major_version == '7'
+         and post_7_to_8_python_interpreter is defined)
+     else '/usr/libexec/platform-python' }}
 
 # Set which Ansible Collection to use for the Linux System Roles.
 # For community/upstream, use 'fedora.linux_system_roles'
