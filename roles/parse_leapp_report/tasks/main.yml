@@ -5,7 +5,7 @@
 
 - name: Collect human readable report results
   ansible.builtin.slurp:
-    src: "{{ result_filename }}"
+    src: "{{ result_filename_txt }}"
   register: results_txt
 
 - name: Collect JSON report results
@@ -35,14 +35,14 @@
   vars:
     high_filter: "{{ '|Risk Factor: high' if leapp_high_sev_as_inhibitors | default(false, true) | bool else '' }}"
   ansible.builtin.command:
-    cmd: awk '/\(inhibitor\){{ high_filter }}/,/^-------/' {{ result_filename }}
+    cmd: awk '/\(inhibitor\){{ high_filter }}/,/^-------/' {{ result_filename_txt }}
   register: results_inhibitors
   changed_when: false
   failed_when: false
 
 - name: Collect high errors
   ansible.builtin.command:
-    cmd: awk '/high \(error\)/,/^-------/' {{ result_filename }}
+    cmd: awk '/high \(error\)/,/^-------/' {{ result_filename_txt }}
   register: results_errors
   changed_when: false
   failed_when: false
