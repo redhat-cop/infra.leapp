@@ -1,8 +1,10 @@
 ---
-# tests file for upgrade
+# tests file for remediate
 
 - name: Test
   hosts: all
+  vars:
+    job_name: test_remediate
   roles:
     - remediate
 ...
