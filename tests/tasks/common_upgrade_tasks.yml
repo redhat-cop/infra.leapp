@@ -14,7 +14,7 @@
 
 - name: common_upgrade_tasks | Extract inhibitor titles
   ansible.builtin.set_fact:
-    inhibitor_titles: "{{ leapp_inhibitors | map(attribute='title') | list }}"
+    inhibitor_titles: "{{ (leapp_inhibitors | default([])) | map(attribute='title') | list }}"
 
 - name: common_upgrade_tasks | Initialize remediation_todo
   ansible.builtin.set_fact:
