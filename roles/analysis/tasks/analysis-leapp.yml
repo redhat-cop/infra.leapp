@@ -97,8 +97,9 @@
 - name: analysis-leapp | Include check-results-file.yml
   ansible.builtin.include_tasks: check-results-file.yml
 
-- name: analysis-leapp | Include the parse_leapp_report role to check for inhibitors
+- name: analysis-leapp | Run parse_leapp_report to check for inhibitors
   ansible.builtin.include_role:
-    name: infra.leapp.parse_leapp_report
+    name: infra.leapp.common
+    tasks_from: parse_leapp_report.yml
 
 ...

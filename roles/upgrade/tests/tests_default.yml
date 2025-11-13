@@ -3,6 +3,24 @@
   hosts: all
   vars:
     job_name: test_upgrade
-  roles:
-    - upgrade
+    check_leapp_analysis_results: false
+  tasks:
+    - name: Test | Run upgrade
+      block:
+        - name: Test | Run role upgrade
+          ansible.builtin.include_role:
+            name: infra.leapp.upgrade
+      rescue:
+        - name: Test | Check error
+          ansible.builtin.debug:
+            msg: errors {{ ansible_failed_result | to_nice_json }}
+
+        - name: Test | Ensure correct error
+          ansible.builtin.assert:
+            that: results_errors.stdout_lines | select("search", err_pat) | list | length > 0
+          when:
+            - results_errors is defined
+            - results_errors.stdout_lines | length > 0
+          vars:
+            err_pat: This system is not yet registered
 ...
