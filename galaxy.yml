@@ -28,6 +28,6 @@ build_ignore:
   - changelogs/.plugin-cache.yaml
 dependencies:
   "ansible.posix": "*" # ">=1.5.1"
-  "community.general": "*" # ">=6.6.0,<11.0.0"
+  "community.general": ">=6.6.0,<11.0.0"
   "fedora.linux_system_roles": "*" # ">=1.21.0"
 ...
