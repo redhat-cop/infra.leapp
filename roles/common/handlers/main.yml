@@ -1,5 +1,11 @@
 ---
 # handlers file for common
+- name: Check for log file
+  ansible.builtin.stat:
+    path: "{{ log_file }}"
+  register: log_file_stat
+  listen: Archive log file
+
 - name: Add end time to log file
   ansible.builtin.lineinfile:
     path: "{{ log_file }}"
@@ -8,17 +14,20 @@
     group: root
     mode: "0644"
   listen: Archive log file
+  when: log_file_stat.stat.exists
 
 - name: Slurp ripu.log file
   ansible.builtin.slurp:
     src: "{{ log_file }}"
   register: ripu_log_file_slurp
   listen: Archive log file
+  when: log_file_stat.stat.exists
 
 - name: Decode ripu.log file
   ansible.builtin.set_fact:
     ripu_log_file: "{{ (ripu_log_file_slurp.content | b64decode).split('\n') }}"
   listen: Archive log file
+  when: log_file_stat.stat.exists
 
 - name: Rename log file
   ansible.builtin.shell: |
@@ -26,4 +35,5 @@
     mv {{ log_file }} {{ log_file }}-{{ ansible_date_time.iso8601_basic_short }}
   listen: Archive log file
   changed_when: true
+  when: log_file_stat.stat.exists
 ...

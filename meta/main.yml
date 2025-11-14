@@ -1,5 +1,7 @@
 ---
 galaxy_info:
+  role_name: leapp
+  namespace: infra
   author: Tomas Fratrik <tfratrik@redhat.com>
   description: Collection of roles to run Leapp
   company: Red Hat, Inc.

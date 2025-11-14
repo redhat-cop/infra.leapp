@@ -1,8 +1,0 @@
----
-- name: Test
-  hosts: all
-  vars:
-    job_name: test_parse_leapp_report
-  roles:
-    - parse_leapp_report
-...
