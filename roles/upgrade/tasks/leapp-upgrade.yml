@@ -1,7 +1,8 @@
 ---
-- name: leapp-upgrade | Include the parse_leapp_report role to check for inhibitors
+- name: leapp-upgrade | Run parse_leapp_report to check for inhibitors
   ansible.builtin.include_role:
-    name: infra.leapp.parse_leapp_report
+    name: infra.leapp.common
+    tasks_from: parse_leapp_report.yml
   when: check_leapp_analysis_results
 
 - name: leapp-upgrade | Verify no inhibitor results found during preupgrade
@@ -93,9 +94,10 @@
       poll: "{{ async_poll_interval | int }}"
       changed_when: true
   rescue:
-    - name: leapp-upgrade | Include the parse_leapp_report role to check for inhibitors
+    - name: leapp-upgrade | Run parse_leapp_report to check for inhibitors
       ansible.builtin.include_role:
-        name: infra.leapp.parse_leapp_report
+        name: infra.leapp.common
+        tasks_from: parse_leapp_report.yml
 
     - name: leapp-upgrade | Display inhibitors
       ansible.builtin.debug:
