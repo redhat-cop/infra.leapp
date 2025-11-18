@@ -61,8 +61,6 @@ use_default_rules: true
 # When putting ignores inside the ignore file, they are marked as ignored, but
 # still visible, making it easier to address later.
 skip_list:
-  - yaml[colons] # Violations reported by yamllint.
-  - yaml[line-length] # Violations reported by yamllint.
   - var-naming
 
 # Ansible-lint does not automatically load rules that have the 'opt-in' tag.
