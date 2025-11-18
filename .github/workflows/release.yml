@@ -109,6 +109,25 @@ jobs:
       - name: Publish to galaxy
         run: ansible-galaxy collection publish --api-key=${{ secrets.GALAXY_INFRA_KEY }} ${{ steps.build.outputs.tar_file }}
 
+      - name: Update dependency for Automation Hub
+        run: 'sed -i ''s/fedora\.linux_system_roles/redhat.rhel_system_roles/g'' galaxy.yml'
+
+      - name: Update default system roles collection for Automation Hub
+        run: 'sed -i ''s/infra_leapp_upgrade_system_roles_collection: fedora\.linux_system_roles/infra_leapp_upgrade_system_roles_collection: redhat.rhel_system_roles/g'' roles/upgrade/defaults/main.yml'
+
+      - name: Update README default for Automation Hub
+        run: |
+          sed -i 's/| infra_leapp_upgrade_system_roles_collection | fedora\.linux_system_roles | Can be one of:<br>- '\''fedora\.linux_system_roles'\''<br>- '\''redhat\.rhel_system_roles'\'' |/| infra_leapp_upgrade_system_roles_collection | redhat.rhel_system_roles | Can be one of:<br>- '\''fedora\.linux_system_roles'\''<br>- '\''redhat\.rhel_system_roles'\''<br>- '\''redhat\.linux_system_roles'\'' |/g' roles/upgrade/README.md
+
+      - name: Rebuild collection for Automation Hub
+        run: ansible-galaxy collection build -vvv --force
+        shell: bash
+        working-directory: ${{ vars.GITHUB_PATH }}
+
+      - name: Get updated tar name
+        run: echo "tar_file=$(ls | grep '.tar')" >> $GITHUB_OUTPUT
+        id: rebuild
+
       - name: Publish to Automation Hub
         run: |
           cat << EOF > ansible.cfg
@@ -119,14 +138,14 @@ jobs:
           auth_url=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
           token=${{ secrets.CONSOLE_API_KEY }}
           EOF
-          ansible-galaxy collection publish ${{ steps.build.outputs.tar_file }}
+          ansible-galaxy collection publish ${{ steps.rebuild.outputs.tar_file }}
           rm ansible.cfg
 
       - name: Upload files to tag
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ steps.build.outputs.tar_file }}
+          file: ${{ steps.rebuild.outputs.tar_file }}
           tag: ${{ github.ref }}
           overwrite: true
 ...

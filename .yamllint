@@ -4,6 +4,7 @@ extends: default
 ignore: |
   changelogs
   vault.yml
+  .github
 rules:
   braces:
     min-spaces-inside: 0
