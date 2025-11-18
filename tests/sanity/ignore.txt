@@ -1,0 +1,2 @@
+# Ignore GitHub workflow files from sanity checks
+.github/
