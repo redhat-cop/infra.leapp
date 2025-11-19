@@ -30,14 +30,18 @@ common_leapp_answerfile: |
   confirm = True
 
 # Repository URL templates
+# Note: These placeholders are replaced by GitHub Actions using secrets
+# See .github/workflows/tft.yml for the substitution logic
 repo_urls:
+  rhel7_extras:
+    url: "__RHEL7_EXTRAS_REPO_URL__"
   rhel8:
-    base_url: "http://download.eng.brq.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10/compose"
+    url: "__RHEL8_REPO_URL__"
     latest_version: "8.10"
   rhel9:
-    base_url: "http://download.eng.brq.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.6/compose"
+    url: "__RHEL9_REPO_URL__"
     latest_version: "9.6"
   rhel10:
-    base_url: "http://download.eng.brq.redhat.com/rhel-10/nightly/RHEL-10/latest-RHEL-10.0/compose"
+    url: "__RHEL10_REPO_URL__"
     latest_version: "10.0"
 ...

@@ -194,6 +194,10 @@ jobs:
             SR_TEST_LOCAL_CHANGES=false;\
             COMPOSE_CONTROLLER=${{ matrix.compose_controller }};\
             COMPOSE_MANAGED_NODE=${{ matrix.compose_managed_node }};\
+            RHEL7_EXTRAS_REPO_URL=${{ secrets.RHEL7_EXTRAS_REPO_URL }};\
+            RHEL8_REPO_URL=${{ secrets.RHEL8_REPO_URL }};\
+            RHEL9_REPO_URL=${{ secrets.RHEL9_REPO_URL }};\
+            RHEL10_REPO_URL=${{ secrets.RHEL10_REPO_URL }};\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
           tmt_context: "initiator=testing-farm"
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
