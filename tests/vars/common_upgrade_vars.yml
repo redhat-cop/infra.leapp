@@ -3,6 +3,7 @@
 common_title_map:
   "Use of CIFS detected. Upgrade can't proceed": leapp_cifs_detected
   "Detected a corrupted grubenv file": leapp_corrupted_grubenv_file
+  # noqa: yaml[line-length]
   "custom network-scripts detected. RHEL 9 does not support the legacy network-scripts package that was deprecated in RHEL 8": leapp_custom_network_scripts_detected
   "A deprecated directive in the sshd configuration": leapp_deprecated_sshd_directive
   "Firewalld Configuration AllowZoneDrifting Is Unsupported": leapp_firewalld_allowzonedrifting

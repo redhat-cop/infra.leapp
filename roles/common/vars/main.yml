@@ -42,7 +42,9 @@ preupg_return_codes:
     fail: true
     inhibited: true
   27:
-    msg: The /usr/share/preupgrade/data/preassessment/scripts.txt file is missing. The Preupgrade Assistant is not installed properly and needs to be reinstalled.
+    msg: >-
+      The /usr/share/preupgrade/data/preassessment/scripts.txt file is missing. The Preupgrade Assistant is not
+      installed properly and needs to be reinstalled.
     fail: true
     inhibited: true
   28:
