@@ -9,21 +9,21 @@
     local_repos_pre_leapp:
       - name: rhel-9-for-x86_64-baseos-rpms
         description: BaseOS for x86_64
-        baseurl: "{{ repo_urls.rhel9.base_url }}/BaseOS/x86_64/os/"
+        baseurl: "{{ repo_urls.rhel9.url }}/BaseOS/x86_64/os/"
         state: present
       - name: rhel-9-for-x86_64-appstream-rpms
         description: AppStream for x86_64
-        baseurl: "{{ repo_urls.rhel9.base_url }}/AppStream/x86_64/os/"
+        baseurl: "{{ repo_urls.rhel9.url }}/AppStream/x86_64/os/"
         state: present
     local_repos_leapp:
       - name: rhel-10-for-x86_64-baseos-rpms
         description: BaseOS for x86_64
-        baseurl: "{{ repo_urls.rhel10.base_url }}/BaseOS/x86_64/os/"
+        baseurl: "{{ repo_urls.rhel10.url }}/BaseOS/x86_64/os/"
         file: /etc/leapp/files/leapp_upgrade_repositories
         state: present
       - name: rhel-10-for-x86_64-appstream-rpms
         description: AppStream for x86_64
-        baseurl: "{{ repo_urls.rhel10.base_url }}/AppStream/x86_64/os/"
+        baseurl: "{{ repo_urls.rhel10.url }}/AppStream/x86_64/os/"
         file: /etc/leapp/files/leapp_upgrade_repositories
         state: present
     title_map: "{{ common_title_map }}"

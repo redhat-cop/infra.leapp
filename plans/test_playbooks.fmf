@@ -77,6 +77,16 @@ prepare:
     order: 10
     how: feature
     epel: enabled
+  - name: Substitute repository URL secrets
+    order: 20
+    how: shell
+    where: control_node
+    script: |
+      vars_file="$TMT_TREE/tests/vars/common_upgrade_vars.yml"
+      [ -n "$RHEL7_EXTRAS_REPO_URL" ] && sed -i "s|__RHEL7_EXTRAS_REPO_URL__|$RHEL7_EXTRAS_REPO_URL|g" "$vars_file"
+      [ -n "$RHEL8_REPO_URL" ] && sed -i "s|__RHEL8_REPO_URL__|$RHEL8_REPO_URL|g" "$vars_file"
+      [ -n "$RHEL9_REPO_URL" ] && sed -i "s|__RHEL9_REPO_URL__|$RHEL9_REPO_URL|g" "$vars_file"
+      [ -n "$RHEL10_REPO_URL" ] && sed -i "s|__RHEL10_REPO_URL__|$RHEL10_REPO_URL|g" "$vars_file"
 discover:
   - name: Prepare managed node
     how: fmf
