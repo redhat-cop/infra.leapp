@@ -1,0 +1,24 @@
+---
+# Repository URL templates
+# Note: These placeholders are replaced by environment variables
+# See tests/tmt/test_playbooks/test_playbooks.sh for the substitution logic
+repo_urls:
+  rhel7:
+    extras:
+      url: "__RHEL_7_9_EXTRAS_REPO_URL__"
+  rhel8:
+    baseos:
+      url: "__RHEL_8_10_BASEOS_REPO_URL__"
+    appstream:
+      url: "__RHEL_8_10_APPSTREAM_REPO_URL__"
+  rhel9:
+    baseos:
+      url: "__RHEL_9_6_BASEOS_REPO_URL__"
+    appstream:
+      url: "__RHEL_9_6_APPSTREAM_REPO_URL__"
+  rhel10:
+    baseos:
+      url: "__RHEL_10_0_BASEOS_REPO_URL__"
+    appstream:
+      url: "__RHEL_10_0_APPSTREAM_REPO_URL__"
+...

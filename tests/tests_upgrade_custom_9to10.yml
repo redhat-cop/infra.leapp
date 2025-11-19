@@ -3,27 +3,19 @@
   hosts: all
   vars_files:
     - vars/common_upgrade_vars.yml
+    - vars/repo_urls.yml
   vars:
     leapp_upgrade_type: custom
     leapp_upgrade_opts: "--no-rhsm"
-    local_repos_pre_leapp:
-      - name: rhel-9-for-x86_64-baseos-rpms
-        description: BaseOS for x86_64
-        baseurl: "{{ repo_urls.rhel9.base_url }}/BaseOS/x86_64/os/"
-        state: present
-      - name: rhel-9-for-x86_64-appstream-rpms
-        description: AppStream for x86_64
-        baseurl: "{{ repo_urls.rhel9.base_url }}/AppStream/x86_64/os/"
-        state: present
     local_repos_leapp:
       - name: rhel-10-for-x86_64-baseos-rpms
         description: BaseOS for x86_64
-        baseurl: "{{ repo_urls.rhel10.base_url }}/BaseOS/x86_64/os/"
+        baseurl: "{{ repo_urls.rhel10.baseos.url }}"
         file: /etc/leapp/files/leapp_upgrade_repositories
         state: present
       - name: rhel-10-for-x86_64-appstream-rpms
         description: AppStream for x86_64
-        baseurl: "{{ repo_urls.rhel10.base_url }}/AppStream/x86_64/os/"
+        baseurl: "{{ repo_urls.rhel10.appstream.url }}"
         file: /etc/leapp/files/leapp_upgrade_repositories
         state: present
     title_map: "{{ common_title_map }}"
