@@ -1,8 +1,8 @@
 # Remediations
 
-**IMPORTANT:** This role is only supported for RHEL 7 and 8 systems. Not all remediations are applicable to both, and are noted in the remediation playbooks list below.
-
 The `remediation` role is to assist in the remediation of a system. This role contains multiple playbooks that can be used to remediate a system for a specific inhibitors that are found during the pre-upgrade analysis.
+
+**IMPORTANT:** Not all remediations are applicable to all upgrade paths, see the remediation playbooks list below.
 
 ## Role variables
 
