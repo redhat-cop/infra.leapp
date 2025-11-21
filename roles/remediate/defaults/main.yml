@@ -6,12 +6,14 @@ pre_reboot_delay: 60
 post_reboot_delay: 120
 leapp_report_location: /var/log/leapp/leapp-report.json
 remediation_playbooks:
+  - leapp_cgroups-v1_enabled
   - leapp_cifs_detected
   - leapp_corrupted_grubenv_file
   - leapp_custom_network_scripts_detected
   - leapp_deprecated_sshd_directive
   - leapp_firewalld_allowzonedrifting
   - leapp_firewalld_unsupported_tftp_client
+  - leapp_legacy_network_configuration
   - leapp_loaded_removed_kernel_drivers
   - leapp_missing_efibootmgr
   - leapp_missing_pkg
