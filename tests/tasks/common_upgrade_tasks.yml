@@ -41,16 +41,13 @@
 - name: common_upgrade_tasks | Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: common_upgrade_tasks | Reinstall linux-firmware via dnf (remove)
-  ansible.builtin.command: dnf remove -y linux-firmware
-  changed_when: false
-
-- name: common_upgrade_tasks | Reinstall linux-firmware via dnf (install)
-  ansible.builtin.command: dnf install -y linux-firmware
-  changed_when: false
-
-- name: common_upgrade_tasks | Flush handlers
-  ansible.builtin.meta: flush_handlers
+# Need to manually remove linux-firmware package to avoid package conflicts
+# because linux-firmware in RHEL-8.10 is newer than linux-firmware in RHEL-9.6
+- name: common_upgrade_tasks | Remove linux-firmware via dnf (install)
+  ansible.builtin.package:
+    name: linux-firmware
+    state: absent
+  when: ansible_facts.distribution_major_version == 8
 
 - name: common_upgrade_tasks | Run analysis after remediation
   ansible.builtin.include_role:
