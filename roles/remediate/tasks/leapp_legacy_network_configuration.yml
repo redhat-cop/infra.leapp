@@ -1,0 +1,62 @@
+---
+- name: leapp_legacy_network_configuration | Convert network manager configuration to the native keyfile format
+  vars:
+    leapp_report_location: /var/log/leapp/leapp-report.json
+    entry_title: Legacy network configuration found
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 9
+  block:
+    - name: leapp_legacy_network_configuration | Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: leapp_legacy_network_configuration | End remediation early if no leapp report exists
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      when: not leapp_report_stat.stat.exists
+      failed_when: not leapp_report_stat.stat.exists
+
+    - name: leapp_legacy_network_configuration | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leappreport
+
+    - name: leapp_legacy_network_configuration | Parse leapp report
+      ansible.builtin.set_fact:
+        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
+
+    - name: leapp_legacy_network_configuration | Find the inhibitor entry and extract the remediation command
+      # The remediation executes recommended command from the report since it
+      # is generated with specific network interface that needs to be migrated
+      # to the keyfile format.
+      ansible.builtin.set_fact:
+        remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
+      loop: "{{ leappreportdata.entries }}"
+      when: item.title == entry_title and (item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0)
+
+    - name: leapp_legacy_network_configuration | End remediation if no matching entry was found in the leapp report
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: remediation is not defined
+
+    - name: leapp_legacy_network_configuration | Output the remediation command
+      ansible.builtin.debug:
+        msg: "{{ remediation.context | join(' ') }}"
+
+    - name: leapp_legacy_network_configuration | Migrate the network connection configuration to keyfile format
+      ansible.builtin.command: "{{ remediation.context | join(' ') }}"
+      when: remediation is defined
+      register: leapp_legacy_network_config_migration
+      changed_when: leapp_legacy_network_config_migration is success
+
+    - name: leapp_legacy_network_configuration | Output the remediation command result
+      ansible.builtin.debug:
+        msg: "{{ leapp_legacy_network_config_migration.stdout }}"
+
+  rescue:
+    - name: leapp_legacy_network_configuration | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing | d(false)
+
+...
