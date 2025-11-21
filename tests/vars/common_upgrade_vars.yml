@@ -1,6 +1,7 @@
 ---
 # Common variables for upgrade testing
 common_title_map:
+  "cgroups-v1 enabled on the system": leapp_cgroups-v1_enabled
   "Use of CIFS detected. Upgrade can't proceed": leapp_cifs_detected
   "Detected a corrupted grubenv file": leapp_corrupted_grubenv_file
   # noqa: yaml[line-length]
@@ -8,6 +9,7 @@ common_title_map:
   "A deprecated directive in the sshd configuration": leapp_deprecated_sshd_directive
   "Firewalld Configuration AllowZoneDrifting Is Unsupported": leapp_firewalld_allowzonedrifting
   "Firewalld Service tftp-client Is Unsupported": leapp_firewalld_unsupported_tftp_client
+  "Legacy network configuration found": leapp_legacy_network_configuration
   "Leapp detected loaded kernel drivers which have been removed in RHEL 8. Upgrade cannot proceed": leapp_loaded_removed_kernel_drivers
   "efibootmgr package is required on EFI systems": leapp_missing_efibootmgr
   "Leapp detected missing packages": leapp_missing_pkg

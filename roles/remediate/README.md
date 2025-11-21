@@ -26,6 +26,9 @@ remediation_todo:
 
 The list of available remediation playbooks with their corresponding inhibitors titles:
 
+- `leapp_cgroups-v1_enabled`
+  - RHEL 9 only
+  - **Solves:** cgroups-v1 enabled on the system
 - `leapp_cifs_detected`
   - **Solves:** Use of CIFS detected. Upgrade can't proceed.  CIFS is currently not supported by the inplace upgrade.
 - `leapp_corrupted_grubenv_file`
@@ -42,6 +45,9 @@ The list of available remediation playbooks with their corresponding inhibitors 
 - `leapp_firewalld_unsupported_tftp_client`
   - RHEL 8 Only
   - **Solves:** Firewalld Service tftp-client Is Unsupported.
+- `leapp_legacy_network_configuration`
+  - RHEL 9 only
+  - **Solves:** Legacy network configuration found
 - `leapp_loaded_removed_kernel_drivers`
   - **Solves:** Leapp detected loaded kernel drivers which have been removed in RHEL 8. Upgrade cannot proceed.
 - `leapp_missing_efibootmgr`

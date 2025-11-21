@@ -11,4 +11,10 @@
   ansible.builtin.debug:
     msg: The remediations are now complete.
 
+- name: Reboot the system
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ reboot_timeout }}"
+    post_reboot_delay: "{{ post_reboot_delay }}"
+  timeout: "{{ reboot_timeout }}"
+
 ...
