@@ -1,8 +1,8 @@
 # Remediations
 
-**IMPORTANT:** This role is only supported for RHEL 7 and 8 systems. Not all remediations are applicable to both, and are noted in the remediation playbooks list below.
-
 The `remediation` role is to assist in the remediation of a system. This role contains multiple playbooks that can be used to remediate a system for a specific inhibitors that are found during the pre-upgrade analysis.
+
+**IMPORTANT:** Not all remediations are applicable to all upgrade paths, see the remediation playbooks list below.
 
 ## Role variables
 
@@ -26,6 +26,9 @@ remediation_todo:
 
 The list of available remediation playbooks with their corresponding inhibitors titles:
 
+- `leapp_cgroups-v1_enabled`
+  - RHEL 9 only
+  - **Solves:** cgroups-v1 enabled on the system
 - `leapp_cifs_detected`
   - **Solves:** Use of CIFS detected. Upgrade can't proceed.  CIFS is currently not supported by the inplace upgrade.
 - `leapp_corrupted_grubenv_file`
@@ -42,6 +45,9 @@ The list of available remediation playbooks with their corresponding inhibitors 
 - `leapp_firewalld_unsupported_tftp_client`
   - RHEL 8 Only
   - **Solves:** Firewalld Service tftp-client Is Unsupported.
+- `leapp_legacy_network_configuration`
+  - RHEL 9 only
+  - **Solves:** Legacy network configuration found
 - `leapp_loaded_removed_kernel_drivers`
   - **Solves:** Leapp detected loaded kernel drivers which have been removed in RHEL 8. Upgrade cannot proceed.
 - `leapp_missing_efibootmgr`

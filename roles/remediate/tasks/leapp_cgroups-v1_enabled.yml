@@ -1,0 +1,71 @@
+---
+- name: leapp_cgroups-v1_enabled | Disable cgroups-v1 in favor of the new version cgroups-v2
+  vars:
+    leapp_report_location: /var/log/leapp/leapp-report.json
+    leapp_inhibitor_title: cgroups-v1 enabled on the system
+  when:
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_major_version|int == 9
+  block:
+    - name: leapp_cgroups-v1_enabled | Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
+
+    - name: leapp_cgroups-v1_enabled | End remediation early if the leapp report does not exist
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: true
+      when:
+        - not leapp_report_stat.stat.exists
+        - leapp_report_stat.stat.size <= 0
+
+    - name: leapp_cgroups-v1_enabled | Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      register: leapp_report
+
+    - name: leapp_cgroups-v1_enabled | Find the inhibitor entry in the leapp report and extract the remediation command
+      # The remediation executes recommended command from the report since it
+      # is generated with specific kernel arguments that need to be disabled
+      # based on the system's configuration.
+      vars:
+        leapp_report_data: "{{ leapp_report.content | b64decode | from_json }}"
+      ansible.builtin.set_fact:
+        leapp_inhibitor_remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
+      loop: "{{ leapp_report_data.entries }}"
+      when:
+        - item.title == leapp_inhibitor_title
+        - item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0
+
+    - name: leapp_cgroups-v1_enabled | End remediation if a matching entry was not found in the leapp report
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      failed_when: true
+      when:
+        - leapp_inhibitor_remediation is not defined
+        - leapp_inhibitor_remediation.context | length <= 0
+
+    - name: leapp_cgroups-v1_enabled | Show the remediation command
+      ansible.builtin.debug:
+        msg: "{{ leapp_inhibitor_remediation.context | join(' ') }}"
+
+    - name: leapp_cgroups-v1_enabled | Update the kernel arguments to disable the cgroups-v1 in favor of cgroups-v2
+      ansible.builtin.command:
+        argv: "{{ leapp_inhibitor_remediation.context }}"
+      register: leapp_disable_cgroupsv1
+      changed_when: leapp_disable_cgroupsv1 is changed
+      failed_when: leapp_disable_cgroupsv1 is not success
+      notify: Reboot the system
+
+    - name: leapp_cgroups-v1_enabled | Show the remediation command result
+      ansible.builtin.debug:
+        msg: "{{ leapp_disable_cgroupsv1.stdout_lines }}"
+
+  rescue:
+    - name: leapp_cgroups-v1_enabled | Continue when leapp report is missing
+      ansible.builtin.debug:
+        msg: "Leapp report missing or did not contain any matches. Skipping this task."
+      when: leapp_report_missing | d(false)
+
+...
