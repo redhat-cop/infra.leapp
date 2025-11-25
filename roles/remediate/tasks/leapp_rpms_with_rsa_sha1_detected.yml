@@ -1,55 +1,38 @@
 ---
+- name: leapp_rpms_with_rsa_sha1_detected | Continue when leapp report is missing
+  ansible.builtin.debug:
+    msg: "Leapp report missing. Skipping this task."
+  when: leapp_report_missing | default(false)
+
 - name: leapp_rpms_with_rsa_sha1_detected | Remove RPMs with RSA/SHA1 signature
   vars:
-    leapp_report_location: /var/log/leapp/leapp-report.json
     entry_title: Detected RPMs with RSA/SHA1 signature
-  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
+    summaries: "{{ leapp_report_data.entries | selectattr('title', 'match', entry_title) |
+      map(attribute='summary') | list }}"
+    summary: "{{ summaries | first if summaries | length > 0 else '' }}"
+  when:
+    - not leapp_report_missing | default(false)
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_major_version | int == 8
   block:
-    - name: leapp_rpms_with_rsa_sha1_detected | Check that the leapp-report.json exists
-      ansible.builtin.stat:
-        path: "{{ leapp_report_location }}"
-      register: leapp_report_stat
-
-    - name: leapp_rpms_with_rsa_sha1_detected | End play if no leapp report exists
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      when: leapp_report_stat.stat.exists is false
-      failed_when: leapp_report_stat.stat.exists is false
-
-    - name: leapp_rpms_with_rsa_sha1_detected | Read leapp report
-      ansible.builtin.slurp:
-        src: "{{ leapp_report_location }}"
-      register: leappreport
-
-    - name: leapp_rpms_with_rsa_sha1_detected | Parse leapp report to json
-      ansible.builtin.set_fact:
-        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
-
-    - name: leapp_rpms_with_rsa_sha1_detected | Find matching entries
-      ansible.builtin.set_fact:
-        summary: "{{ item.summary }}"
-      loop: "{{ leappreportdata.entries }}"
-      when: item.title is match(entry_title) and (item.summary | length > 0)
-
     - name: leapp_rpms_with_rsa_sha1_detected | End execution of playbook if no entry found in leapp report
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      failed_when: summary is not defined
-
-    - name: leapp_rpms_with_rsa_sha1_detected | Parse bad_pkgs
-      ansible.builtin.set_fact:
-        bad_pkgs: "{{ summary | split('The list of problematic packages:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
-
-    - name: leapp_rpms_with_rsa_sha1_detected | Remove bad packages
-      ansible.builtin.dnf:
-        name: "{{ item }}"
-        state: absent
-      loop: "{{ bad_pkgs }}"
-
-  rescue:
-    - name: leapp_rpms_with_rsa_sha1_detected | Continue when leapp report is missing
       ansible.builtin.debug:
-        msg: "Leapp report missing or did not contain any matches. Skipping this task."
-      when: leapp_report_missing is defined and leapp_report_missing is true
+        msg: "No matching entry found in leapp report. Skipping this task."
+      when: summary | length == 0
+
+    - name: leapp_rpms_with_rsa_sha1_detected | Process remediation
+      when: summary | length > 0
+      block:
+        - name: leapp_rpms_with_rsa_sha1_detected | Parse bad_pkgs
+          ansible.builtin.set_fact:
+            bad_pkgs: "{{ summary | split('The list of problematic packages:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+
+        # TODO: Pass the bad_pkgs list directly to the dnf command?  Is there some reason
+        # this has to be done one at a time?  It is much slower this way.
+        - name: leapp_rpms_with_rsa_sha1_detected | Remove bad packages
+          ansible.builtin.dnf:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ bad_pkgs }}"
 
 ...

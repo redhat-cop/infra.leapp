@@ -28,7 +28,14 @@
     loop_var: inhibitor_title
   vars:
     map_key: "{{ title_map.keys() | select('in', inhibitor_title) | first | default('') }}"
-  when: map_key != ''
+  when:
+    - not leapp_test_all_remediations | d(false)
+    - map_key != ''
+
+- name: common_upgrade_tasks | Enable all remediations
+  ansible.builtin.set_fact:
+    remediation_todo: "{{ common_title_map.values() | list }}"
+  when: leapp_test_all_remediations | d(false)
 
 - name: common_upgrade_tasks | Debug remediation_todo
   ansible.builtin.debug:

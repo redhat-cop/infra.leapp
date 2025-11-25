@@ -17,7 +17,7 @@
       ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
       when: installed_kernels.stdout_lines[0] != current_kernel.stdout
       register: set_default_kernel
-      changed_when: set_default_kernel.rc == 0
+      changed_when: set_default_kernel is success
 
     - name: leapp_multiple_kernels | Update-and-reboot | Reboot when updates applied
       ansible.builtin.reboot:
@@ -26,6 +26,8 @@
       timeout: "{{ reboot_timeout }}"
       when: installed_kernels.stdout_lines[0] != current_kernel.stdout
 
+    # TODO: This is slow.  Instead, use filters/map to construct the list
+    # of package names to remove and pass the list as name:
     - name: leapp_multiple_kernels | Remove old kernels
       ansible.builtin.package:
         name: kernel-core-{{ item }}
