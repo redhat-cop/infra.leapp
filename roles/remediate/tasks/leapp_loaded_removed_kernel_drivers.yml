@@ -1,61 +1,34 @@
 ---
+- name: leapp_loaded_removed_kernel_drivers | Continue when leapp report is missing
+  ansible.builtin.debug:
+    msg: "Leapp report missing. Skipping this task."
+  when: leapp_report_missing | default(false)
+
 - name: leapp_loaded_removed_kernel_drivers | Unload kernel drivers which have been removed in next RHEL release
   vars:
-    leapp_report_location: /var/log/leapp/leapp-report.json
     entry_title_pattern: Leapp detected loaded kernel drivers which have been removed in RHEL \d+. Upgrade cannot proceed.
+    unsupported_modules: "{{ leapp_report_data.entries | selectattr('title', 'match', entry_title_pattern) |
+      selectattr('summary', 'defined') | rejectattr('summary', 'eq', '') |
+      map(attribute='summary') | flatten | map('regex_findall', '(?<=- ).*') | flatten | list }}"
+  when: not leapp_report_missing | default(false)
   block:
-    - name: leapp_loaded_removed_kernel_drivers | Check that the leapp-report.json exists
-      ansible.builtin.stat:
-        path: "{{ leapp_report_location }}"
-      register: leapp_report_stat
-
-    - name: leapp_loaded_removed_kernel_drivers | End execution of playbook if leapp report does not exist
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      when: leapp_report_stat.stat.exists is false
-      failed_when: leapp_report_stat.stat.exists is false
-
-    - name: leapp_loaded_removed_kernel_drivers | Read leapp report
-      ansible.builtin.slurp:
-        src: "{{ leapp_report_location }}"
-      register: leappreport
-
-    - name: leapp_loaded_removed_kernel_drivers | Parse leapp report to json
-      ansible.builtin.set_fact:
-        leappreportdata: "{{ leappreport.content | b64decode | from_json }}"
-
-    - name: leapp_loaded_removed_kernel_drivers | Find entry in leapp report
-      ansible.builtin.set_fact:
-        leapp_entry: "{{ item }}"
-      loop: "{{ leappreportdata.entries }}"
-      when: item.title is match(entry_title_pattern)
-
     - name: leapp_loaded_removed_kernel_drivers | End execution of playbook if no entry found in leapp report
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      failed_when: leapp_entry is not defined
-
-    - name: leapp_loaded_removed_kernel_drivers | Parse summary to obtain list of modules
-      ansible.builtin.set_fact:
-        unsupported_modules: "{{ leapp_entry.summary | regex_findall('(?<=- ).*') }}"
-      when: leapp_entry is defined
-
-    - name: leapp_loaded_removed_kernel_drivers | Print unsupported modules
       ansible.builtin.debug:
-        var: unsupported_modules
+        msg: "No matching entry found in leapp report. Skipping this task."
+      when: unsupported_modules | length == 0
 
-    - name: leapp_loaded_removed_kernel_drivers | Unload unsupported modules
-      community.general.modprobe:
-        name: "{{ item }}"
-        state: absent
-      loop: "{{ unsupported_modules }}"
-      when: unsupported_modules is defined
-      changed_when: unsupported_modules is defined
+    - name: leapp_loaded_removed_kernel_drivers | Process remediation
+      when: unsupported_modules | length > 0
+      block:
+        - name: leapp_loaded_removed_kernel_drivers | Print unsupported modules
+          ansible.builtin.debug:
+            var: unsupported_modules
 
-  rescue:
-    - name: leapp_loaded_removed_kernel_drivers | Continue when leapp report is missing
-      ansible.builtin.debug:
-        msg: "Leapp report missing or did not contain any matches. Skipping this task."
-      when: leapp_report_missing is defined and leapp_report_missing is true
+        - name: leapp_loaded_removed_kernel_drivers | Unload unsupported modules
+          community.general.modprobe:
+            name: "{{ item }}"
+            state: absent
+          loop: "{{ unsupported_modules }}"
+          changed_when: unsupported_modules | length > 0
 
 ...

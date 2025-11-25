@@ -6,7 +6,7 @@
         set -o pipefail
         mount | grep -E '(/var|/var/lib|/var/lib/leapp).*noexec'
       register: mountpoints
-      changed_when: mountpoints.rc == 0
+      changed_when: mountpoints is success
       failed_when: false
 
     - name: leapp_partitions_with_noexec | Go through the the mountpoints and remount
@@ -24,7 +24,7 @@
         set -o pipefail
         sed -i '/\/var\/lib\/leapp\|\/var\/lib\|\/var/s/noexec/exec/' /etc/fstab
       register: sed_result
-      changed_when: sed_result.rc == 0
+      changed_when: sed_result is success
       when: mountpoints.stdout_lines | length > 0
 
 ...

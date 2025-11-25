@@ -1,71 +1,43 @@
 ---
+- name: leapp_legacy_network_configuration | Continue when leapp report is missing
+  ansible.builtin.debug:
+    msg: "Leapp report missing. Skipping this task."
+  when: leapp_report_missing | default(false)
+
 - name: leapp_legacy_network_configuration | Convert network manager configuration to the native keyfile format
   vars:
-    leapp_report_location: /var/log/leapp/leapp-report.json
     leapp_inhibitor_title: Legacy network configuration found
+    remediation_matches: "{{ leapp_report_data.entries | selectattr('title', 'match', leapp_inhibitor_title) |
+      map(attribute='detail.remediations') | flatten | list }}"
+    leapp_inhibitor_remediation: "{{ remediation_matches | selectattr('type', 'eq', 'command') | first
+      if remediation_matches | length > 0 else {} }}"
   when:
+    - not leapp_report_missing | default(false)
     - ansible_distribution == 'RedHat'
-    - ansible_distribution_major_version|int == 9
+    - ansible_distribution_major_version | int == 9
   block:
-    - name: leapp_legacy_network_configuration | Check that the leapp-report.json exists
-      ansible.builtin.stat:
-        path: "{{ leapp_report_location }}"
-      register: leapp_report_stat
-
-    - name: leapp_legacy_network_configuration | End remediation early if the leapp report does not exist
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      failed_when: true
-      when:
-        - not leapp_report_stat.stat.exists
-        - leapp_report_stat.stat.size <= 0
-
-    - name: leapp_legacy_network_configuration | Read leapp report
-      ansible.builtin.slurp:
-        src: "{{ leapp_report_location }}"
-      register: leapp_report
-
-    - name: leapp_legacy_network_configuration | Find the inhibitor entry in the leapp report and extract the remediation command
-      # The remediation executes recommended command from the report since it
-      # is generated with specific network interface that needs to be migrated
-      # to the keyfile format.
-      vars:
-        leapp_report_data: "{{ leapp_report.content | b64decode | from_json }}"
-      ansible.builtin.set_fact:
-        leapp_inhibitor_remediation: "{{ item.detail.remediations | selectattr('type', 'eq', 'command') | first }}"
-      loop: "{{ leapp_report_data.entries }}"
-      when:
-        - item.title == leapp_inhibitor_title
-        - item.detail.remediations | selectattr('type', 'eq', 'command') | list | length > 0
-
     - name: leapp_legacy_network_configuration | End remediation if a matching entry was not found in the leapp report
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      failed_when: true
+      ansible.builtin.debug:
+        msg: "No matching entry found in leapp report. Skipping this task."
+      when: leapp_inhibitor_remediation | length == 0 or leapp_inhibitor_remediation.context | length == 0
+
+    - name: leapp_legacy_network_configuration | Process remediation
       when:
-        - leapp_inhibitor_remediation is not defined
-        - leapp_inhibitor_remediation.context | length <= 0
+        - leapp_inhibitor_remediation | length > 0
+        - leapp_inhibitor_remediation.context | length > 0
+      block:
+        - name: leapp_legacy_network_configuration | Show the remediation command
+          ansible.builtin.debug:
+            var: leapp_inhibitor_remediation.context | join(' ')
 
-    - name: leapp_legacy_network_configuration | Show the remediation command
-      ansible.builtin.debug:
-        msg: "{{ leapp_inhibitor_remediation.context | join(' ') }}"
+        - name: leapp_legacy_network_configuration | Migrate the network connection configuration to the keyfile format
+          ansible.builtin.command:
+            argv: "{{ leapp_inhibitor_remediation.context }}"
+          register: leapp_legacy_network_config_migration
+          changed_when: leapp_legacy_network_config_migration is success
 
-    - name: leapp_legacy_network_configuration | Migrate the network connection configuration to the keyfile format
-      ansible.builtin.command:
-        argv: "{{ leapp_inhibitor_remediation.context }}"
-      when: leapp_inhibitor_remediation is defined
-      register: leapp_legacy_network_config_migration
-      changed_when: leapp_legacy_network_config_migration is changed
-      failed_when: leapp_legacy_network_config_migration is not success
-
-    - name: leapp_legacy_network_configuration | Show the remediation command result
-      ansible.builtin.debug:
-        msg: "{{ leapp_legacy_network_config_migration.stdout_lines }}"
-
-  rescue:
-    - name: leapp_legacy_network_configuration | Continue when leapp report is missing
-      ansible.builtin.debug:
-        msg: "Leapp report missing or did not contain any matches. Skipping this task."
-      when: leapp_report_missing | d(false)
+        - name: leapp_legacy_network_configuration | Show the remediation command result
+          ansible.builtin.debug:
+            var: leapp_legacy_network_config_migration.stdout_lines
 
 ...
