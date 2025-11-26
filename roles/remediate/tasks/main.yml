@@ -1,11 +1,49 @@
 ---
 # tasks file for remediations
+- name: Run remediations
+  vars:
+    leapp_report_location_6to7: /root/preupgrade/result.txt
+  block:
+    - name: Check that the leapp-report.json exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location }}"
+      register: leapp_report_stat
 
-- name: Remediate the system
-  ansible.builtin.include_tasks: "{{ remediation_item }}.yml"
-  loop: "{{ remediation_playbooks }}"
-  loop_control:
-    loop_var: remediation_item
-  when: remediation_item in remediation_todo
+    - name: Set leapp_report_missing to true if the leapp-report.json does not exist
+      ansible.builtin.set_fact:
+        leapp_report_missing: true
+      when: not leapp_report_stat.stat.exists
 
+    - name: Read leapp report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location }}"
+      when: leapp_report_stat.stat.exists
+      register: leapp_report_content
+
+    - name: Parse leapp report
+      ansible.builtin.set_fact:
+        leapp_report_data: "{{ leapp_report_content.content | b64decode | from_json }}"
+      when: leapp_report_content.content | length > 0
+
+    - name: Check that the 6to7 preupgrade report exists
+      ansible.builtin.stat:
+        path: "{{ leapp_report_location_6to7 }}"
+      register: leapp_report_stat_6to7
+
+    - name: Set leapp_report_missing_6to7 to true if the 6to7 preupgrade report does not exist
+      ansible.builtin.set_fact:
+        leapp_report_missing_6to7: true
+      when: not leapp_report_stat_6to7.stat.exists
+
+    - name: Read 6to7 preupgrade report
+      ansible.builtin.slurp:
+        src: "{{ leapp_report_location_6to7 }}"
+      register: leapp_pre_upgrade_report_6to7
+      when: leapp_report_stat_6to7.stat.exists
+
+    - name: Remediate the system
+      ansible.builtin.include_tasks: "{{ remediation_item }}.yml"
+      loop: "{{ remediation_playbooks | intersect(remediation_todo) }}"
+      loop_control:
+        loop_var: remediation_item
 ...

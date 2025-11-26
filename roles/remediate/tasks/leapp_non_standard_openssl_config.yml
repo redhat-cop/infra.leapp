@@ -1,34 +1,34 @@
 ---
 - name: leapp_non_standard_openssl_config | Adjust openssl.cnf configuration for default_modules
-  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version|int == 8
+  when:
+    - ansible_distribution == 'RedHat'
+    - ansible_distribution_major_version | int == 8
+  vars:
+    openssl_cnf_path: /etc/pki/tls/openssl.cnf
   block:
     - name: leapp_non_standard_openssl_config | Check if openssl.cnf exists
       ansible.builtin.stat:
-        path: /etc/pki/tls/openssl.cnf
+        path: "{{ openssl_cnf_path }}"
       register: openssl_cnf_stat
 
     - name: leapp_non_standard_openssl_config | End execution of playbook if openssl.cnf does not exist
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      when: openssl_cnf_stat.stat.exists is false
-      failed_when: openssl_cnf_stat.stat.exists is false
-
-    - name: leapp_non_standard_openssl_config | Back up openssl.cnf
-      ansible.builtin.copy:
-        src: /etc/pki/tls/openssl.cnf
-        dest: /etc/pki/tls/openssl.cnf.rhel8-bkup
-        remote_src: true
-        mode: "0644"
-
-    - name: leapp_non_standard_openssl_config | Remove openssl.cnf
-      ansible.builtin.file:
-        path: /etc/pki/tls/openssl.cnf
-        state: absent
-
-  rescue:
-    - name: leapp_non_standard_openssl_config | Continue when leapp report is missing
       ansible.builtin.debug:
-        msg: "Leapp report missing or did not contain any matches. Skipping this task."
-      when: leapp_report_missing is defined and leapp_report_missing is true
+        msg: "{{ openssl_cnf_path }} does not exist. Skipping this task."
+      when: not openssl_cnf_stat.stat.exists
+
+    - name: leapp_non_standard_openssl_config | Process remediation
+      when: openssl_cnf_stat.stat.exists
+      block:
+        - name: leapp_non_standard_openssl_config | Back up openssl.cnf
+          ansible.builtin.copy:
+            src: "{{ openssl_cnf_path }}"
+            dest: "{{ openssl_cnf_path }}.rhel8-bkup"
+            remote_src: true
+            mode: "0644"
+
+        - name: leapp_non_standard_openssl_config | Remove openssl.cnf
+          ansible.builtin.file:
+            path: "{{ openssl_cnf_path }}"
+            state: absent
 
 ...
