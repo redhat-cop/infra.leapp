@@ -1,30 +1,69 @@
 summary: Test Ansible playbooks from control node against managed nodes
 tag: test_playbook
 adjust:
-  - when: initiator is not defined
+  # Running locally on local VMs
+  # URLs for images are provided by an environment-file below. Example run:
+  # tmt -c COMPOSE_MANAGED_NODE=rhel8 try -p /plans/test_playbooks
+  - when: >-
+      initiator is not defined
+      and 1minutetip is not defined
+    provision+:
+      - name: control-node01
+        role: control_node
+        how: virtual
+        connection: system
+        image: ${RHEL_9_8_image}
+  - when: >-
+      initiator is not defined
+      and 1minutetip is not defined
+      and COMPOSE_MANAGED_NODE == rhel7
+    provision+:
+      - name: managed-node01
+        role: managed_node
+        how: virtual
+        connection: system
+        image: ${RHEL_7_9_image}
+  - when: >-
+      initiator is not defined
+      and 1minutetip is not defined
+      and COMPOSE_MANAGED_NODE=rhel8
+    provision+:
+      - name: managed-node01
+        role: managed_node
+        how: virtual
+        connection: system
+        image: ${RHEL_8_10_image}
+  - when: >-
+      initiator is not defined
+      and 1minutetip is not defined
+      and COMPOSE_MANAGED_NODE=rhel9
+    provision+:
+      - name: managed-node01
+        role: managed_node
+        how: virtual
+        connection: system
+        image: ${RHEL_9_6_image}
+
+  # Running locally by provisioning 1minutetip VMs. Example run:
+  # tmt -c 1minutetip=true -c COMPOSE_MANAGED_NODE=rhel8 try -p /plans/test_playbooks
+  - when: >-
+      initiator is not defined
+      and 1minutetip == true
     provision+:
       - name: control-node01
         role: control_node
         how: minute
         image: rhel9
-  - when: initiator is not defined and COMPOSE_MANAGED_NODE=rhel7
+  - when: >-
+      initiator is not defined
+      and 1minutetip == true
     provision+:
       - name: managed-node01
         role: managed_node
         how: minute
-        image: rhel7
-  - when: initiator is not defined and COMPOSE_MANAGED_NODE=rhel8
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: minute
-        image: rhel8
-  - when: initiator is not defined and COMPOSE_MANAGED_NODE=rhel9
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: minute
-        image: rhel-9.6
+        image: $@COMPOSE_MANAGED_NODE
+
+  # Running from CI in testing-farm
   - when: initiator == testing-farm
     provision+:
       - name: control-node01
@@ -49,11 +88,17 @@ adjust:
         how: artemis
         image: ${COMPOSE_MANAGED_NODE}
         arch: x86_64
+# URL or path to environment file that provides vars for images and repositories
+# environment-file:
+#   - https... or leapp_coll_env_file
+environment-file:
+  - https://gitlab.cee.redhat.com/oamg/tests-ansible-collection-leapp/-/raw/main/leapp_coll_env_file?ref_type=heads
 environment:
     SR_ANSIBLE_VER: 2.17
     SR_REPO_NAME: ""
     SR_PYTHON_VERSION: 3.12
-    SR_ONLY_TESTS: ""
+    SR_ONLY_TESTS: "leapp/tests_upgrade_custom_7to8.yml"
+    # SR_ONLY_TESTS: ""
     SR_TEST_LOCAL_CHANGES: true
     SR_PR_NUM: ""
     SR_LSR_USER: ""
@@ -63,20 +108,67 @@ environment:
     SR_ARTIFACTS_URL: ""
     SR_TFT_DEBUG: false
 prepare:
-  - name: Use vault.centos.org repos (CS 7, 8 EOL workaround)
-    # Providing order to run prep tasks as first because beakerlib is required
+  # beaker-harndess contains beaker packages that are required to keep the
+  # machine live when running in beaker
+  - name: Replaces repositories with custom repos
     order: 10
+    when: initiator is not defined and 1minutetip is not defined
     script: |
-      if grep -q 'CentOS Stream release 8' /etc/redhat-release; then
-        sed -i '/^mirror/d;s/#\(baseurl=http:\/\/\)mirror/\1vault/' /etc/yum.repos.d/*.repo
+      # Backup all repositories
+      if ls /etc/yum.repos.d/*.repo 1>/dev/null 2>&1; then
+        for file in /etc/yum.repos.d/*.repo; do
+          mv "$file" "${file}.backup$(date +%Y%m%d%H%M%S)"
+        done
       fi
-      if grep -q 'CentOS Linux release 7.9' /etc/redhat-release; then
-        sed -i '/^mirror/d;s/#\?\(baseurl=http:\/\/\)mirror/\1vault/' /etc/yum.repos.d/*.repo
+
+      # Add beaker-harness repository to install beakerlib
+      source /etc/os-release
+      OS_MAJOR_VERSION=${VERSION_ID/%[.]*/}
+      OS_VERSION_UNDERSCORE=$(echo ${VERSION_ID} | sed 's/\./_/g')
+      {
+        echo "[beaker-harness]"
+        echo "baseurl = ${BEAKERLIB_HARNESS_URL_NO_VER}${OS_MAJOR_VERSION}/"
+        echo "enabled = 1"
+        echo "gpgcheck = 0"
+        echo "name = Beaker harness"
+        echo "skip_if_unavailable = 1"
+      } > /etc/yum.repos.d/beaker-harness.repo
+
+      # Configure repositories for RHEL 7
+      # Extras is required to install the leapp package
+      if [ -n "${OS_MAJOR_VERSION}" ] && [ "${OS_MAJOR_VERSION}" -eq 7 ]; then
+        {
+          echo "[rhel-7-server-extras-rpms]"
+          echo "name=RHEL 7 Server Extras"
+          echo "baseurl=${RHEL_7_9_EXTRAS_REPO_URL}"
+          echo "enabled = 1"
+          echo "gpgcheck=0"
+          echo ""
+          echo "[rhel]"
+          echo "name=rhel"
+          echo "baseurl=${RHEL_7_9_SERVER_REPO_URL}"
+          echo "enabled = 1"
+          echo "gpgcheck=0"
+        } > /etc/yum.repos.d/rhel${OS_MAJOR_VERSION}.repo
+        exit
       fi
-  - name: Enable EPEL to get beakerlib
-    order: 10
-    how: feature
-    epel: enabled
+
+      # Configure repositories for RHEL 8+
+      BASEOS_VAR="RHEL_${OS_VERSION_UNDERSCORE}_BASEOS_REPO_URL"
+      APPSTREAM_VAR="RHEL_${OS_VERSION_UNDERSCORE}_APPSTREAM_REPO_URL"
+      {
+        echo "[rhel-${OS_MAJOR_VERSION}-for-x86_64-baseos-rpms]"
+        echo "name=BaseOS for x86_64"
+        echo "baseurl=${!BASEOS_VAR}"
+        echo "enabled = 1"
+        echo "gpgcheck=0"
+        echo ""
+        echo "[rhel-${OS_MAJOR_VERSION}-for-x86_64-appstream-rpms]"
+        echo "name=AppStream for x86_64"
+        echo "baseurl=${!APPSTREAM_VAR}"
+        echo "enabled = 1"
+        echo "gpgcheck=0"
+      } > /etc/yum.repos.d/rhel${OS_MAJOR_VERSION}.repo
 discover:
   - name: Prepare managed node
     how: fmf

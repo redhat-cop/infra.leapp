@@ -1,6 +1,9 @@
 ---
 name: Run integration tests in Testing Farm
 on:
+  # Tests that run on issue_comment are run from the main branch.
+  # Changes to this workflow and to tmt plans and tests need to be merged to
+  # main first appear in CI runs.
   issue_comment:
     types:
       - created

@@ -11,15 +11,16 @@
       - name: rhel-9-for-x86_64-baseos-rpms
         description: BaseOS for x86_64
         baseurl: "{{ repo_urls.rhel9.baseos.url }}"
-        file: /etc/leapp/files/leapp_upgrade_repositories
         state: present
       - name: rhel-9-for-x86_64-appstream-rpms
         description: AppStream for x86_64
         baseurl: "{{ repo_urls.rhel9.appstream.url }}"
-        file: /etc/leapp/files/leapp_upgrade_repositories
         state: present
     title_map: "{{ common_title_map }}"
     leapp_answerfile: "{{ common_leapp_answerfile }}"
+    # This repo is created in prepare phase in plans/test_playbooks.fmf
+    repo_files_to_remove_at_upgrade:
+      - rhel8.repo
   tasks:
     - name: Test | Run upgrade 8to9
       block:
@@ -50,6 +51,12 @@
         - name: Mark upgrade as completed
           ansible.builtin.set_fact:
             leapp_upgrade_completed: true
+
+        - name: Move RHEL repositories to /etc/yum.repos.d/
+          ansible.builtin.command: >-
+            mv /etc/leapp/files/leapp_upgrade_repositories.repo
+            /etc/yum.repos.d/rhel9.repo
+          changed_when: true
       always:
         - name: Cleanup | Remove log files
           tags: tests::cleanup

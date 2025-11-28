@@ -24,6 +24,8 @@ rlJournalStart
             fi
         done
         is_virtual=$(lsrIsVirtual)
+        # Remove beaker-harness repository added in the test plan prepare phase
+        rlRun "rm -rf /etc/yum.repos.d/beaker-harness.repo"
         if [ "$is_virtual" -eq 0 ]; then
             lsrDistributeSSHKeys
         fi
