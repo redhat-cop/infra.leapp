@@ -31,4 +31,9 @@ common_title_map:
 common_leapp_answerfile: |
   [remove_pam_pkcs11_module_check]
   confirm = True
+
+# These repositories are created in prepare phase in plans/test_playbooks.fmf
+repo_files_to_remove_at_upgrade:
+  - rhel.repo
+  - beaker-harness.repo
 ...
