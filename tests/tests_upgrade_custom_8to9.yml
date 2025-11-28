@@ -42,7 +42,7 @@
         - name: Assert that the system has been upgraded to RHEL 9
           ansible.builtin.assert:
             that:
-              - ansible_distribution not ['CentOS', 'RedHat']
+              - ansible_distribution in ['CentOS', 'RedHat']
               - ansible_distribution_major_version == "9"
             fail_msg: "System was not upgraded to RHEL 9. Current OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
             success_msg: "System successfully upgraded to RHEL 9"

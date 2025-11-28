@@ -41,17 +41,6 @@
 - name: common_upgrade_tasks | Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: common_upgrade_tasks | Reinstall linux-firmware via dnf (remove)
-  ansible.builtin.command: dnf remove -y linux-firmware
-  changed_when: false
-
-- name: common_upgrade_tasks | Reinstall linux-firmware via dnf (install)
-  ansible.builtin.command: dnf install -y linux-firmware
-  changed_when: false
-
-- name: common_upgrade_tasks | Flush handlers
-  ansible.builtin.meta: flush_handlers
-
 - name: common_upgrade_tasks | Run analysis after remediation
   ansible.builtin.include_role:
     name: infra.leapp.analysis
