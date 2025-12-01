@@ -3,6 +3,20 @@
   hosts: all
   vars:
     job_name: test_common
-  roles:
-    - common
+  tasks:
+    - name: Test | Run common
+      block:
+        - name: Test | Run role common
+          ansible.builtin.include_role:
+            name: infra.leapp.common
+      always:
+        - name: Cleanup | Remove log files
+          tags: tests::cleanup
+          ansible.builtin.shell:
+            executable: /bin/bash
+            cmd: |
+              set -euxo pipefail
+              rm -f /var/log/leapp/leapp-upgrade.log
+              rm -f /var/log/ripu/ripu.log*
+          changed_when: true
 ...
