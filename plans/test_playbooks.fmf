@@ -95,8 +95,8 @@ environment:
     SR_ANSIBLE_VER: 2.17
     SR_REPO_NAME: ""
     SR_PYTHON_VERSION: 3.12
-    SR_ONLY_TESTS: "leapp/tests_upgrade_custom_7to8.yml"
-    # SR_ONLY_TESTS: ""
+    # SR_ONLY_TESTS: "leapp/tests_upgrade_custom_7to8.yml"
+    SR_ONLY_TESTS: ""
     SR_TEST_LOCAL_CHANGES: true
     SR_PR_NUM: ""
     SR_LSR_USER: ""
