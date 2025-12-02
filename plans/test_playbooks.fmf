@@ -110,7 +110,6 @@ prepare:
   # machine live when running in beaker
   - name: Replaces repositories with custom repos
     order: 10
-    when: initiator is not defined and 1minutetip is not defined
     script: |
       # Backup all repositories
       if ls /etc/yum.repos.d/*.repo 1>/dev/null 2>&1; then
