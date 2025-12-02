@@ -91,8 +91,6 @@ adjust:
 # URL or path to environment file that provides vars for images and repositories
 # environment-file:
 #   - https... or leapp_coll_env_file
-environment-file:
-  - https://gitlab.cee.redhat.com/oamg/tests-ansible-collection-leapp/-/raw/main/leapp_coll_env_file?ref_type=heads
 environment:
     SR_ANSIBLE_VER: 2.17
     SR_REPO_NAME: ""
