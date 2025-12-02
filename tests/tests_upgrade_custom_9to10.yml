@@ -5,8 +5,8 @@
     - vars/common_upgrade_vars.yml
     - vars/repo_urls.yml
   vars:
-    leapp_upgrade_type: custom
-    leapp_upgrade_opts: "--no-rhsm"
+    rhel_base_ver: 9
+    rhel_target_ver: 10
     local_repos_leapp:
       - name: rhel-10-for-x86_64-baseos-rpms
         description: BaseOS for x86_64
@@ -16,55 +16,7 @@
         description: AppStream for x86_64
         baseurl: "{{ repo_urls.rhel10.appstream.url }}"
         state: present
-    title_map: "{{ common_title_map }}"
-    leapp_answerfile: "{{ common_leapp_answerfile }}"
-    # This repo is created in prepare phase in plans/test_playbooks.fmf
-    repo_files_to_remove_at_upgrade:
-      - rhel9.repo
   tasks:
-    - name: Test | Run upgrade 9to10
-      block:
-        - name: Check if leapp upgrade log exists
-          ansible.builtin.stat:
-            path: /var/log/leapp/leapp-upgrade.log
-          register: leapp_log_stat
-
-        - name: Skip test if not RHEL 9 or already upgraded
-          when: >-
-              ansible_distribution not in ['CentOS', 'RedHat']
-              or ansible_distribution_major_version != "9"
-              or leapp_upgrade_completed is defined
-              or leapp_log_stat.stat.exists
-          ansible.builtin.meta: end_play
-
-        - name: Include common upgrade tasks
-          ansible.builtin.include_tasks: tasks/common_upgrade_tasks.yml
-
-        - name: Assert that the system has been upgraded to RHEL 10
-          ansible.builtin.assert:
-            that:
-              - ansible_distribution in ['CentOS', 'RedHat']
-              - ansible_distribution_major_version == "10"
-            fail_msg: "System was not upgraded to RHEL 10. Current OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
-            success_msg: "System successfully upgraded to RHEL 10"
-
-        - name: Mark upgrade as completed
-          ansible.builtin.set_fact:
-            leapp_upgrade_completed: true
-
-        - name: Move RHEL repositories to /etc/yum.repos.d/
-          ansible.builtin.command: >-
-            mv /etc/leapp/files/leapp_upgrade_repositories.repo
-            /etc/yum.repos.d/rhel10.repo
-          changed_when: true
-      always:
-        - name: Cleanup | Remove log files
-          tags: tests::cleanup
-          ansible.builtin.shell:
-            executable: /bin/bash
-            cmd: |
-              set -euxo pipefail
-              rm -f /var/log/leapp/leapp-upgrade.log
-              rm -f /var/log/ripu/ripu.log*
-          changed_when: true
+    - name: Include tests_upgrade_custom playbook
+      ansible.builtin.include_tasks: tasks/tests_upgrade_custom.yml
 ...
