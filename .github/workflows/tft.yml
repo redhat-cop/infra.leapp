@@ -197,6 +197,7 @@ jobs:
             SR_TEST_LOCAL_CHANGES=false;\
             COMPOSE_CONTROLLER=${{ matrix.compose_controller }};\
             COMPOSE_MANAGED_NODE=${{ matrix.compose_managed_node }};\
+            RHEL_7_9_SERVER_REPO_URL=${{ secrets.RHEL_7_9_SERVER_REPO_URL }};\
             RHEL_7_9_EXTRAS_REPO_URL=${{ secrets.RHEL_7_9_EXTRAS_REPO_URL }};\
             RHEL_8_10_BASEOS_REPO_URL=${{ secrets.RHEL_8_10_BASEOS_REPO_URL }};\
             RHEL_8_10_APPSTREAM_REPO_URL=${{ secrets.RHEL_8_10_APPSTREAM_REPO_URL }};\
