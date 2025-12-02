@@ -1,40 +1,36 @@
 ---
 - name: leapp_old_postgresql_data | Backup and then remove /var/lib/pgsql/data for remediation
+  vars:
+    postgresql_data_path: /var/lib/pgsql/data
   block:
     - name: leapp_old_postgresql_data | Check if /var/lib/pgsql/data exists
       ansible.builtin.stat:
-        path: /var/lib/pgsql/data
+        path: "{{ postgresql_data_path }}"
       register: pgsql_data_stat
 
     - name: leapp_old_postgresql_data | End play if /var/lib/psql/data does not exist
-      ansible.builtin.set_fact:
-        leapp_report_missing: true
-      when: pgsql_data_stat.stat.exists is false
-      failed_when: pgsql_data_stat.stat.exists is false
-
-    - name: leapp_old_postgresql_data | Set backup filename with timestamp
-      ansible.builtin.set_fact:
-        backup_filename: pgsql_data_backup_{{ ansible_date_time.iso8601_basic_short }}.tar.gz
-
-    - name: leapp_old_postgresql_data | Ensure /var/backups exists
-      ansible.builtin.file:
-        path: /var/backups
-        state: directory
-        mode: "0755"
-
-    - name: leapp_old_postgresql_data | Backup /var/lib/pgsql/data
-      community.general.archive:
-        dest: /var/backups/{{ backup_filename }}
-        path: /var/lib/pgsql/data
-        format: gz
-        force_archive: true
-        remove: true
-        mode: "0755"
-
-  rescue:
-    - name: leapp_old_postgresql_data | Continue when leapp report is missing
       ansible.builtin.debug:
-        msg: "Leapp report missing or did not contain any matches. Skipping this task."
-      when: leapp_report_missing is defined and leapp_report_missing is true
+        msg: "{{ postgresql_data_path }} does not exist. Skipping this task."
+      when: not pgsql_data_stat.stat.exists
+
+    - name: leapp_old_postgresql_data | Process remediation
+      when: pgsql_data_stat.stat.exists
+      block:
+        - name: leapp_old_postgresql_data | Ensure /var/backups exists
+          ansible.builtin.file:
+            path: /var/backups
+            state: directory
+            mode: "0755"
+
+        - name: leapp_old_postgresql_data | Backup /var/lib/pgsql/data
+          community.general.archive:
+            dest: /var/backups/{{ backup_filename }}
+            path: "{{ postgresql_data_path }}"
+            format: gz
+            force_archive: true
+            remove: true
+            mode: "0755"
+          vars:
+            backup_filename: pgsql_data_backup_{{ ansible_date_time.iso8601_basic_short }}.tar.gz
 
 ...
