@@ -15,7 +15,7 @@
     gpgcheck: "{{ item.gpgcheck | default(0) }}"
     gpgkey: "{{ item.gpgkey | default(omit) }}"
     repo_gpgcheck: "{{ item.repo_gpgcheck | default(omit) }}"
-    file: "{{ __leapp_repo_file | default(item.file) | default('local') }}"
+    file: "{{ item.file | default(__leapp_repo_file) }}"
     state: "{{ item.state | default('present') }}"
     owner: root
     group: root

@@ -31,4 +31,11 @@ common_title_map:
 common_leapp_answerfile: |
   [remove_pam_pkcs11_module_check]
   confirm = True
+
+# We test with internal non-production composes (e.g. nightly) that often
+# contain RPMs that are not signed by RH yet
+# Setting these variables makes leapp accept all installed RPMs as signed by RH
+leapp_env_vars:
+  LEAPP_UNSUPPORTED: 1
+  LEAPP_DEVEL_RPMS_ALL_SIGNED: 1
 ...
