@@ -9,7 +9,7 @@
 #   failed_when: ausearch_results.stdout != "<no matches>"
 
 - name: leapp-post-upgrade-selinux | SELinux mode is set to {{ selinux_mode }}
-  ansible.posix.selinux:
+  redhat.rhel_system_roles.selinux:
     policy: targeted
     state: "{{ selinux_mode }}"
   register: selinux_results
@@ -22,7 +22,7 @@
   when: selinux_results.reboot_required
 
 - name: leapp-post-upgrade-selinux | Verify SELinux is set to {{ selinux_mode }}
-  ansible.posix.selinux:
+  redhat.rhel_system_roles.selinux:
     policy: targeted
     state: "{{ selinux_mode }}"
   check_mode: true
