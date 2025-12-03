@@ -17,6 +17,8 @@ SR_GITHUB_ORG="${SR_GITHUB_ORG:-linux-system-roles}"
 rlJournalStart
     rlPhaseStartSetup
         rlRun "rlImport /library/upstream_library"
+        rlRun "rlImport leapp_lib"
+
         # lsrLabBosRepoWorkaround
         for required_var in "${SR_REQUIRED_VARS[@]}"; do
             if [ -z "${!required_var}" ]; then
@@ -30,6 +32,7 @@ rlJournalStart
             lsrDistributeSSHKeys
         fi
         lsrSetHostname
+        leappDebugRepos
         lsrBuildEtcHosts
         # lsrEnableHA
         # lsrDisableNFV

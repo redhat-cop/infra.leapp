@@ -110,6 +110,19 @@ leappGetTests() {
     fi
 }
 
+leappDebugRepos() {
+    local hostname repos
+    hostname=$(lsrGetCurrNodeHostname)
+    repos=$(find /etc/yum.repos.d -name "*.repo")
+    rlLog "Hostname: $hostname"
+    for repo in $repos; do
+        rlLog "Repo: $repo"
+        repo_content=$(cat "$repo")
+        rlLog "Repo content:
+$repo_content"
+    done
+}
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Verification
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
