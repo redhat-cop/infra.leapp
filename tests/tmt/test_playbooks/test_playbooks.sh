@@ -113,7 +113,6 @@ echo "~~~ Environment Variables Definition - END"
 rlJournalStart
     rlPhaseStartSetup
         rlRun "rlImport /library/upstream_library"
-
         rlRun "rlImport leapp_lib"
 
         for required_var in "${SR_REQUIRED_VARS[@]}"; do
@@ -152,6 +151,8 @@ rlJournalStart
         [ -n "$RHEL_9_6_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_9_6_APPSTREAM_REPO_URL__|$RHEL_9_6_APPSTREAM_REPO_URL|g" "$repo_vars_file"
         [ -n "$RHEL_10_0_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_10_0_BASEOS_REPO_URL__|$RHEL_10_0_BASEOS_REPO_URL|g" "$repo_vars_file"
         [ -n "$RHEL_10_0_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_0_APPSTREAM_REPO_URL__|$RHEL_10_0_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+        rlRun "cat $repo_vars_file"
+        leappDebugRepos
 
         rlWaitForCmd "ansible-galaxy collection install -r $coll_path/meta/collection-requirements.yml -vv" -m 5
 
