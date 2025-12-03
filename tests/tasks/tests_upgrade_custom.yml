@@ -1,0 +1,55 @@
+---
+- name: tests_upgrade_custom | Run upgrade to {{ rhel_target_version }}
+  vars:
+    leapp_upgrade_type: custom
+    leapp_upgrade_opts: "--no-rhsm"
+    # Define local_repos_post_upgrade by adding file key to local_repos_leapp
+    local_repos_post_upgrade: "{{ local_repos_leapp | map('combine', {'file': '/etc/yum.repos.d/rhel' ~ rhel_target_ver ~ '.repo'}) | list }}"
+    # This repo is created in prepare phase in plans/test_playbooks.fmf
+    repo_files_to_remove_at_upgrade:
+      - rhel{{ rhel_base_ver }}.repo
+  block:
+    - name: tests_upgrade_custom | Check if leapp upgrade log exists
+      ansible.builtin.stat:
+        path: /var/log/leapp/leapp-upgrade.log
+      register: leapp_log_stat
+
+    - name: >-
+        tests_upgrade_custom | Skip test if already upgraded or not RHEL
+        {{ rhel_base_ver }}
+      when: >-
+          ansible_distribution not in ['CentOS', 'RedHat']
+          or ansible_distribution_major_version | int != rhel_base_ver
+          or leapp_upgrade_completed is defined
+          or leapp_log_stat.stat.exists
+      ansible.builtin.meta: end_play
+
+    - name: tests_upgrade_custom | Include common upgrade tasks
+      ansible.builtin.include_tasks: tasks/common_upgrade_tasks.yml
+
+    - name: tests_upgrade_custom | Assert that the system has been upgraded
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution in ['CentOS', 'RedHat']
+          - ansible_distribution_major_version | int == rhel_target_ver
+        fail_msg: >-
+          System was not upgraded to RHEL {{ rhel_target_ver }}.
+          Current OS: {{ ansible_distribution }}
+          {{ ansible_distribution_version }}
+        success_msg: >-
+          System successfully upgraded to RHEL {{ rhel_target_ver }}
+
+    - name: tests_upgrade_custom | Mark upgrade as completed
+      ansible.builtin.set_fact:
+        leapp_upgrade_completed: true
+  always:
+    - name: tests_upgrade_custom | Cleanup | Remove log files
+      tags: tests::cleanup
+      ansible.builtin.shell:
+        executable: /bin/bash
+        cmd: |
+          set -euxo pipefail
+          rm -f /var/log/leapp/leapp-upgrade.log
+          rm -f /var/log/ripu/ripu.log*
+      changed_when: true
+...

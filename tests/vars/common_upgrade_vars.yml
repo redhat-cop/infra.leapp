@@ -1,6 +1,6 @@
 ---
 # Common variables for upgrade testing
-common_title_map:
+title_map:
   "cgroups-v1 enabled on the system": leapp_cgroups-v1_enabled
   "Use of CIFS detected. Upgrade can't proceed": leapp_cifs_detected
   "Detected a corrupted grubenv file": leapp_corrupted_grubenv_file
@@ -28,7 +28,7 @@ common_title_map:
   "The installed KDE environment is unavailable on RHEL 8": leapp_unavailable_kde
   "Cannot perform the VDO check of block devices": leapp_vdo_check_needed
 
-common_leapp_answerfile: |
+leapp_answerfile: |
   [remove_pam_pkcs11_module_check]
   confirm = True
 
