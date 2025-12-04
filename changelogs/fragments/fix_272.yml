@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - fixed issue with missing python interpreter after upgrade
+...
