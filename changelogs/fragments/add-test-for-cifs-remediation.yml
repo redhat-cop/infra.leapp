@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Add a test for the cifs shares remediation.
+
+...
