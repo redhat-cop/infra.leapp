@@ -1,0 +1,24 @@
+---
+- name: Test RHEL 7 to 8 remediations
+  hosts: all
+  vars_files:
+    - vars/common_upgrade_vars.yml
+    - vars/repo_urls.yml
+  vars:
+    leapp_test_upgrade: false
+    leapp_test_remediations: true
+    rhel_base_ver: 7
+    rhel_target_ver: 8
+    local_repos_leapp:
+      - name: rhel-8-for-x86_64-baseos-rpms
+        description: BaseOS for x86_64
+        baseurl: "{{ repo_urls.rhel8.baseos.url }}"
+        state: present
+      - name: rhel-8-for-x86_64-appstream-rpms
+        description: AppStream for x86_64
+        baseurl: "{{ repo_urls.rhel8.appstream.url }}"
+        state: present
+  tasks:
+    - name: Include tests_upgrade_custom playbook
+      ansible.builtin.include_tasks: tasks/tests_upgrade_custom.yml
+...
