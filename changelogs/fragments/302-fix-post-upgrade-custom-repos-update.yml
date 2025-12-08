@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Fix the post-upgrade on-demand update so that it will not execute if there are no post-upgrade repositories specified.
+...
