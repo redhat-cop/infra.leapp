@@ -167,7 +167,7 @@ rlJournalStart
     rlPhaseEnd
     rlPhaseStartTest
         roles=("$coll_path"/roles/*)
-        for test_type in "$coll_path" "${roles[@]}"; do
+        for test_type in "${roles[@]}" "$coll_path"; do
             test_playbooks=$(lsrGetTests "$test_type/tests")
             lsrRunPlaybooksParallel "$SR_SKIP_TAGS" "$test_playbooks" "$managed_nodes" "true" "$SR_ANSIBLE_VERBOSITY"
         done
