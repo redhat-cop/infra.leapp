@@ -72,9 +72,10 @@
     "{{ repo_files_to_remove_at_upgrade }}"
   when: leapp_upgrade_type == "custom"
 
-- name: leapp-upgrade | Include rmmod-kernel-modules.yml
-  ansible.builtin.include_tasks: rmmod-kernel-modules.yml
-  loop: "{{ kernel_modules_to_unload_before_upgrade }}"
+- name: leapp-upgrade | Include remove-kernel-modules.yml
+  ansible.builtin.include_tasks: remove-kernel-modules.yml
+  vars:
+    __kernel_modules_to_remove: "{{ kernel_modules_to_unload_before_upgrade | default([]) }}"
 
 - name: leapp-upgrade | Block to rescue leapp failures to collect errors
   block:
