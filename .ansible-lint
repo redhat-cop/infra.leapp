@@ -31,7 +31,7 @@ mock_modules:
   - community.general.archive
   - community.general.yum_versionlock
   - community.general.rhsm_repository
-  - ansible.posix.selinux
+  - fedora.linux_system_roles.selinux
   - ansible.posix.mount
 
 # mock_roles:

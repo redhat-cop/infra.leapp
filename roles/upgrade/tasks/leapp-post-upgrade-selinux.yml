@@ -9,9 +9,11 @@
 #   failed_when: ausearch_results.stdout != "<no matches>"
 
 - name: leapp-post-upgrade-selinux | SELinux mode is set to {{ selinux_mode }}
-  ansible.posix.selinux:
-    policy: targeted
-    state: "{{ selinux_mode }}"
+  ansible.builtin.include_role:
+    name: fedora.linux_system_roles.selinux
+  vars:
+    selinux_policy: targeted
+    selinux_state: "{{ selinux_mode }}"
   register: selinux_results
 
 - name: leapp-post-upgrade-selinux | Reboot when required for SELinux change
@@ -22,9 +24,11 @@
   when: selinux_results.reboot_required
 
 - name: leapp-post-upgrade-selinux | Verify SELinux is set to {{ selinux_mode }}
-  ansible.posix.selinux:
-    policy: targeted
-    state: "{{ selinux_mode }}"
+  ansible.builtin.include_role:
+    name: fedora.linux_system_roles.selinux
+  vars:
+    selinux_policy: targeted
+    selinux_state: "{{ selinux_mode }}"
   check_mode: true
   register: selinux_check_results
   failed_when: selinux_check_results.changed
