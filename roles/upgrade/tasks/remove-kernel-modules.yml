@@ -1,0 +1,16 @@
+---
+- name: remove-kernel-modules | Get names of loaded kernel modules
+  ansible.builtin.command:
+    cmd: awk '{print $1}' /proc/modules
+  register: loaded_kernel_modules
+  changed_when: false
+
+- name: remove-kernel-modules | Remove specified kernel modules
+  ansible.builtin.command:
+    cmd: modprobe -r {{ kernel_module }}
+  changed_when: true
+  loop: "{{ __kernel_modules_to_remove | list }}"
+  loop_control:
+    loop_var: kernel_module
+  when: kernel_module in loaded_kernel_modules.stdout_lines
+...
