@@ -1,6 +1,23 @@
 ---
 # Common upgrade test tasks that can be included in any upgrade test
 
+- name: common_upgrade_tasks | Gather setup tasks
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/tasks/setup"
+    patterns: "*.yml"
+  register: setup_tasks
+  delegate_to: localhost
+
+- name: common_upgrade_tasks | Do setup tasks
+  ansible.builtin.include_tasks: "{{ setup_task_file }}"
+  loop: "{{ setup_task_files }}"
+  loop_control:
+    loop_var: setup_task_file
+  vars:
+    setup_task_files: "{{ setup_tasks.files | map(attribute='path') | reject('search', reject_pattern) | list }}"
+    reject_pattern: "{{ '/remediate_' if not leapp_test_remediations | d(false) else 'NOMATCH' }}"
+  when: setup_task_files | length > 0
+
 - name: common_upgrade_tasks | Run first analysis
   ansible.builtin.include_role:
     name: infra.leapp.analysis
@@ -28,14 +45,7 @@
     loop_var: inhibitor_title
   vars:
     map_key: "{{ title_map.keys() | select('in', inhibitor_title) | first | default('') }}"
-  when:
-    - not leapp_test_all_remediations | d(false)
-    - map_key != ''
-
-- name: common_upgrade_tasks | Enable all remediations
-  ansible.builtin.set_fact:
-    remediation_todo: "{{ common_title_map.values() | list }}"
-  when: leapp_test_all_remediations | d(false)
+  when: map_key != ''
 
 - name: common_upgrade_tasks | Debug remediation_todo
   ansible.builtin.debug:
@@ -44,6 +54,21 @@
 - name: common_upgrade_tasks | Run remediation
   ansible.builtin.include_role:
     name: infra.leapp.remediate
+
+- name: common_upgrade_tasks | Gather verify remediation tasks
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/tasks/verify"
+    patterns: "remediate_*.yml"
+  when: leapp_test_remediations | d(false)
+  register: verify_remediation_tasks
+  delegate_to: localhost
+
+- name: common_upgrade_tasks | Verify remediations
+  ansible.builtin.include_tasks: "{{ verify_remediation_task_file }}"
+  loop: "{{ verify_remediation_tasks.files | map(attribute='path') | list }}"
+  loop_control:
+    loop_var: verify_remediation_task_file
+  when: leapp_test_remediations | d(false)
 
 - name: common_upgrade_tasks | Flush handlers
   ansible.builtin.meta: flush_handlers
@@ -55,7 +80,11 @@
 - name: common_upgrade_tasks | Flush handlers
   ansible.builtin.meta: flush_handlers
 
+# set leapp_test_upgrade to false in order to test only analysis and remediation
 - name: common_upgrade_tasks | Run upgrade role
   ansible.builtin.include_role:
     name: infra.leapp.upgrade
+  when: leapp_test_upgrade | d(true)
+  tags:
+    - tests::upgrade
 ...

@@ -61,7 +61,7 @@ SR_PYTHON_VERSION="${SR_PYTHON_VERSION:-3.12}"
 # SR_SKIP_TAGS
 #   Ansible tags that must be skipped
 [ -n "$SKIP_TAGS" ] && export SR_SKIP_TAGS="$SKIP_TAGS"
-SR_SKIP_TAGS="--skip-tags tests::nvme,tests::infiniband,tests::bootc-e2e"
+SR_SKIP_TAGS="${SR_SKIP_TAGS:---skip-tags tests::nvme,tests::infiniband,tests::bootc-e2e}"
 # SR_TFT_DEBUG
 #   Print output of ansible playbooks to terminal in addition to printing it to logfile
 [ -n "$LSR_TFT_DEBUG" ] && export SR_TFT_DEBUG="$LSR_TFT_DEBUG"

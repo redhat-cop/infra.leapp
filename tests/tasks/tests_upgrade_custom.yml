@@ -38,6 +38,9 @@
           {{ ansible_distribution_version }}
         success_msg: >-
           System successfully upgraded to RHEL {{ rhel_target_ver }}
+      when: leapp_test_upgrade | d(true)
+      tags:
+        - tests::upgrade
 
     - name: tests_upgrade_custom | Mark upgrade as completed
       ansible.builtin.set_fact:
