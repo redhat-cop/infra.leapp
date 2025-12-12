@@ -42,11 +42,22 @@
 - name: redhat-upgrade-tool-upgrade | Gather package facts
   ansible.builtin.package_facts:
 
-- name: redhat-upgrade-tool-upgrade | No packages are version locked
-  community.general.yum_versionlock:
-    name: "*"
-    state: absent
-  when: "'yum-plugin-versionlock' in ansible_facts.packages"
+- name: redhat-upgrade-tool-upgrade | Get yum version lock entries
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: yum versionlock list
+  register: versionlock_list
+  changed_when: false
+  failed_when: false
+  when:
+    - "'yum-plugin-versionlock' in ansible_facts.packages"
+
+- name: redhat-upgrade-tool-upgrade | Remove all yum version locks
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: yum versionlock clear
+  changed_when: versionlock_list.stdout != ''
+  when:
+    - "'yum-plugin-versionlock' in ansible_facts.packages"
+    - versionlock_list is defined and versionlock_list.stdout != ''
 
 # Clean up upgrade repository from failed previous runs.
 # So upgrade-and-reboot.yml can succeed.
