@@ -1,8 +1,13 @@
 summary: Test Ansible playbooks from control node against managed nodes
 tag: test_playbook
 adjust:
+  # File that provides URLs for images and repositories
+  - when: initiator is not defined
+    environment-file+:
+      - https://<GitLab CEE RedHat instance>/oamg/tests-ansible-collection-leapp/-/raw/main/leapp_coll_env_file.yml
+
   # Running locally on local VMs
-  # URLs for images are provided by an environment-file below. Example run:
+  # Example run:
   # tmt -c COMPOSE_MANAGED_NODE=rhel8 try -p /plans/test_playbooks
   - when: >-
       initiator is not defined
@@ -88,9 +93,6 @@ adjust:
         how: artemis
         image: ${COMPOSE_MANAGED_NODE}
         arch: x86_64
-# URL or path to environment file that provides vars for images and repositories
-# environment-file:
-#   - https://<GitLab CEE RedHat instance>/oamg/tests-ansible-collection-leapp/-/raw/main/leapp_coll_env_file.yml
 environment:
     SR_ANSIBLE_VER: 2.17
     SR_REPO_NAME: ""
