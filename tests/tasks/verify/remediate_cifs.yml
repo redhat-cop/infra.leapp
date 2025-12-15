@@ -1,0 +1,11 @@
+# verify the cifs shares remediation
+# verify that lines with "cifs" are commented out
+# verify that there are no lines with "cifs" that are not commented out
+---
+- name: verify | remediate_cifs | Verify the cifs shares remediation
+  ansible.builtin.command: cat /etc/fstab
+  changed_when: false
+  register: cat_fstab
+  failed_when:
+    - cat_fstab.stdout_lines | select("match", "^#.*cifs") | list | length == 0
+    - cat_fstab.stdout_lines | select("match", "^[^#].*cifs") | list | length > 0
