@@ -1,5 +1,4 @@
 ---
-# vars file for common
 preupg_return_codes:
   0:
     msg: "preupg works properly and modules exit with the following results: PASS, FIXED, INFORMATIONAL, NEEDS_INSPECTION, NOT_APPLICABLE."

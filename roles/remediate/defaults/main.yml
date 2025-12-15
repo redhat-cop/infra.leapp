@@ -1,11 +1,10 @@
 ---
 # defaults file for remedations
-
-reboot_timeout: 7200
-pre_reboot_delay: 60
-post_reboot_delay: 120
+leapp_reboot_timeout: 7200
+leapp_pre_reboot_delay: 60
+leapp_post_reboot_delay: 120
 leapp_report_location: /var/log/leapp/leapp-report.json
-remediation_playbooks:
+leapp_remediation_playbooks:
   - leapp_cgroups-v1_enabled
   - leapp_cifs_detected
   - leapp_corrupted_grubenv_file
@@ -32,5 +31,5 @@ remediation_playbooks:
   - leapp_rpms_with_rsa_sha1_detected
   - leapp_unavailable_kde
   - leapp_vdo_check_needed
-remediation_todo: []
+leapp_remediation_todo: []
 ...

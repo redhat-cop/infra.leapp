@@ -1,19 +1,19 @@
 ---
 # defaults file for analysis
-analysis_packages_el6:
+leapp_analysis_packages_el6:
   - preupgrade-assistant
   - preupgrade-assistant-el6toel7
   - redhat-upgrade-tool
   - openscap
   - openscap-engine-sce
 
-analysis_packages_el7:
+leapp_analysis_packages_el7:
   # TODO: Seems to cause package dependency problems with post upgrade cleanup.
   # - leapp-upgrade-el7toel8
   # Try this instead.
   - leapp-upgrade
 
-analysis_packages_el8:
+leapp_analysis_packages_el8:
   # TODO: Seems to cause package dependency problems with post upgrade cleanup.
   # - leapp-upgrade-el8toel9
   # Try this instead.
@@ -23,19 +23,19 @@ analysis_packages_el8:
   # TODO: only w/ rhui for aws
   # - leapp-rhui-aws
 
-analysis_packages_el9:
+leapp_analysis_packages_el9:
   - leapp-upgrade
 
-analysis_repos_el6:
+leapp_analysis_repos_el6:
   - rhel-6-server-extras-rpms
   - rhel-6-server-optional-rpms
 
-analysis_repos_el7:
+leapp_analysis_repos_el7:
   - rhel-7-server-extras-rpms
 
-analysis_repos_el8: []
+leapp_analysis_repos_el8: []
 
-analysis_repos_el9: []
+leapp_analysis_repos_el9: []
 
 # If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.
 # leapp_answerfile: |
@@ -74,8 +74,8 @@ leapp_env_vars: {}
 
 # For leapp_upgrade_type == "custom"
 # Used to configure repos before running leapp analysis / installing leapp packages.
-local_repos_pre_leapp: []
-# local_repos_pre_leapp:
+leapp_local_repos_pre: []
+# leapp_local_repos_pre:
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
@@ -98,8 +98,8 @@ local_repos_pre_leapp: []
 # For leapp_upgrade_type == "custom"
 # Used to generate /etc/leapp/files/leapp_upgrade_repositories.repo
 # Generated using ansible.builtin.yum_repository.
-local_repos_leapp: []
-# local_repos_leapp:
+leapp_local_repos: []
+# leapp_local_repos:
 #   - name: rhel-8-for-x86_64-baseos-rpms
 #     description: Red Hat 8.10 Base OS
 #     baseurl: http://repo01.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
@@ -117,8 +117,8 @@ local_repos_leapp: []
 
 # For leapp_upgrade_type == "custom"
 # Used to return repos to previous state after leapp analysis if necessary.
-local_repos_post_analysis: []
-# local_repos_post_analysis:
+leapp_local_repos_post_analysis: []
+# leapp_local_repos_post_analysis:
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
@@ -156,8 +156,8 @@ local_repos_post_analysis: []
 #     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     # state: present # Defaults to present
 
-os_path: $PATH
+leapp_os_path: $PATH
 
-async_timeout_maximum: 7200
-async_poll_interval: 60
+leapp_async_timeout_maximum: 7200
+leapp_async_poll_interval: 60
 ...

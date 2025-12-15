@@ -1,5 +1,36 @@
 ---
 # vars file for upgrade
+__leapp_upgrade_deprecated_vars:
+  upgrade_packages_el7: leapp_upgrade_packages_el7
+  upgrade_packages_el8: leapp_upgrade_packages_el8
+  upgrade_packages_el9: leapp_upgrade_packages_el9
+  upgrade_repos_el7: leapp_upgrade_repos_el7
+  upgrade_repos_el8: leapp_upgrade_repos_el8
+  upgrade_repos_el9: leapp_upgrade_repos_el9
+  rhel_7_network_install_repo_url: leapp_rhel_7_network_install_repo_url
+  local_repos_pre_leapp: leapp_local_repos_pre
+  local_repos_leapp: leapp_local_repos
+  repo_files_to_remove_at_upgrade: leapp_repo_files_to_remove_at_upgrade
+  local_repos_post_upgrade: leapp_local_repos_post_upgrade
+  selinux_mode: leapp_selinux_mode
+  set_crypto_policies: leapp_set_crypto_policies
+  crypto_policy: leapp_crypto_policy
+  update_grub_to_grub_2: leapp_update_grub_to_grub_2
+  pre_upgrade_update: leapp_pre_upgrade_update
+  post_upgrade_update: leapp_post_upgrade_update
+  post_upgrade_unset_release: leapp_post_upgrade_unset_release
+  post_upgrade_release: leapp_post_upgrade_release
+  reboot_timeout: leapp_reboot_timeout
+  upgrade_timeout: leapp_upgrade_timeout
+  post_reboot_delay: leapp_post_reboot_delay
+  os_path: leapp_os_path
+  async_timeout_maximum: leapp_async_timeout_maximum
+  async_poll_interval: leapp_async_poll_interval
+  check_leapp_analysis_results: leapp_check_analysis_results
+  kernel_modules_to_unload_before_upgrade: leapp_kernel_modules_to_unload_before_upgrade
+  post_7_to_8_python_interpreter: leapp_post_7_to_8_python_interpreter
+  remove_old_rhel_packages: leapp_remove_old_rhel_packages
+
 leapp_enable_repos_args: "{{ ('--enablerepo ' + leapp_repos_enabled | default([], true) | join(' --enablerepo '))
   if leapp_repos_enabled | length > 0 else '' }}"
 

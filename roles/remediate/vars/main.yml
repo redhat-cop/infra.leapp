@@ -1,4 +1,10 @@
 ---
-# vars file for upgrade
+# vars file for remediate
+__leapp_remediate_deprecated_vars:
+  reboot_timeout: leapp_reboot_timeout
+  pre_reboot_delay: leapp_pre_reboot_delay
+  post_reboot_delay: leapp_post_reboot_delay
+  remediation_playbooks: leapp_remediation_playbooks
+  remediation_todo: leapp_remediation_todo
 
 ...

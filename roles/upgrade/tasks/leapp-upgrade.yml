@@ -3,13 +3,13 @@
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: parse_leapp_report.yml
-  when: check_leapp_analysis_results
+  when: leapp_check_analysis_results
 
 - name: leapp-upgrade | Verify no inhibitor results found during preupgrade
   ansible.builtin.assert:
     that: not upgrade_inhibited
     msg: Inhibitors found, please investigate and rerun analysis.
-  when: check_leapp_analysis_results
+  when: leapp_check_analysis_results
 
 - name: leapp-upgrade | Register to leapp activation key
   community.general.redhat_subscription:
@@ -24,7 +24,7 @@
 
 - name: leapp-upgrade | Include custom_local_repos for local_repos_pre_leapp
   vars:
-    __repos: "{{ local_repos_pre_leapp }}"
+    __repos: "{{ leapp_local_repos_pre }}"
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
@@ -32,66 +32,66 @@
 
 - name: leapp-upgrade | Install packages for upgrade from RHEL 7
   ansible.builtin.package:
-    name: "{{ upgrade_packages_el7 }}"
-    enablerepo: "{{ upgrade_repos_el7 }}"
+    name: "{{ leapp_upgrade_packages_el7 }}"
+    enablerepo: "{{ leapp_upgrade_repos_el7 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 7
 
 - name: leapp-upgrade | Install packages for upgrade from RHEL 8
   ansible.builtin.package:
-    name: "{{ upgrade_packages_el8 }}"
-    enablerepo: "{{ upgrade_repos_el8 }}"
+    name: "{{ leapp_upgrade_packages_el8 }}"
+    enablerepo: "{{ leapp_upgrade_repos_el8 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 8
 
 - name: leapp-upgrade | Install packages for upgrade from RHEL 9
   ansible.builtin.package:
-    name: "{{ upgrade_packages_el9 }}"
-    enablerepo: "{{ upgrade_repos_el9 }}"
+    name: "{{ leapp_upgrade_packages_el9 }}"
+    enablerepo: "{{ leapp_upgrade_repos_el9 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 9
 
 - name: leapp-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
-  when: pre_upgrade_update | bool
+  when: leapp_pre_upgrade_update | bool
 
 - name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
   vars:
-    __repos: "{{ local_repos_leapp }}"
+    __repos: "{{ leapp_local_repos }}"
     __leapp_repo_file: /etc/leapp/files/leapp_upgrade_repositories
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
   when:
     - leapp_upgrade_type == 'custom'
-    - local_repos_leapp | length > 0
+    - leapp_local_repos | length > 0
 
 - name: leapp-upgrade | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
   loop:
-    "{{ repo_files_to_remove_at_upgrade }}"
+    "{{ leapp_repo_files_to_remove_at_upgrade }}"
   when: leapp_upgrade_type == "custom"
 
 - name: leapp-upgrade | Include rmmod-kernel-modules.yml
   ansible.builtin.include_tasks: rmmod-kernel-modules.yml
-  loop: "{{ kernel_modules_to_unload_before_upgrade }}"
+  loop: "{{ leapp_kernel_modules_to_unload_before_upgrade }}"
 
 - name: leapp-upgrade | Block to rescue leapp failures to collect errors
   block:
     - name: leapp-upgrade | Start Leapp OS upgrade
       ansible.builtin.shell: >
         set -o pipefail;
-        export PATH={{ os_path }};
+        export PATH={{ leapp_os_path }};
         ulimit -n 16384;
         leapp upgrade --report-schema=1.2.0
         {{ leapp_upgrade_opts }}
         {{ leapp_enable_repos_args }}
-        2>&1 | tee -a {{ log_file }}
+        2>&1 | tee -a {{ leapp_log_file }}
       environment: "{{ leapp_env_vars }}"
       args:
         executable: /bin/bash
-      async: "{{ async_timeout_maximum | int }}"
-      poll: "{{ async_poll_interval | int }}"
+      async: "{{ leapp_async_timeout_maximum | int }}"
+      poll: "{{ leapp_async_poll_interval | int }}"
       changed_when: true
   rescue:
     - name: leapp-upgrade | Run parse_leapp_report to check for inhibitors
@@ -118,14 +118,14 @@
 - name: leapp-upgrade | Reboot to continue Leapp OS upgrade
   ansible.builtin.reboot:
     msg: Host is starting Leapp OS upgrade now!
-    reboot_timeout: "{{ upgrade_timeout }}"
-    post_reboot_delay: "{{ post_reboot_delay }}"
-  timeout: "{{ upgrade_timeout }}"
+    reboot_timeout: "{{ leapp_upgrade_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_upgrade_timeout }}"
 
 # Ansible discovers /usr/bin/python on RHEL 7, then on RHEL 8 it is no longer available.
 - name: leapp-upgrade | Set python interpreter to /usr/libexec/platform-python since /usr/bin/python is no longer available
   ansible.builtin.set_fact:
-    ansible_python_interpreter: "{{ post_7_to_8_python_interpreter }}"
+    ansible_python_interpreter: "{{ leapp_post_7_to_8_python_interpreter }}"
   when: ansible_distribution_major_version == "7"
 
 - name: leapp-upgrade | Wait for leapp_resume run once service to no longer exist
@@ -150,8 +150,8 @@
 
     - name: leapp-upgrade | Reboot to pickup grub update
       ansible.builtin.reboot:
-        reboot_timeout: "{{ reboot_timeout }}"
-        post_reboot_delay: "{{ post_reboot_delay }}"
-      timeout: "{{ reboot_timeout }}"
+        reboot_timeout: "{{ leapp_reboot_timeout }}"
+        post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+      timeout: "{{ leapp_reboot_timeout }}"
 
 ...

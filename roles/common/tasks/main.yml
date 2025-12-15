@@ -2,7 +2,7 @@
 # tasks file for common
 - name: Log directory exists
   ansible.builtin.file:
-    path: "{{ log_directory }}"
+    path: "{{ leapp_log_directory }}"
     state: directory
     owner: root
     group: root
@@ -10,13 +10,13 @@
 
 - name: Check for existing log file
   ansible.builtin.stat:
-    path: "{{ log_file }}"
+    path: "{{ leapp_log_file }}"
   register: log_file_stat
 
 - name: Fail if log file already exists
   ansible.builtin.fail:
     msg: >-
-      Another RIPU playbook job is already running. See {{ log_file }} for details. If the previous job was aborted,
+      Another RIPU playbook job is already running. See {{ leapp_log_file }} for details. If the previous job was aborted,
       rename the log file to clear this failure and try again.
   when: log_file_stat.stat.exists
 
@@ -25,7 +25,7 @@
     content: |
       {{ job_name }}
       Job started at {{ now(fmt='%Y-%m-%dT%H:%M:%SZ', utc=true) }}
-    dest: "{{ log_file }}"
+    dest: "{{ leapp_log_file }}"
     owner: root
     group: root
     mode: "0644"
@@ -52,7 +52,7 @@
   ansible.builtin.shell:
     cmd: >-
       set -o pipefail;
-      export PATH={{ os_path }};
+      export PATH={{ leapp_os_path }};
       rpm -qa | grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |
       grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
       sort

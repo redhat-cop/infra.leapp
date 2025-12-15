@@ -2,13 +2,13 @@
 # handlers file for common
 - name: Check for log file
   ansible.builtin.stat:
-    path: "{{ log_file }}"
+    path: "{{ leapp_log_file }}"
   register: log_file_stat
   listen: Archive log file
 
 - name: Add end time to log file
   ansible.builtin.lineinfile:
-    path: "{{ log_file }}"
+    path: "{{ leapp_log_file }}"
     line: Job ended at {{ now(fmt='%Y-%m-%dT%H:%M:%SZ', utc=true) }}
     owner: root
     group: root
@@ -18,7 +18,7 @@
 
 - name: Slurp ripu.log file
   ansible.builtin.slurp:
-    src: "{{ log_file }}"
+    src: "{{ leapp_log_file }}"
   register: ripu_log_file_slurp
   listen: Archive log file
   when: log_file_stat.stat.exists
@@ -31,8 +31,8 @@
 
 - name: Rename log file
   ansible.builtin.shell: |
-    export PATH={{ os_path }}
-    mv {{ log_file }} {{ log_file }}-{{ ansible_date_time.iso8601_basic_short }}
+    export PATH={{ leapp_os_path }}
+    mv {{ leapp_log_file }} {{ leapp_log_file }}-{{ ansible_date_time.iso8601_basic_short }}
   listen: Archive log file
   changed_when: true
   when: log_file_stat.stat.exists

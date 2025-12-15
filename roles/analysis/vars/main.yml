@@ -1,5 +1,21 @@
 ---
 # vars file for analysis
+__leapp_analysis_deprecated_vars:
+  analysis_packages_el6: leapp_analysis_packages_el6
+  analysis_packages_el7: leapp_analysis_packages_el7
+  analysis_packages_el8: leapp_analysis_packages_el8
+  analysis_packages_el9: leapp_analysis_packages_el9
+  analysis_repos_el6: leapp_analysis_repos_el6
+  analysis_repos_el7: leapp_analysis_repos_el7
+  analysis_repos_el8: leapp_analysis_repos_el8
+  analysis_repos_el9: leapp_analysis_repos_el9
+  local_repos_pre_leapp: leapp_local_repos_pre
+  local_repos_leapp: leapp_local_repos
+  local_repos_post_analysis: leapp_local_repos_post_analysis
+  os_path: leapp_os_path
+  async_timeout_maximum: leapp_async_timeout_maximum
+  async_poll_interval: leapp_async_poll_interval
+
 leapp_enable_repos_args: "{{ ('--enablerepo ' + leapp_repos_enabled | default([], true) | join(' --enablerepo '))
   if leapp_repos_enabled | length > 0 else '' }}"
 

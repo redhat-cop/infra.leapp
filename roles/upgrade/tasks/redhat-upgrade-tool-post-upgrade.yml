@@ -7,7 +7,7 @@
 
 - name: redhat-upgrade-tool-post-upgrade | "Register to post upgrade activation key"
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     subscription-manager register
     --org="{{ satellite_organization }}"
     --activationkey="{{ satellite_activation_key_post_leapp }}"
@@ -22,7 +22,7 @@
 
 - name: redhat-upgrade-tool-post-upgrade | Include custom_local_repos for local_repos_post_upgrade
   vars:
-    __repos: "{{ local_repos_post_upgrade }}"
+    __repos: "{{ leapp_local_repos_post_upgrade }}"
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
@@ -35,7 +35,7 @@
   ansible.builtin.include_tasks: grub2-upgrade.yml
   when:
     - ansible_architecture == 'x86_64'
-    - update_grub_to_grub_2
+    - leapp_update_grub_to_grub_2
 
 - name: redhat-upgrade-tool-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml

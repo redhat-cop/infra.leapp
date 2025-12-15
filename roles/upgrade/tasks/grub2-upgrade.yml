@@ -41,13 +41,13 @@
 
 - name: grub2-upgrade | Run grub2-install
   ansible.builtin.shell: |
-    export PATH={{ os_path }}
+    export PATH={{ leapp_os_path }}
     grub2-install {{ grub_boot_device }}
   changed_when: true
 
 - name: grub2-upgrade | Run grub2-mkconfig
   ansible.builtin.shell: |
-    export PATH={{ os_path }}
+    export PATH={{ leapp_os_path }}
     set -o pipefail
     grub2-mkconfig -o /boot/grub2/grub.cfg
     grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
@@ -60,8 +60,8 @@
 
 - name: grub2-upgrade | Reboot to start using grub2
   ansible.builtin.reboot:
-    reboot_timeout: "{{ reboot_timeout }}"
-    post_reboot_delay: "{{ post_reboot_delay }}"
-  timeout: "{{ reboot_timeout }}"
+    reboot_timeout: "{{ leapp_reboot_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
 
 ...

@@ -3,7 +3,7 @@
   hosts: all
   vars:
     job_name: test_upgrade
-    check_leapp_analysis_results: false
+    leapp_check_analysis_results: false
   tasks:
     - name: Test | Run upgrade
       block:

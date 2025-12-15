@@ -1,7 +1,7 @@
 ---
 # defaults file for common
-os_path: $PATH
-log_directory: /var/log/ripu
-log_file: "{{ log_directory }}/ripu.log"
+leapp_os_path: $PATH
+leapp_log_directory: /var/log/ripu
+leapp_log_file: "{{ leapp_log_directory }}/ripu.log"
 
 ...
