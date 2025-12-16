@@ -2,7 +2,6 @@
 - name: Test
   hosts: all
   vars:
-    job_name: test_upgrade
     leapp_check_analysis_results: false
   tasks:
     - name: Test | Run upgrade

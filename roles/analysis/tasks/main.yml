@@ -1,5 +1,12 @@
 ---
-# tasks file for analysis
+- name: Notify about deprecated variables
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: notify_deprecated_variable
+  with_dict: "{{ __leapp_analysis_deprecated_vars }}"
+  loop_control:
+    loop_var: __leapp_deprecated_var
+
 - name: Initialize lock, logging, and common vars
   ansible.builtin.import_role:
     name: infra.leapp.common

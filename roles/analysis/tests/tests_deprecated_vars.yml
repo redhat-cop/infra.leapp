@@ -1,0 +1,48 @@
+---
+- name: Test if deprecated variables are linked correctly
+  hosts: all
+  tasks:
+    - name: Test | Run in a block to cleanup afterwards
+      block:
+        - name: Run the role to get __leapp_analysis_deprecated_vars variable
+          ansible.builtin.include_role:
+            name: infra.leapp.analysis
+            public: true
+
+        - name: Remove ripu.log
+          command: rm -f /var/log/ripu/ripu.log
+
+        - name: Set facts with deprecated variables
+          with_dict: "{{ __leapp_analysis_deprecated_vars }}"
+          loop_control:
+            loop_var: __leapp_deprecated_var
+          ansible.builtin.set_fact:
+            "{{ __leapp_deprecated_var.key }}": "{{ __leapp_deprecated_var.value }}"
+
+        - name: Test | Run role with deprecated variables set
+          block:
+            - name: Test | Run the role, it will fail but variables will be set
+              ansible.builtin.include_role:
+                name: infra.leapp.analysis
+                public: true
+          rescue:
+            - name: Test | Verify that deprecated variables are linked correctly
+              with_dict: "{{ __leapp_analysis_deprecated_vars }}"
+              loop_control:
+                loop_var: __leapp_deprecated_var
+              ansible.builtin.assert:
+                that: >-
+                  lookup('vars', __leapp_deprecated_var.value)
+                  == __leapp_deprecated_var.value
+
+      always:
+        - name: Cleanup | Remove log files
+          tags: tests::cleanup
+          ansible.builtin.shell:
+            executable: /bin/bash
+            cmd: |
+              set -euxo pipefail
+              rm -f /var/log/leapp/leapp-upgrade.log
+              rm -f /var/log/ripu/ripu.log*
+          changed_when: true
+...

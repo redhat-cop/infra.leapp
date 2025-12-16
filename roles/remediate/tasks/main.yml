@@ -1,5 +1,13 @@
 ---
 # tasks file for remediations
+- name: Notify about deprecated variables
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: notify_deprecated_variable
+  with_dict: "{{ __leapp_remediate_deprecated_vars }}"
+  loop_control:
+    loop_var: __leapp_deprecated_var
+
 - name: Run remediations
   vars:
     leapp_report_location_6to7: /root/preupgrade/result.txt

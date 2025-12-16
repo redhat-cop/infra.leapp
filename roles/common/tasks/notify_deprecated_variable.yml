@@ -1,0 +1,32 @@
+# This task file takes a variable with a dict of deprecated variables and
+# their new names.
+# Usage:
+#   - name: Notify about deprecated variables
+#     ansible.builtin.include_role:
+#       name: infra.leapp.common
+#       tasks_from: notify_deprecated_variable
+#     vars:
+#       __leapp_deprecated_vars: "{{ __leapp_analysis_deprecated_vars }}"
+#     with_dict: "{{ __leapp_deprecated_vars }}"
+#     loop_control:
+#       loop_var: __leapp_deprecated_var
+
+- name: Link the deprecated {{ deprecated_var_name }} variable
+  vars:
+    deprecated_var_name: "{{ __leapp_deprecated_var.key }}"
+    deprecated_var_content: "{{ lookup('vars', deprecated_var_name) }}"
+    new_var_name: "{{ __leapp_deprecated_var.value }}"
+  when: deprecated_var_content is defined
+  block:
+    - name: Print that {{ deprecated_var_name }} is deprecated
+      debug:
+        msg: >-
+          You must replace {{ deprecated_var_name }} with {{ new_var_name }}.
+          The {{ deprecated_var_name }} variable is deprecated and will
+          be removed in a future version.
+
+    - name: >-
+        Link the value of deprecated {{ deprecated_var_name }} to
+        {{ new_var_name }}
+      set_fact:
+        "{{ new_var_name }}": "{{ deprecated_var_content }}"
