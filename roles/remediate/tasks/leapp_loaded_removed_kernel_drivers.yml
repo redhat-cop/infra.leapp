@@ -25,10 +25,12 @@
             var: unsupported_modules
 
         - name: leapp_loaded_removed_kernel_drivers | Unload unsupported modules
-          community.general.modprobe:
-            name: "{{ item }}"
-            state: absent
-          loop: "{{ unsupported_modules }}"
-          changed_when: unsupported_modules | length > 0
+          ansible.builtin.include_role:
+            name: infra.leapp.common
+            tasks_from: manage_kernel_modules.yml
+          vars:
+            leapp_kernel_modules: "{{ unsupported_modules }}"
+            leapp_kernel_modules_state: absent
+          when: unsupported_modules | length > 0
 
 ...

@@ -4,3 +4,5 @@
   ansible.builtin.lineinfile:
     path: /etc/fstab
     line: "//127.0.0.1/test_remediate_cifs /mnt/cifs cifs username=test,password=test 0 0"
+
+...

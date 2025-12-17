@@ -1,0 +1,41 @@
+# Inputs:
+# - leapp_kernel_module - REQUIRED - kernel module to manage
+# - leapp_kernel_module_state - REQUIRED - state of the kernel modules - present or absent
+---
+- name: manage_one_kernel_module | Load or unload kernel module
+  community.general.modprobe:
+    name: "{{ leapp_kernel_module }}"
+    state: "{{ leapp_kernel_module_state }}"
+
+# https://access.redhat.com/solutions/41278
+- name: manage_one_kernel_module | Unload and disable kernel module
+  when: leapp_kernel_module_state == "absent"
+  vars:
+    leapp_kernel_module_conf_file: /etc/modules-load.d/90-{{ leapp_kernel_module }}.conf
+    leapp_kernel_module_modprobe_file: /etc/modprobe.d/{{ leapp_kernel_module }}.conf
+  block:
+    - name: manage_one_kernel_module | Disable modules-load.d file entry
+      ansible.builtin.template:
+        src: modules-load.d.j2
+        dest: "{{ leapp_kernel_module_conf_file }}"
+        mode: "0644"
+        owner: root
+        group: root
+
+    - name: manage_one_kernel_module | Ensure modules are not loaded at boot
+      ansible.builtin.template:
+        src: modprobe.d.j2
+        dest: "{{ leapp_kernel_module_modprobe_file }}"
+        mode: "0644"
+        owner: root
+        group: root
+
+    - name: manage_one_kernel_module | Debug modprobe.d file
+      ansible.builtin.command: cat {{ leapp_kernel_module_modprobe_file | quote }}
+      changed_when: false
+
+    - name: manage_one_kernel_module | Debug modules-load.d file
+      ansible.builtin.command: cat {{ leapp_kernel_module_conf_file | quote }}
+      changed_when: false
+
+...
