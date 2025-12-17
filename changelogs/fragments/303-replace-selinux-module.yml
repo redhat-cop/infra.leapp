@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Replace SELinux community module with Linux System Role.
+...
