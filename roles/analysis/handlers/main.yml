@@ -3,21 +3,21 @@
 - name: Register to pre leapp activation key
   community.general.redhat_subscription:
     state: present
-    activationkey: "{{ satellite_activation_key_pre_leapp }}"
-    org_id: "{{ satellite_organization }}"
+    activationkey: "{{ leapp_satellite_activation_key_pre_leapp }}"
+    org_id: "{{ leapp_satellite_organization }}"
     force_register: true
   when:
     - leapp_upgrade_type == 'satellite'
-    - satellite_organization is defined
-    - satellite_activation_key_pre_leapp is defined
+    - leapp_satellite_organization is not none
+    - leapp_satellite_activation_key_pre_leapp is not none
 
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: Register to pre leapp activation key RHEL 6
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     subscription-manager register
-    --org="{{ satellite_organization }}"
-    --activationkey="{{ satellite_activation_key_pre_leapp }}"
+    --org="{{ leapp_satellite_organization }}"
+    --activationkey="{{ leapp_satellite_activation_key_pre_leapp }}"
     --force
   register: sub_man_reg
   changed_when: true
@@ -50,6 +50,6 @@
     msg: >-
       The preupgrade analysis report generation is now complete.
       {{ 'WARNING: Inhibitors' if upgrade_inhibited else 'SUCCESS: No inhibitors' }} found.
-      Review the tasks above or the result file at {{ result_filename }}.
+      Review the tasks above or the result file at {{ leapp_result_filename }}.
 
 ...

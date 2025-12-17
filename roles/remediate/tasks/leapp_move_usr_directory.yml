@@ -153,8 +153,8 @@
         - name: leapp_move_usr_directory | Reboot the system
           ansible.builtin.reboot:
             msg: "Rebooting the system to complete the move of /usr"
-            connect_timeout: "{{ reboot_timeout }}"
-            pre_reboot_delay: "{{ pre_reboot_delay }}"
-            post_reboot_delay: "{{ post_reboot_delay }}"
+            connect_timeout: "{{ leapp_reboot_timeout }}"
+            pre_reboot_delay: "{{ leapp_pre_reboot_delay }}"
+            post_reboot_delay: "{{ leapp_post_reboot_delay }}"
 
 ...

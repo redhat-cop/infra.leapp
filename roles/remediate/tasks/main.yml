@@ -43,7 +43,7 @@
 
     - name: Remediate the system
       ansible.builtin.include_tasks: "{{ remediation_item }}.yml"
-      loop: "{{ remediation_playbooks | intersect(remediation_todo) }}"
+      loop: "{{ leapp_remediation_playbooks | intersect(leapp_remediation_todo) }}"
       loop_control:
         loop_var: remediation_item
 ...

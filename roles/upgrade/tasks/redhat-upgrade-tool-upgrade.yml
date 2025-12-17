@@ -1,39 +1,39 @@
 ---
 - name: redhat-upgrade-tool-upgrade | Run preupg --riskcheck
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     preupg --riskcheck
   register: preupg
   changed_when: false
   failed_when: false
-  when: check_leapp_analysis_results
+  when: leapp_check_analysis_results
 
 - name: redhat-upgrade-tool-upgrade | Assert that preupg was successful
   ansible.builtin.assert:
-    that: not preupg_return_codes[preupg.rc].inhibited
-    msg: "{{ preupg_return_codes[preupg.rc].msg }}"
-  when: check_leapp_analysis_results
+    that: not __leapp_preupg_return_codes[preupg.rc].inhibited
+    msg: "{{ __leapp_preupg_return_codes[preupg.rc].msg }}"
+  when: leapp_check_analysis_results
 
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: redhat-upgrade-tool-upgrade | Register to leapp activation key
   ansible.builtin.shell: >
     set -o pipefail;
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     subscription-manager register
-    --org_id: "{{ satellite_organization }}"
-    activationkey: "{{ satellite_activation_key_leapp }}"
+    --org_id: "{{ leapp_satellite_organization }}"
+    activationkey: "{{ leapp_satellite_activation_key_leapp }}"
     force_register: true
   register: sub_man_reg
   when:
     - leapp_upgrade_type == 'satellite'
-    - satellite_organization is defined
-    - satellite_activation_key_leapp is defined
+    - leapp_satellite_organization is not none
+    - leapp_satellite_activation_key_leapp is not none
   failed_when: false
   changed_when: true
 
 - name: redhat-upgrade-tool-upgrade | Include custom_local_repos for local_repos_post_upgrade
   vars:
-    __repos: "{{ local_repos_pre_leapp }}"
+    __repos: "{{ leapp_local_repos_pre }}"
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
@@ -67,39 +67,39 @@
 
 - name: redhat-upgrade-tool-upgrade | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
-  loop: "{{ repo_files_to_remove_at_upgrade }}"
+  loop: "{{ leapp_repo_files_to_remove_at_upgrade }}"
   when: leapp_upgrade_type == "custom"
 
 - name: redhat-upgrade-tool-upgrade | Install RPM Key for RHEL 7 ISO Repository
   ansible.builtin.rpm_key:
-    key: "{{ rhel_7_network_install_repo_url }}/RPM-GPG-KEY-redhat-release"
+    key: "{{ leapp_rhel_7_network_install_repo_url }}/RPM-GPG-KEY-redhat-release"
     state: present
   when: leapp_upgrade_type == "custom"
 
 - name: redhat-upgrade-tool-upgrade | Include rmmod-kernel-modules.yml
   ansible.builtin.include_tasks: rmmod-kernel-modules.yml
-  loop: "{{ kernel_modules_to_unload_before_upgrade }}"
+  loop: "{{ leapp_kernel_modules_to_unload_before_upgrade }}"
 
 # --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.
 - name: redhat-upgrade-tool-upgrade | Run redhat-upgrade-tool
   ansible.builtin.shell: >
     set -o pipefail;
-    export PATH={{ os_path }};
-    redhat-upgrade-tool --network 7.9 --instrepo {{ rhel_7_network_install_repo_url }} --force --cleanup-post
-    2>&1 | tee -a {{ log_file }}
+    export PATH={{ leapp_os_path }};
+    redhat-upgrade-tool --network 7.9 --instrepo {{ leapp_rhel_7_network_install_repo_url }} --force --cleanup-post
+    2>&1 | tee -a {{ leapp_log_file }}
   register: redhat_upgrade_tool
   args:
     executable: /bin/bash
-  async: "{{ async_timeout_maximum | int }}"
-  poll: "{{ async_poll_interval | int }}"
+  async: "{{ leapp_async_timeout_maximum | int }}"
+  poll: "{{ leapp_async_poll_interval | int }}"
   # failed_when: false
   changed_when: true
 
 - name: redhat-upgrade-tool-upgrade | Reboot to continue OS upgrade
   ansible.builtin.reboot:
     msg: Host is starting OS upgrade now!
-    reboot_timeout: "{{ upgrade_timeout }}"
-    post_reboot_delay: "{{ post_reboot_delay }}"
-  timeout: "{{ upgrade_timeout }}"
+    reboot_timeout: "{{ leapp_upgrade_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_upgrade_timeout }}"
 
 ...

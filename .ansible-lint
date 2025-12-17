@@ -86,6 +86,7 @@ warn_list:
   - risky-file-permissions # File permissions unset or incorrect.
   - template-instead-of-copy # Templated files should use template instead of copy
   - sanity[cannot-ignore] # cope with shebang test bug
+  - jinja[spacing] # Jinja spacing warnings that rarely provide helpful information
 
 # Some rules can transform files to fix (or make it easier to fix) identified
 # errors. `ansible-lint --fix` will reformat YAML files and run these transforms.

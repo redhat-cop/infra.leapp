@@ -18,9 +18,9 @@ Activation keys provide a method to identify content views available from Red Ha
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| satellite_organization  | String   |  | Organization used in Satellite definition |
-| satellite_activation_key_pre_leapp | String |  | Activation key for the current RHEL version content view |
-| satellite_activation_key_leapp     | String |  | Activation key for the content view including both the current RHEL version and the next version |
+| leapp_satellite_organization  | String   | null | Organization used in Satellite definition |
+| leapp_satellite_activation_key_pre_leapp | String | null | Activation key for the current RHEL version content view |
+| leapp_satellite_activation_key_leapp     | String | null | Activation key for the content view including both the current RHEL version and the next version |
 | leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
 
 ## Custom repos variables
@@ -29,9 +29,9 @@ See comments in defaults/main.yml for additional details.
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| local_repos_pre_leapp  | List of dicts   | [] | Used to configure repos before running leapp analysis / installing leapp packages.|
-| local_repos_leapp  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo. |
-| local_repos_post_analysis  | List of dicts   | [] | Used to return repos to previous state after leapp analysis if necessary. |
+| leapp_local_repos_pre  | List of dicts   | [] | Used to configure repos before running leapp analysis / installing leapp packages.|
+| leapp_local_repos  | List of dicts   | [] | Used to configure next version repos in /etc/leapp/files/leapp_upgrade_repositories.repo. |
+| leapp_local_repos_post_analysis  | List of dicts   | [] | Used to return repos to previous state after leapp analysis if necessary. |
 
 ## Optional variables
 
@@ -42,9 +42,10 @@ See comments in defaults/main.yml for additional details.
 | leapp_high_sev_as_inhibitors | Boolean | False | Treat all high severity findings as inhibitors. |
 | leapp_known_inhibitors | List | [] | List of keys of known inhibitors ignored when setting upgrade_inhibited and leapp_inhibitors. |
 | leapp_env_vars | Dict | {} | Environment variables to use when running `leapp` command. See defaults/main.yml for example. |
-| os_path | String | $PATH | Option string to override the $PATH variable used on the target node |
-| async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds) |
-| async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds) |
+| leapp_os_path | String | $PATH | Option string to override the $PATH variable used on the target node |
+| leapp_async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds) |
+| leapp_async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds) |
+| leapp_bypass_fs_checks | Boolean | false | Set to `true` to bypass filesystem capacity checks |
 
 ## Example playbook
 

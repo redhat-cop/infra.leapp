@@ -1,41 +1,71 @@
 ---
 # defaults file for analysis
-analysis_packages_el6:
-  - preupgrade-assistant
-  - preupgrade-assistant-el6toel7
-  - redhat-upgrade-tool
-  - openscap
-  - openscap-engine-sce
+# analysis_packages_el6 is deprecated, use leapp_analysis_packages_el6 instead
+# leapp_analysis_packages_el6:
+#   - preupgrade-assistant
+#   - preupgrade-assistant-el6toel7
+#   - redhat-upgrade-tool
+#   - openscap
+#   - openscap-engine-sce
+leapp_analysis_packages_el6: "{{ analysis_packages_el6 | default([
+  'preupgrade-assistant',
+  'preupgrade-assistant-el6toel7',
+  'redhat-upgrade-tool',
+  'openscap',
+  'openscap-engine-sce'
+]) }}"
 
-analysis_packages_el7:
-  # TODO: Seems to cause package dependency problems with post upgrade cleanup.
-  # - leapp-upgrade-el7toel8
-  # Try this instead.
-  - leapp-upgrade
+# analysis_packages_el7 is deprecated, use leapp_analysis_packages_el7 instead
+# leapp_analysis_packages_el7:
+#   TODO: Seems to cause package dependency problems with post upgrade cleanup.
+#   - leapp-upgrade-el7toel8
+#   Try this instead.
+#   - leapp-upgrade
+leapp_analysis_packages_el7: "{{ analysis_packages_el7 | default([
+  'leapp-upgrade'
+]) }}"
+# analysis_packages_el8 is deprecated, use leapp_analysis_packages_el8 instead
+# leapp_analysis_packages_el8:
+#   TODO: Seems to cause package dependency problems with post upgrade cleanup.
+#   - leapp-upgrade-el8toel9
+#   Try this instead.
+#   - leapp-upgrade
+#   TODO: This should be part of inhibitor remediation.
+#   - vdo
+#   TODO: only w/ rhui for aws
+#   - leapp-rhui-aws
+leapp_analysis_packages_el8: "{{ analysis_packages_el8 | default([
+  'leapp-upgrade'
+]) }}"
+# analysis_packages_el9 is deprecated, use leapp_analysis_packages_el9 instead
+# leapp_analysis_packages_el9:
+#   - leapp-upgrade
+leapp_analysis_packages_el9: "{{ analysis_packages_el9 | default([
+  'leapp-upgrade'
+]) }}"
 
-analysis_packages_el8:
-  # TODO: Seems to cause package dependency problems with post upgrade cleanup.
-  # - leapp-upgrade-el8toel9
-  # Try this instead.
-  - leapp-upgrade
-  # TODO: This should be part of inhibitor remediation.
-  # - vdo
-  # TODO: only w/ rhui for aws
-  # - leapp-rhui-aws
+# analysis_repos_el6 is deprecated, use leapp_analysis_repos_el6 instead
+# leapp_analysis_repos_el6:
+#   - rhel-6-server-extras-rpms
+#   - rhel-6-server-optional-rpms
+leapp_analysis_repos_el6: "{{ analysis_repos_el6 | default([
+  'rhel-6-server-extras-rpms',
+  'rhel-6-server-optional-rpms'
+]) }}"
+# analysis_repos_el7 is deprecated, use leapp_analysis_repos_el7 instead
+# leapp_analysis_repos_el7:
+#   - rhel-7-server-extras-rpms
+leapp_analysis_repos_el7: "{{ analysis_repos_el7 | default([
+  'rhel-7-server-extras-rpms'
+]) }}"
 
-analysis_packages_el9:
-  - leapp-upgrade
+# analysis_repos_el8 is deprecated, use leapp_analysis_repos_el8 instead
+# leapp_analysis_repos_el8: []
+leapp_analysis_repos_el8: "{{ analysis_repos_el8 | default([]) }}"
 
-analysis_repos_el6:
-  - rhel-6-server-extras-rpms
-  - rhel-6-server-optional-rpms
-
-analysis_repos_el7:
-  - rhel-7-server-extras-rpms
-
-analysis_repos_el8: []
-
-analysis_repos_el9: []
+# analysis_repos_el9 is deprecated, use leapp_analysis_repos_el9 instead
+# leapp_analysis_repos_el9: []
+leapp_analysis_repos_el9: "{{ analysis_repos_el9 | default([]) }}"
 
 # If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.
 # leapp_answerfile: |
@@ -51,13 +81,13 @@ leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' or leapp_upgr
 
 # Satellite Organization and Activation Keys are required if using Satellite to change content views
 # unless the content view already in use has all required repositories.
-# satellite_organization: Example
-# satellite_activation_key_pre_leapp: rhel{{ ansible_distribution_major_version }}
-# satellite_activation_key_leapp: rhel{{ ansible_distribution_major_version }}_leapp
+leapp_satellite_organization: null
+leapp_satellite_activation_key_pre_leapp: null
+leapp_satellite_activation_key_leapp: null
 
-leapp_repos_enabled: []
 # leapp_repos_enabled:
 #   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
+leapp_repos_enabled: []
 
 # Treat all high risk findings as inhibitors, not just those exclusively marked as inhibitors by Leapp
 leapp_high_sev_as_inhibitors: false
@@ -74,90 +104,105 @@ leapp_env_vars: {}
 
 # For leapp_upgrade_type == "custom"
 # Used to configure repos before running leapp analysis / installing leapp packages.
-local_repos_pre_leapp: []
-# local_repos_pre_leapp:
+# local_repos_pre_leapp is deprecated, use leapp_local_repos_pre instead
+# leapp_local_repos_pre: []
+leapp_local_repos_pre: "{{ local_repos_pre_leapp | default([]) }}"
+# leapp_local_repos_pre:
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # state: present # Defaults to present
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # state: present # Defaults to present
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
 
 # For leapp_upgrade_type == "custom"
 # Used to generate /etc/leapp/files/leapp_upgrade_repositories.repo
 # Generated using ansible.builtin.yum_repository.
-local_repos_leapp: []
-# local_repos_leapp:
+# local_repos_leapp is deprecated, use leapp_local_repos instead
+# leapp_local_repos: []
+leapp_local_repos: "{{ local_repos_leapp | default([]) }}"
+# leapp_local_repos:
 #   - name: rhel-8-for-x86_64-baseos-rpms
 #     description: Red Hat 8.10 Base OS
 #     baseurl: http://repo01.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
 #   - name: rhel-8-for-x86_64-appstream-rpms
 #     description: Red Hat 8.10 App Stream
 #     baseurl: http://repo01.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
 
 # For leapp_upgrade_type == "custom"
 # Used to return repos to previous state after leapp analysis if necessary.
-local_repos_post_analysis: []
-# local_repos_post_analysis:
+# local_repos_post_analysis is deprecated, use leapp_local_repos_post_analysis instead
+# leapp_local_repos_post_analysis: []
+leapp_local_repos_post_analysis: "{{ local_repos_post_analysis | default([]) }}"
+# leapp_local_repos_post_analysis:
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     state: absent # Defaults to present
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
 #     state: absent # Defaults to present
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo01.example.com/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # state: present # Defaults to present
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo01.example.com/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # state: present # Defaults to present
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
 
-os_path: $PATH
+# os_path is deprecated, use leapp_os_path instead
+# leapp_os_path: $PATH
+leapp_os_path: "{{ os_path | default('$PATH') }}"
 
-async_timeout_maximum: 7200
-async_poll_interval: 60
+# async_timeout_maximum is deprecated, use leapp_async_timeout_maximum instead
+# leapp_async_timeout_maximum: 7200
+leapp_async_timeout_maximum: "{{ async_timeout_maximum | default(7200) }}"
+
+# async_poll_interval is deprecated, use leapp_async_poll_interval instead
+# leapp_async_poll_interval: 60
+leapp_async_poll_interval: "{{ async_poll_interval | default(60) }}"
+
+leapp_bypass_fs_checks: false
 ...
