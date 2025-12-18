@@ -9,15 +9,16 @@ The `remediation` role is to assist in the remediation of a system. This role co
 | Name                    | Default value         | Description                                         |
 |-------------------------|-----------------------|-----------------------------------------------------|
 | leapp_report_location   | /var/log/leapp/leapp-report.json | Location of the leapp report file.       |
-| remediation_playbooks   | see [Remediation playbooks](#remediation-playbooks) | List of available remediation playbooks.|
-| remediation_todo        | []                    | List of remediation playbooks to run.               |
-| reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete.     |
-| post_reboot_delay       | 120                   | Integer to pass to the reboot post_reboot_delay option. |
+| leapp_remediation_playbooks   | see [Remediation playbooks](#remediation-playbooks) | List of available remediation playbooks.|
+| leapp_remediation_todo        | []                    | List of remediation playbooks to run.               |
+| leapp_reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete.     |
+| leapp_pre_reboot_delay        | 60                    | Integer to pass to the reboot pre_reboot_delay option. |
+| leapp_post_reboot_delay       | 120                   | Integer to pass to the reboot post_reboot_delay option. |
 
-`remediation_todo` is a list of remediation playbooks to run. The list is empty by default. The list can be populated by the titles from [Remediation playbooks](#remediation-playbooks) section. For example:
+`leapp_remediation_todo` is a list of remediation playbooks to run. The list is empty by default. The list can be populated by the titles from [Remediation playbooks](#remediation-playbooks) section. For example:
 
 ```yaml
-remediation_todo:
+leapp_remediation_todo:
   - leapp_cifs_detected
   - leapp_corrupted_grubenv_file
 ```

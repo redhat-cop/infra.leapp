@@ -1,7 +1,7 @@
 ---
 - name: leapp-post-upgrade-crypto | Include rhel_system_roles.crypto_policies role
   ansible.builtin.include_role:
-    name: "{{ infra_leapp_upgrade_system_roles_collection }}.crypto_policies"
+    name: "{{ leapp_infra_upgrade_system_roles_collection }}.crypto_policies"
   vars:
-    crypto_policies_policy: "{{ crypto_policy }}"
+    crypto_policies_policy: "{{ leapp_crypto_policy }}"
 ...

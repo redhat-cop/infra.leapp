@@ -35,11 +35,11 @@
 
 - name: common_upgrade_tasks | Initialize remediation_todo
   ansible.builtin.set_fact:
-    remediation_todo: []
+    leapp_remediation_todo: []
 
 - name: common_upgrade_tasks | Map inhibitors to remediation_todo
   ansible.builtin.set_fact:
-    remediation_todo: "{{ remediation_todo + [title_map[map_key]] }}"
+    leapp_remediation_todo: "{{ leapp_remediation_todo | default([]) + [title_map[map_key]] }}"
   loop: "{{ inhibitor_titles }}"
   loop_control:
     loop_var: inhibitor_title
@@ -49,7 +49,7 @@
 
 - name: common_upgrade_tasks | Debug remediation_todo
   ansible.builtin.debug:
-    var: remediation_todo
+    var: leapp_remediation_todo
 
 - name: common_upgrade_tasks | Run remediation
   ansible.builtin.include_role:

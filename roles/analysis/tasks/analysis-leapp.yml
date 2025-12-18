@@ -2,18 +2,18 @@
 - name: analysis-leapp | Register to leapp activation key
   community.general.redhat_subscription:
     state: present
-    activationkey: "{{ satellite_activation_key_leapp }}"
-    org_id: "{{ satellite_organization }}"
+    activationkey: "{{ leapp_satellite_activation_key_leapp }}"
+    org_id: "{{ leapp_satellite_organization }}"
     force_register: true
   notify: Register to pre leapp activation key
   when:
     - leapp_upgrade_type == 'satellite'
-    - satellite_organization is defined
-    - satellite_activation_key_leapp is defined
+    - leapp_satellite_organization is not none
+    - leapp_satellite_activation_key_leapp is not none
 
 - name: analysis-leapp | Include custom_local_repos for local_repos_pre_leapp
   vars:
-    __repos: "{{ local_repos_pre_leapp }}"
+    __repos: "{{ leapp_local_repos_pre }}"
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
@@ -21,22 +21,22 @@
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 7
   ansible.builtin.package:
-    name: "{{ analysis_packages_el7 }}"
-    enablerepo: "{{ analysis_repos_el7 }}"
+    name: "{{ leapp_analysis_packages_el7 }}"
+    enablerepo: "{{ leapp_analysis_repos_el7 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 7
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 8
   ansible.builtin.package:
-    name: "{{ analysis_packages_el8 }}"
-    enablerepo: "{{ analysis_repos_el8 }}"
+    name: "{{ leapp_analysis_packages_el8 }}"
+    enablerepo: "{{ leapp_analysis_repos_el8 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 8
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 9
   ansible.builtin.package:
-    name: "{{ analysis_packages_el9 }}"
-    enablerepo: "{{ analysis_repos_el9 }}"
+    name: "{{ leapp_analysis_packages_el9 }}"
+    enablerepo: "{{ leapp_analysis_repos_el9 }}"
     state: latest # noqa package-latest
   when: ansible_distribution_major_version|int == 9
 
@@ -59,36 +59,36 @@
 
 - name: analysis-leapp | Create /etc/leapp/files/leapp_upgrade_repositories.repo
   vars:
-    __repos: "{{ local_repos_leapp }}"
+    __repos: "{{ leapp_local_repos }}"
     __leapp_repo_file: /etc/leapp/files/leapp_upgrade_repositories
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
   when:
     - leapp_upgrade_type == 'custom'
-    - local_repos_leapp | length > 0
+    - leapp_local_repos | length > 0
 
 - name: analysis-leapp | Leapp preupgrade report
   ansible.builtin.shell: >
     set -o pipefail;
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     ulimit -n 16384;
     leapp preupgrade --report-schema=1.2.0
     {{ leapp_preupg_opts }}
-    {{ leapp_enable_repos_args }}
-    2>&1 | tee -a {{ log_file }}
+    {{ __leapp_enable_repos_args }}
+    2>&1 | tee -a {{ leapp_log_file }}
   environment: "{{ leapp_env_vars }}"
   changed_when: true
   register: leapp
   args:
     executable: /bin/bash
-  async: "{{ async_timeout_maximum | int }}"
-  poll: "{{ async_poll_interval | int }}"
+  async: "{{ leapp_async_timeout_maximum | int }}"
+  poll: "{{ leapp_async_poll_interval | int }}"
   failed_when: "'report has been generated' not in leapp.stdout"
 
 - name: analysis-leapp | Include custom_local_repos for local_repos_post_analysis
   vars:
-    __repos: "{{ local_repos_post_analysis }}"
+    __repos: "{{ leapp_local_repos_post_analysis }}"
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
