@@ -5,7 +5,7 @@
   become: true
   force_handlers: true
   vars:
-    remediation_todo:
+    leapp_remediation_todo:
       - leapp_firewalld_allowzonedrifting
       - leapp_missing_pkg
   tasks:

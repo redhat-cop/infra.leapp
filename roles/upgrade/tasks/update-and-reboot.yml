@@ -4,14 +4,14 @@
     name: "*"
     state: latest # noqa package-latest
   register: updates_available
-  async: "{{ async_timeout_maximum | int }}"
-  poll: "{{ async_poll_interval | int }}"
+  async: "{{ leapp_async_timeout_maximum | int }}"
+  poll: "{{ leapp_async_poll_interval | int }}"
 
 - name: update-and-reboot | Reboot when updates applied
   ansible.builtin.reboot:
-    reboot_timeout: "{{ reboot_timeout }}"
-    post_reboot_delay: "{{ post_reboot_delay }}"
-  timeout: "{{ reboot_timeout }}"
+    reboot_timeout: "{{ leapp_reboot_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
   when: updates_available.changed # noqa: no-handler
 
 ...

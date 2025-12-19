@@ -4,7 +4,7 @@
   ansible.builtin.shell:
     cmd: >-
       set -o pipefail;
-      export PATH={{ os_path }};
+      export PATH={{ leapp_os_path }};
       rpm -qa |
       grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |
       grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
@@ -60,7 +60,7 @@
     name: "{{ unsigned_packages_post }}"
     state: absent
   when:
-    - remove_old_rhel_packages
+    - leapp_remove_old_rhel_packages
     - ansible_distribution_major_version | int >= 7
 
 ...

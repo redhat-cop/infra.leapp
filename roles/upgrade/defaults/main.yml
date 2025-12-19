@@ -1,20 +1,32 @@
 ---
 # defaults file for upgrade
-upgrade_packages_el7:
-  - leapp-upgrade
+# upgrade_packages_el7 is deprecated, use leapp_upgrade_packages_el7 instead
+# leapp_upgrade_packages_el7:
+#   - leapp-upgrade
+leapp_upgrade_packages_el7: "{{ upgrade_packages_el7 | default(['leapp-upgrade']) }}"
 
-upgrade_packages_el8:
-  - leapp-upgrade
+# upgrade_packages_el8 is deprecated, use leapp_upgrade_packages_el8 instead
+# leapp_upgrade_packages_el8:
+#   - leapp-upgrade
+leapp_upgrade_packages_el8: "{{ upgrade_packages_el8 | default(['leapp-upgrade']) }}"
 
-upgrade_packages_el9:
-  - leapp-upgrade
+# upgrade_packages_el9 is deprecated, use leapp_upgrade_packages_el9 instead
+# leapp_upgrade_packages_el9:
+#   - leapp-upgrade
+leapp_upgrade_packages_el9: "{{ upgrade_packages_el9 | default(['leapp-upgrade']) }}"
 
-upgrade_repos_el7:
-  - rhel-7-server-extras-rpms
+# upgrade_repos_el7 is deprecated, use leapp_upgrade_repos_el7 instead
+# leapp_upgrade_repos_el7:
+#   - rhel-7-server-extras-rpms
+leapp_upgrade_repos_el7: "{{ upgrade_repos_el7 | default(['rhel-7-server-extras-rpms']) }}"
 
-upgrade_repos_el8: []
+# upgrade_repos_el8 is deprecated, use leapp_upgrade_repos_el8 instead
+# leapp_upgrade_repos_el8: []
+leapp_upgrade_repos_el8: "{{ upgrade_repos_el8 | default([]) }}"
 
-upgrade_repos_el9: []
+# upgrade_repos_el9 is deprecated, use leapp_upgrade_repos_el9 instead
+# leapp_upgrade_repos_el9: []
+leapp_upgrade_repos_el9: "{{ upgrade_repos_el9 | default([]) }}"
 
 leapp_upgrade_type: satellite
 # leapp_upgrade_type: cdn
@@ -27,92 +39,102 @@ leapp_repos_enabled: []
 # leapp_repos_enabled:
 #   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
 
-rhel_7_network_install_repo_url: http://capsule1.example.com/pub/ISO/RHEL7.9
+# rhel_7_network_install_repo_url is deprecated, use leapp_rhel_7_network_install_repo_url instead
+# leapp_rhel_7_network_install_repo_url: http://capsule1.example.com/pub/ISO/RHEL7.9
+leapp_rhel_7_network_install_repo_url: "{{ rhel_7_network_install_repo_url | default('http://capsule1.example.com/pub/ISO/RHEL7.9') }}"
 
 # Satellite Organization and Activation Keys are required if using Satellite to change content views
 # unless the content view already in use has all required repositories.
-# satellite_organization: Example
-# satellite_activation_key_leapp: rhel{{ ansible_distribution_major_version }}_leapp
-# satellite_activation_key_post_leapp: rhel{{ ansible_distribution_major_version }}_prod
+leapp_satellite_organization: null
+leapp_satellite_activation_key_leapp: null
+leapp_satellite_activation_key_post_leapp: null
 
 # For leapp_upgrade_type == "custom"
 # Used to configure repos before running leapp analysis / installing leapp packages.
-local_repos_pre_leapp: []
-# local_repos_pre_leapp:
+# local_repos_pre_leapp is deprecated, use leapp_local_repos_pre instead
+# leapp_local_repos_pre: []
+leapp_local_repos_pre: "{{ local_repos_pre_leapp | default([]) }}"
+# leapp_local_repos_pre:
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # state: present # Defaults to present
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
 #   - name: rhel-server-7-rpms
 #     description: Red Hat 7 Server
 #     baseurl: http://repo02.example.com/leapp/7Server/rhel-server-7-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # state: present # Defaults to present
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     state: present # Defaults to present
 
 # For leapp_upgrade_type == "custom"
 # Used to generate /etc/leapp/files/leapp_upgrade_repositories.repo
-local_repos_leapp: []
-# local_repos_leapp:
+# local_repos_leapp is deprecated, use leapp_local_repos instead
+# leapp_local_repos: []
+leapp_local_repos: "{{ local_repos_leapp | default([]) }}"
+# leapp_local_repos:
 #   - name: rhel-8-for-x86_64-baseos-rpms
 #     description: Red Hat 8.10 Base OS
 #     baseurl: http://repo03.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # Can include file in this data structure to reuse this for local_repos_post_upgrade.
-#     # file: local # Will be ignored for leapp_upgrade_repositories.repo
-#     # state: present # Defaults to present.
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     Can include file in this data structure to reuse this for local_repos_post_upgrade.
+#     file: local # Will be ignored for leapp_upgrade_repositories.repo
+#     state: present # Defaults to present.
 #   - name: rhel-8-for-x86_64-appstream-rpms
 #     description: Red Hat 8.10 App Stream
 #     baseurl: http://repo03.example.com/8.10/rhel-8-for-x86_64-baseos-rpms
-#     # enabled: 1 # Default 1
-#     # gpgcheck: 0 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # Can include file in this data structure to reuse this for local_repos_post_upgrade.
-#     # file: local # Will be ignored for leapp_upgrade_repositories.repo
-#     # state: present # Defaults to present.
+#     enabled: 1 # Default 1
+#     gpgcheck: 0 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     Can include file in this data structure to reuse this for local_repos_post_upgrade.
+#     file: local # Will be ignored for leapp_upgrade_repositories.repo
+#     state: present # Defaults to present.
 
 # For leapp_upgrade_type == "custom"
 # Used to rename previous previous repo files with timestamp at the end for future reference.
 # /etc/yum.repos.d/ prepended to file names in task.
-repo_files_to_remove_at_upgrade: []
-# repo_files_to_remove_at_upgrade:
+# repo_files_to_remove_at_upgrade is deprecated, use leapp_repo_files_to_remove_at_upgrade instead
+# leapp_repo_files_to_remove_at_upgrade: []
+leapp_repo_files_to_remove_at_upgrade: "{{ repo_files_to_remove_at_upgrade | default([]) }}"
+# leapp_repo_files_to_remove_at_upgrade:
 #   - rhel7Server.repo
 
 # For leapp_upgrade_type == "custom"
 # Applied using ansible.builtin.yum_repository post upgrade.
-local_repos_post_upgrade: []
-# local_repos_post_upgrade: "{{ local_repos_leapp }}" # If same.
-# local_repos_post_upgrade:
+# local_repos_post_upgrade is deprecated, use leapp_local_repos_post_upgrade instead
+# leapp_local_repos_post_upgrade: []
+leapp_local_repos_post_upgrade: "{{ local_repos_post_upgrade | default(leapp_local_repos | default([])) }}"
+# leapp_local_repos_post_upgrade: "{{ leapp_local_repos }}" # If same.
+# leapp_local_repos_post_upgrade:
 #   - name: rhel-8-for-x86_64-baseos-rpms
 #     description: Red Hat 8 Base OS
 #     baseurl: http://repo01.example.com/8/rhel-8-for-x86_64-baseos-rpms
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # enabled: 0 # Default 1
-#     # gpgcheck: 1 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # state: present # Defaults to present.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     enabled: 0 # Default 1
+#     gpgcheck: 1 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     state: present # Defaults to present.
 #   - name: rhel-8-for-x86_64-appstream-rpms
 #     description: Red Hat 8 App Stream
 #     baseurl: http://repo01.example.com/8/rhel-8-for-x86_64-baseos-rpms
-#     # file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
-#     # enabled: 0 # Default 1
-#     # gpgcheck: 1 # Default 0
-#     # gpgkey: XXX # Default omit.
-#     # repo_gpgcheck: 0 # Default omit.
-#     # state: present # Defaults to present.
+#     file: local # The filename to use in /etc/yum.repos.d minus the .repo, default local.
+#     enabled: 0 # Default 1
+#     gpgcheck: 1 # Default 0
+#     gpgkey: XXX # Default omit.
+#     repo_gpgcheck: 0 # Default omit.
+#     state: present # Defaults to present.
 
 # Dict of env vars to be used when the leapp command is run
 leapp_env_vars: {}
@@ -126,48 +148,86 @@ leapp_env_vars: {}
 # selinux_mode: disabled
 # Default selinux_mode to what was found during the pre-upgrade analysis automation.
 # The config_mode fact is not created if selinux is disabled so default the variable to "disabled"
-selinux_mode: "{{ ansible_facts.ansible_local.pre_ripu.selinux.config_mode | default('disabled') }}"
+# selinux_mode is deprecated, use leapp_selinux_mode instead
+# leapp_selinux_mode: "{{ ansible_facts.ansible_local.pre_ripu.selinux.config_mode | default('disabled') }}"
+leapp_selinux_mode: "{{ selinux_mode | default(ansible_facts.ansible_local.pre_ripu.selinux.config_mode | default('disabled')) }}"
 
 # System-wide cryptographic policies
-# set_crypto_policies: false
-set_crypto_policies: true
-crypto_policy: DEFAULT
-# crypto_policy: FUTURE
-# crypto_policy: DEFAULT:SHA1
+# set_crypto_policies is deprecated, use leapp_set_crypto_policies instead
+# leapp_set_crypto_policies: true
+leapp_set_crypto_policies: "{{ set_crypto_policies | default(true) }}"
+
+# crypto_policy is deprecated, use leapp_crypto_policy instead
+# leapp_crypto_policy: DEFAULT
+leapp_crypto_policy: "{{ crypto_policy | default('DEFAULT') }}"
+# leapp_crypto_policy: FUTURE
+# leapp_crypto_policy: DEFAULT:SHA1
 
 # Whether or not to update from legacy grub to grub2 in post-upgrade steps from RHEL 6 -> 7.
-update_grub_to_grub_2: false
-pre_upgrade_update: true
-post_upgrade_update: true
-post_upgrade_unset_release: true
-post_upgrade_release: ""
+# update_grub_to_grub_2 is deprecated, use leapp_update_grub_to_grub_2 instead
+# leapp_update_grub_to_grub_2: false
+leapp_update_grub_to_grub_2: "{{ update_grub_to_grub_2 | default(false) }}"
+
+# pre_upgrade_update is deprecated, use leapp_pre_upgrade_update instead
+# leapp_pre_upgrade_update: true
+leapp_pre_upgrade_update: "{{ pre_upgrade_update | default(true) }}"
+
+# post_upgrade_update is deprecated, use leapp_post_upgrade_update instead
+# leapp_post_upgrade_update: true
+leapp_post_upgrade_update: "{{ post_upgrade_update | default(true) }}"
+
+# post_upgrade_unset_release is deprecated, use leapp_post_upgrade_unset_release instead
+# leapp_post_upgrade_unset_release: true
+leapp_post_upgrade_unset_release: "{{ post_upgrade_unset_release | default(true) }}"
+
+# post_upgrade_release is deprecated, use leapp_post_upgrade_release instead
+# leapp_post_upgrade_release: ""
+leapp_post_upgrade_release: "{{ post_upgrade_release | default('') }}"
 
 # Used by grub to grub2 upgrade in RHEL 6 to 7 post upgrade, and RHEL 7 to 8 post upgrade.
-# For grub to grub2 upgrade, if grub_boot_device is not defined, the parent device of /boot
+# For grub to grub2 upgrade, if leapp_grub_boot_device is not defined, the parent device of /boot
 # will be used if present, else the parent device of / will be used.
 # For RHEL 7 to 8 post upgrade, used to grub2-install on a device other than the disk
 # /boot is on.
-# grub_boot_device: /dev/sda
+leapp_grub_boot_device: null
 
-reboot_timeout: 7200
-upgrade_timeout: 14400
-post_reboot_delay: 120
+# reboot_timeout is deprecated, use leapp_reboot_timeout instead
+# leapp_reboot_timeout: 7200
+leapp_reboot_timeout: "{{ reboot_timeout | default(7200) }}"
+
+# upgrade_timeout is deprecated, use leapp_upgrade_timeout instead
+# leapp_upgrade_timeout: 14400
+leapp_upgrade_timeout: "{{ upgrade_timeout | default(14400) }}"
+
+# post_reboot_delay is deprecated, use leapp_post_reboot_delay instead
+# leapp_post_reboot_delay: 120
+leapp_post_reboot_delay: "{{ post_reboot_delay | default(120) }}"
 
 leapp_resume_retries: 360
 leapp_resume_delay: 10
 
-os_path: $PATH
+# os_path is deprecated, use leapp_os_path instead
+# leapp_os_path: $PATH
+leapp_os_path: "{{ os_path | default('$PATH') }}"
 
-async_timeout_maximum: 7200
-async_poll_interval: 60
+# async_timeout_maximum is deprecated, use leapp_async_timeout_maximum instead
+# leapp_async_timeout_maximum: 7200
+leapp_async_timeout_maximum: "{{ async_timeout_maximum | default(7200) }}"
 
-check_leapp_analysis_results: true
+# async_poll_interval is deprecated, use leapp_async_poll_interval instead
+# leapp_async_poll_interval: 60
+leapp_async_poll_interval: "{{ async_poll_interval | default(60) }}"
 
-kernel_modules_to_unload_before_upgrade: []
+# check_leapp_analysis_results is deprecated, use leapp_check_analysis_results instead
+# leapp_check_analysis_results: true
+leapp_check_analysis_results: "{{ check_leapp_analysis_results | default(true) }}"
 
+# kernel_modules_to_unload_before_upgrade is deprecated, use leapp_kernel_modules_to_unload_before_upgrade instead
+# leapp_kernel_modules_to_unload_before_upgrade: []
+leapp_kernel_modules_to_unload_before_upgrade: "{{ kernel_modules_to_unload_before_upgrade | default([]) }}"
 
 # Note: Leaving the deprecated 'post_7_to_8_python_interpreter' variable functional for now.
-post_upgrade_python_interpreter: >-
+leapp_post_upgrade_python_interpreter: >-
   {{ post_7_to_8_python_interpreter
      if (ansible_distribution_major_version == '7'
          and post_7_to_8_python_interpreter is defined)
@@ -178,8 +238,12 @@ post_upgrade_python_interpreter: >-
 # For the RHEL System Roles, use 'redhat.rhel_system_roles'
 # - fedora.linux_system_roles
 # - redhat.rhel_system_roles
-infra_leapp_upgrade_system_roles_collection: fedora.linux_system_roles
+# infra_leapp_upgrade_system_roles_collection is deprecated, use leapp_infra_upgrade_system_roles_collection instead
+# leapp_infra_upgrade_system_roles_collection: fedora.linux_system_roles
+leapp_infra_upgrade_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
 
-remove_old_rhel_packages: true
+# remove_old_rhel_packages is deprecated, use leapp_remove_old_rhel_packages instead
+# leapp_remove_old_rhel_packages: true
+leapp_remove_old_rhel_packages: "{{ remove_old_rhel_packages | default(true) }}"
 
 ...

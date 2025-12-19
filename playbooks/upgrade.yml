@@ -5,12 +5,12 @@
   become: true
   force_handlers: true
   vars:
-    satellite_organization: My Satellite Organization
-    satellite_activation_key_leapp: MY_ACTIVATION_KEY
-    satellite_activation_key_post_leapp: MY_ACTIVATION_KEY_POST
+    leapp_satellite_organization: My Satellite Organization
+    leapp_satellite_activation_key_leapp: MY_ACTIVATION_KEY
+    leapp_satellite_activation_key_post_leapp: MY_ACTIVATION_KEY_POST
     leapp_upgrade_opts: --target 8.10
-    update_grub_to_grub_2: true
-    selinux_mode: permissive
+    leapp_update_grub_to_grub_2: true
+    leapp_selinux_mode: permissive
   tasks:
     - name: Perform OS upgrade
       ansible.builtin.import_role:

@@ -1,12 +1,12 @@
 ---
 - name: check-results-file | Result file status
   ansible.builtin.stat:
-    path: "{{ result_filename }}"
+    path: "{{ leapp_result_filename }}"
   register: result
 
 - name: check-results-file | Check that result file exists
   ansible.builtin.assert:
     that: result.stat.exists
-    msg: The preupgrade analysis report file {{ result_filename }} was not created.
+    msg: The preupgrade analysis report file {{ leapp_result_filename }} was not created.
 
 ...

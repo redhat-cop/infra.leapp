@@ -2,29 +2,29 @@
 # TODO: Relocate to validation and compare to previous selinux state.
 # - name: leapp-post-upgrade-selinux | Ensure there are no SELinux denials
 #   ansible.builtin.shell: >
-#     export PATH={{ os_path }};
+#     export PATH={{ leapp_os_path }};
 #     ausearch -m AVC,USER_AVC -ts boot 2>&1
 #   register: ausearch_results
 #   changed_when: false
 #   failed_when: ausearch_results.stdout != "<no matches>"
 
-- name: leapp-post-upgrade-selinux | SELinux mode is set to {{ selinux_mode }}
+- name: leapp-post-upgrade-selinux | SELinux mode is set to {{ leapp_selinux_mode }}
   ansible.posix.selinux:
     policy: targeted
-    state: "{{ selinux_mode }}"
+    state: "{{ leapp_selinux_mode }}"
   register: selinux_results
 
 - name: leapp-post-upgrade-selinux | Reboot when required for SELinux change
   ansible.builtin.reboot:
-    reboot_timeout: "{{ reboot_timeout }}"
-    post_reboot_delay: "{{ post_reboot_delay }}"
-  timeout: "{{ reboot_timeout }}"
+    reboot_timeout: "{{ leapp_reboot_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
   when: selinux_results.reboot_required
 
-- name: leapp-post-upgrade-selinux | Verify SELinux is set to {{ selinux_mode }}
+- name: leapp-post-upgrade-selinux | Verify SELinux is set to {{ leapp_selinux_mode }}
   ansible.posix.selinux:
     policy: targeted
-    state: "{{ selinux_mode }}"
+    state: "{{ leapp_selinux_mode }}"
   check_mode: true
   register: selinux_check_results
   failed_when: selinux_check_results.changed

@@ -21,6 +21,6 @@
     group: root
     mode: "0644"
   loop: "{{ __repos }}"
-  no_log: true
+  # no_log: true
 
 ...

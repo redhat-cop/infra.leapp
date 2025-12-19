@@ -13,8 +13,8 @@
 
 - name: Reboot the system
   ansible.builtin.reboot:
-    reboot_timeout: "{{ reboot_timeout }}"
-    post_reboot_delay: "{{ post_reboot_delay }}"
-  timeout: "{{ reboot_timeout }}"
+    reboot_timeout: "{{ leapp_reboot_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
 
 ...

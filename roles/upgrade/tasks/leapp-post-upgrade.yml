@@ -2,7 +2,7 @@
 # /etc/dnf/dnf.conf is an ini file and could be parsed to check if exclude has value and run this conditionally.
 - name: leapp-post-upgrade | Clean dnf exclude list
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     dnf config-manager --save --setopt exclude=''
   changed_when: true
 
@@ -20,7 +20,7 @@
 
     - name: leapp-post-upgrade | Remove weak modules from old kernels
       ansible.builtin.shell: |
-        export PATH={{ os_path }}
+        export PATH={{ leapp_os_path }}
         set -o pipefail
         [ -x /usr/sbin/weak-modules ] && /usr/sbin/weak-modules --remove-kernel {{ item.path | basename }}
       loop: "{{ old_kernels.files }}"
@@ -29,7 +29,7 @@
 
     - name: leapp-post-upgrade | Remove the old kernels from the boot loader entry
       ansible.builtin.shell: |
-        export PATH={{ os_path }}
+        export PATH={{ leapp_os_path }}
         set -o pipefail
         /bin/kernel-install remove {{ item.path | basename }} {{ item.path }}/vmlinuz
       loop: "{{ old_kernels.files }}"
@@ -47,13 +47,13 @@
     {{ ansible_facts.ansible_local.pre_ripu.distribution_major_version }}
   ansible.builtin.shell: >-
     set -o pipefail;
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     grubby --info=ALL | grep -E "^title=.* {{
     ansible_facts.ansible_local.pre_ripu.distribution_major_version
     }}\.[0-9]+ " -B 4 | grep "^kernel"
     | sed -n 's/.*kernel="\([^"]*\)".*/\1/p' || echo ""
   register: leapp_upgrade_outdated_kernels
-  when: remove_old_rhel_packages
+  when: leapp_remove_old_rhel_packages
   changed_when: false
 
 - name: leapp-post-upgrade | Debug kernel paths for outdated RHEL
@@ -64,7 +64,7 @@
   ansible.builtin.command: grubby --remove-kernel={{ item | quote }}
   loop: "{{ leapp_upgrade_outdated_kernels.stdout_lines }}"
   when:
-    - remove_old_rhel_packages
+    - leapp_remove_old_rhel_packages
     - leapp_upgrade_outdated_kernels.stdout | length > 0
   changed_when: true
 
@@ -89,21 +89,21 @@
 
 - name: leapp-post-upgrade | Unset subscription-manager release
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     subscription-manager release --unset
   when:
     - leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
-    - post_upgrade_unset_release | bool
-    - post_upgrade_release | length == 0
+    - leapp_post_upgrade_unset_release | bool
+    - leapp_post_upgrade_release | length == 0
   changed_when: true
 
 - name: leapp-post-upgrade | Set subscription-manager release
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
-    subscription-manager release --set {{ post_upgrade_release }}
+    export PATH={{ leapp_os_path }};
+    subscription-manager release --set {{ leapp_post_upgrade_release }}
   when:
     - leapp_upgrade_type == 'satellite' or leapp_upgrade_type == 'cdn'
-    - post_upgrade_release | length > 0
+    - leapp_post_upgrade_release | length > 0
   changed_when: true
 
 - name: leapp-post-upgrade | Unset release via yum variable for RHUI upgrades
@@ -112,34 +112,34 @@
     state: absent
   when:
     - leapp_upgrade_type == 'rhui'
-    - post_upgrade_unset_release | bool
-    - post_upgrade_release | length == 0
+    - leapp_post_upgrade_unset_release | bool
+    - leapp_post_upgrade_release | length == 0
 
 - name: leapp-post-upgrade | Set release via yum variable for RHUI upgrades
   ansible.builtin.copy:
-    content: "{{ post_upgrade_release }}\n"
+    content: "{{ leapp_post_upgrade_release }}\n"
     dest: /etc/yum/vars/releasever
     owner: root
     group: root
     mode: '0644'
   when:
     - leapp_upgrade_type == 'rhui'
-    - post_upgrade_release | length > 0
+    - leapp_post_upgrade_release | length > 0
 
 - name: leapp-post-upgrade | "Register to post leapp activation key"
   community.general.redhat_subscription:
     state: present
-    activationkey: "{{ satellite_activation_key_post_leapp }}"
-    org_id: "{{ satellite_organization }}"
+    activationkey: "{{ leapp_satellite_activation_key_post_leapp }}"
+    org_id: "{{ leapp_satellite_organization }}"
     force_register: true
   when:
     - leapp_upgrade_type == 'satellite'
-    - satellite_organization is defined
-    - satellite_activation_key_post_leapp is defined
+    - leapp_satellite_organization is not none
+    - leapp_satellite_activation_key_post_leapp is not none
 
 - name: leapp-post-upgrade | Include custom_local_repos for local_repos_post_upgrade
   vars:
-    __repos: "{{ local_repos_post_upgrade }}"
+    __repos: "{{ leapp_local_repos_post_upgrade }}"
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: custom_local_repos
@@ -162,7 +162,7 @@
 
 - name: leapp-post-upgrade | Reinstall the rescue kernel files when old ones were found
   ansible.builtin.shell: >
-    export PATH={{ os_path }};
+    export PATH={{ leapp_os_path }};
     /usr/lib/kernel/install.d/51-dracut-rescue.install add "$(uname -r)" /boot "/boot/vmlinuz-$(uname -r)"
   when: __rescue_kernel_files.files | length > 0
   changed_when: true
@@ -170,8 +170,8 @@
 - name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
   when:
-    - post_upgrade_update | bool
-    - leapp_upgrade_type != "custom" or local_repos_post_upgrade | length > 0
+    - leapp_post_upgrade_update | bool
+    - leapp_upgrade_type != "custom" or leapp_local_repos_post_upgrade | length > 0
 
 # TODO: Validate RHEL OS versions again?
 
@@ -180,5 +180,5 @@
 
 - name: leapp-post-upgrade | Include tasks for leapp post upgrade crypto policies
   ansible.builtin.include_tasks: leapp-post-upgrade-crypto.yml
-  when: set_crypto_policies | bool
+  when: leapp_set_crypto_policies | bool
 ...

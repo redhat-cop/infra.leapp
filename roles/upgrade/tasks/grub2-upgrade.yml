@@ -17,9 +17,9 @@
     group: root
     mode: "0644"
 
-# If grub_boot_device is not defined, attempt to determine it based on /boot if present, or / if /boot is not present.
-- name: grub2-upgrade | Determine grub_boot_device if not defined
-  when: grub_boot_device is not defined
+# If leapp_grub_boot_device is not defined, attempt to determine it based on /boot if present, or / if /boot is not present.
+- name: grub2-upgrade | Determine leapp_grub_boot_device if not defined
+  when: leapp_grub_boot_device is none
   block:
     - name: grub2-upgrade | Determine if /boot is a mount point
       ansible.builtin.set_fact:
@@ -37,17 +37,17 @@
 
     - name: grub2-upgrade | Get boot device from boot device dict
       ansible.builtin.set_fact:
-        grub_boot_device: "{{ boot_device_dict.device | regex_replace('[1-9]$', '') }}"
+        leapp_grub_boot_device: "{{ boot_device_dict.device | regex_replace('[1-9]$', '') }}"
 
 - name: grub2-upgrade | Run grub2-install
   ansible.builtin.shell: |
-    export PATH={{ os_path }}
-    grub2-install {{ grub_boot_device }}
+    export PATH={{ leapp_os_path }}
+    grub2-install {{ leapp_grub_boot_device }}
   changed_when: true
 
 - name: grub2-upgrade | Run grub2-mkconfig
   ansible.builtin.shell: |
-    export PATH={{ os_path }}
+    export PATH={{ leapp_os_path }}
     set -o pipefail
     grub2-mkconfig -o /boot/grub2/grub.cfg
     grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
@@ -60,8 +60,8 @@
 
 - name: grub2-upgrade | Reboot to start using grub2
   ansible.builtin.reboot:
-    reboot_timeout: "{{ reboot_timeout }}"
-    post_reboot_delay: "{{ post_reboot_delay }}"
-  timeout: "{{ reboot_timeout }}"
+    reboot_timeout: "{{ leapp_reboot_timeout }}"
+    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
 
 ...
