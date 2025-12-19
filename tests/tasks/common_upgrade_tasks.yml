@@ -1,5 +1,12 @@
 ---
 # Common upgrade test tasks that can be included in any upgrade test
+# TODO: This is a hack to remove leapp packages before each test to ensure role will install it.
+# This is usually due to the fact that we are not using the right repository for the test, which
+# causes e.g. rhel 8 packages to have a later N-V-R than rhel 9 packages.
+- name: common_upgrade_tasks | Remove leapp packages
+  ansible.builtin.package:
+    name: "{{ leapp_remove_test_packages }}"
+    state: absent
 
 - name: common_upgrade_tasks | Gather setup tasks
   ansible.builtin.find:
@@ -27,7 +34,7 @@
 
 - name: common_upgrade_tasks | Show all inhibitors collected by analysis
   ansible.builtin.debug:
-    var: leapp_inhibitors
+    var: leapp_inhibitors | default([])
 
 - name: common_upgrade_tasks | Extract inhibitor titles
   ansible.builtin.set_fact:

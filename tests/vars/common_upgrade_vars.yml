@@ -38,4 +38,8 @@ leapp_answerfile: |
 leapp_env_vars:
   LEAPP_UNSUPPORTED: 1
   LEAPP_DEVEL_RPMS_ALL_SIGNED: 1
+
+# Remove these test packages before each test
+leapp_remove_test_packages:
+  - leapp-upgrade
 ...

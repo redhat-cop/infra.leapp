@@ -1,70 +1,44 @@
 ---
 # defaults file for analysis
 # analysis_packages_el6 is deprecated, use leapp_analysis_packages_el6 instead
-# leapp_analysis_packages_el6:
-#   - preupgrade-assistant
-#   - preupgrade-assistant-el6toel7
-#   - redhat-upgrade-tool
-#   - openscap
-#   - openscap-engine-sce
-leapp_analysis_packages_el6: "{{ analysis_packages_el6 | default([
-  'preupgrade-assistant',
-  'preupgrade-assistant-el6toel7',
-  'redhat-upgrade-tool',
-  'openscap',
-  'openscap-engine-sce'
-]) }}"
+default_leapp_analysis_packages_el6:
+  - preupgrade-assistant
+  - preupgrade-assistant-el6toel7
+  - redhat-upgrade-tool
+  - openscap
+  - openscap-engine-sce
+leapp_analysis_packages_el6: "{{ analysis_packages_el6 | default(default_leapp_analysis_packages_el6) }}"
 
 # analysis_packages_el7 is deprecated, use leapp_analysis_packages_el7 instead
-# leapp_analysis_packages_el7:
-#   TODO: Seems to cause package dependency problems with post upgrade cleanup.
-#   - leapp-upgrade-el7toel8
-#   Try this instead.
-#   - leapp-upgrade
-leapp_analysis_packages_el7: "{{ analysis_packages_el7 | default([
-  'leapp-upgrade'
-]) }}"
+default_leapp_analysis_packages_el7:
+  - leapp-upgrade
+leapp_analysis_packages_el7: "{{ analysis_packages_el7 | default(default_leapp_analysis_packages_el7) }}"
+
 # analysis_packages_el8 is deprecated, use leapp_analysis_packages_el8 instead
-# leapp_analysis_packages_el8:
-#   TODO: Seems to cause package dependency problems with post upgrade cleanup.
-#   - leapp-upgrade-el8toel9
-#   Try this instead.
-#   - leapp-upgrade
-#   TODO: This should be part of inhibitor remediation.
-#   - vdo
-#   TODO: only w/ rhui for aws
-#   - leapp-rhui-aws
-leapp_analysis_packages_el8: "{{ analysis_packages_el8 | default([
-  'leapp-upgrade'
-]) }}"
+default_leapp_analysis_packages_el8:
+  - leapp-upgrade
+leapp_analysis_packages_el8: "{{ analysis_packages_el8 | default(default_leapp_analysis_packages_el8) }}"
+
 # analysis_packages_el9 is deprecated, use leapp_analysis_packages_el9 instead
-# leapp_analysis_packages_el9:
-#   - leapp-upgrade
-leapp_analysis_packages_el9: "{{ analysis_packages_el9 | default([
-  'leapp-upgrade'
-]) }}"
+default_leapp_analysis_packages_el9:
+  - leapp-upgrade
+leapp_analysis_packages_el9: "{{ analysis_packages_el9 | default(default_leapp_analysis_packages_el9) }}"
 
 # analysis_repos_el6 is deprecated, use leapp_analysis_repos_el6 instead
-# leapp_analysis_repos_el6:
-#   - rhel-6-server-extras-rpms
-#   - rhel-6-server-optional-rpms
-leapp_analysis_repos_el6: "{{ analysis_repos_el6 | default([
-  'rhel-6-server-extras-rpms',
-  'rhel-6-server-optional-rpms'
-]) }}"
+default_leapp_analysis_repos_el6:
+  - rhel-6-server-extras-rpms
+  - rhel-6-server-optional-rpms
+leapp_analysis_repos_el6: "{{ analysis_repos_el6 | default(default_leapp_analysis_repos_el6) }}"
+
 # analysis_repos_el7 is deprecated, use leapp_analysis_repos_el7 instead
-# leapp_analysis_repos_el7:
-#   - rhel-7-server-extras-rpms
-leapp_analysis_repos_el7: "{{ analysis_repos_el7 | default([
-  'rhel-7-server-extras-rpms'
-]) }}"
+default_leapp_analysis_repos_el7:
+  - rhel-7-server-extras-rpms
+leapp_analysis_repos_el7: "{{ analysis_repos_el7 | default(default_leapp_analysis_repos_el7) }}"
 
 # analysis_repos_el8 is deprecated, use leapp_analysis_repos_el8 instead
-# leapp_analysis_repos_el8: []
 leapp_analysis_repos_el8: "{{ analysis_repos_el8 | default([]) }}"
 
 # analysis_repos_el9 is deprecated, use leapp_analysis_repos_el9 instead
-# leapp_analysis_repos_el9: []
 leapp_analysis_repos_el9: "{{ analysis_repos_el9 | default([]) }}"
 
 # If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.

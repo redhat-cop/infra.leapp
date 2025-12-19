@@ -63,4 +63,11 @@ __leapp_preupg_return_codes:
     msg: preupg command not found.  Analysis must be run first.
     fail: true
     inhibited: true
+
+__leapp_enable_repos_args: "{{ ('--enablerepo ' + leapp_repos_enabled | default([], true) | join(' --enablerepo '))
+  if leapp_repos_enabled | length > 0 else '' }}"
+
+leapp_result_filename: "{{ '/root/preupgrade/result.txt' if ansible_distribution_major_version == '6'
+  else '/var/log/leapp/leapp-report.txt' }}"
+
 ...
