@@ -15,15 +15,27 @@
   register: setup_tasks
   delegate_to: localhost
 
+- name: common_upgrade_tasks | Do remediation setup tasks
+  ansible.builtin.include_tasks: "{{ setup_task_file }}"
+  loop: "{{ setup_task_files }}"
+  loop_control:
+    loop_var: setup_task_file
+  vars:
+    setup_task_files: "{{ setup_tasks.files | map(attribute='path') | select('search', '/remediate_') | list }}"
+  when:
+    - setup_task_files | length > 0
+    - leapp_test_remediations | d(false)
+
 - name: common_upgrade_tasks | Do setup tasks
   ansible.builtin.include_tasks: "{{ setup_task_file }}"
   loop: "{{ setup_task_files }}"
   loop_control:
     loop_var: setup_task_file
   vars:
-    setup_task_files: "{{ setup_tasks.files | map(attribute='path') | reject('search', reject_pattern) | list }}"
-    reject_pattern: "{{ '/remediate_' if not leapp_test_remediations | d(false) else 'NOMATCH' }}"
-  when: setup_task_files | length > 0
+    setup_task_files: "{{ setup_tasks.files | map(attribute='path') | reject('search', '/remediate_') | list }}"
+  when:
+    - setup_task_files | length > 0
+    - not (leapp_test_remediations | d(false))
 
 - name: common_upgrade_tasks | Run first analysis
   ansible.builtin.include_role:
@@ -64,7 +76,7 @@
 
 - name: common_upgrade_tasks | Gather verify remediation tasks
   ansible.builtin.find:
-    paths: "{{ playbook_dir }}/tasks/verify"
+    paths: "{{ playbook_dir }}/tasks/verify/preupgrade"
     patterns: "remediate_*.yml"
   when: leapp_test_remediations | d(false)
   register: verify_remediation_tasks
@@ -94,4 +106,19 @@
   when: leapp_test_upgrade | d(true)
   tags:
     - tests::upgrade
+
+- name: common_upgrade_tasks | Gather verify postupgrade tasks
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/tasks/verify/postupgrade"
+    patterns: "*.yml"
+  register: verify_postupgrade_tasks
+  delegate_to: localhost
+  when: leapp_test_upgrade | d(true)
+
+- name: common_upgrade_tasks | Run verification tasks after upgrade
+  ansible.builtin.include_tasks: "{{ verify_postupgrade_tasks_file }}"
+  loop: "{{ verify_postupgrade_tasks.files | map(attribute='path') | list }}"
+  loop_control:
+    loop_var: verify_postupgrade_tasks_file
+  when: leapp_test_upgrade | d(true)
 ...
