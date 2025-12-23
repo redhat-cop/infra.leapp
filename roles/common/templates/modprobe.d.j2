@@ -1,0 +1,4 @@
+{{ ansible_managed | comment }}
+{{ "leapp" | comment(prefix="", postfix="") }}
+blacklist {{ leapp_kernel_module }}
+install {{ leapp_kernel_module }} /bin/true

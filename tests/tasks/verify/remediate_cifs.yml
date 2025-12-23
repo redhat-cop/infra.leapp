@@ -9,3 +9,5 @@
   failed_when:
     - cat_fstab.stdout_lines | select("match", "^#.*cifs") | list | length == 0
     - cat_fstab.stdout_lines | select("match", "^[^#].*cifs") | list | length > 0
+
+...

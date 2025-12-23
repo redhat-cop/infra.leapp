@@ -1,0 +1,14 @@
+# Inputs:
+# - leapp_kernel_modules - REQUIRED - list of kernel modules to manage
+# - leapp_kernel_modules_state - REQUIRED - state of the kernel modules - present or absent
+---
+- name: manage_kernel_modules | Load or unload kernel modules
+  ansible.builtin.include_tasks: manage_one_kernel_module.yml
+  loop: "{{ leapp_kernel_modules }}"
+  loop_control:
+    loop_var: leapp_kernel_module
+  vars:
+    leapp_kernel_module_state: "{{ leapp_kernel_modules_state }}"
+  when: leapp_kernel_modules | length > 0
+
+...

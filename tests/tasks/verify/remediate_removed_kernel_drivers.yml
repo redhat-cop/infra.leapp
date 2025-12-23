@@ -1,0 +1,13 @@
+# verify the removed kernel drivers remediation
+---
+- name: verify | remediate_removed_kernel_drivers | Verify the removed kernel drivers remediation
+  ansible.builtin.shell: set -o pipefail; lsmod | awk '{print $1}'
+  changed_when: false
+  register: lsmod_output
+  vars:
+    modlist: "{{ lsmod_output.stdout_lines | map('trim') | list }}"
+    diff: "{{ modlist | intersect(leapp_test_kernel_modules) | list }}"
+  when: leapp_test_kernel_modules | default([]) | length > 0
+  failed_when: diff | length > 0
+
+...
