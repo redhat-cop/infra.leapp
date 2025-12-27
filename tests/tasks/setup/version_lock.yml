@@ -1,0 +1,14 @@
+---
+- name: setup | version_lock | Install versionlock module
+  ansible.builtin.package:
+    name: "{{ 'yum-plugin-versionlock' if ansible_distribution_major_version | int == 7 else 'python3-dnf-plugin-versionlock' }}"
+    state: present
+
+- name: setup | version_lock | Version lock the dracut package
+  ansible.builtin.command:
+    cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock add dracut"
+  register: versionlock_result
+  changed_when:
+    - versionlock_result is success
+    - "'Adding versionlock' in versionlock_result.stdout"
+...

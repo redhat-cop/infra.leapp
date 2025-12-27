@@ -29,7 +29,6 @@ mock_modules:
   - community.general.redhat_subscription
   - community.general.modprobe
   - community.general.archive
-  - community.general.yum_versionlock
   - community.general.rhsm_repository
   - ansible.posix.selinux
   - ansible.posix.mount

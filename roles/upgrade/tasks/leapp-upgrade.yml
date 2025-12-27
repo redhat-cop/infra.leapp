@@ -30,6 +30,21 @@
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
+- name: leapp-upgrade | Get package version lock entries
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock list"
+  register: versionlock_list
+  changed_when: false
+  failed_when: false
+
+- name: leapp-upgrade | Remove all package version locks
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock clear"
+  changed_when: true
+  when:
+    - versionlock_list is success
+    - versionlock_list.stdout | d("") != ""
+
 - name: leapp-upgrade | Install packages for upgrade from RHEL 7
   ansible.builtin.package:
     name: "{{ leapp_upgrade_packages_el7 }}"
