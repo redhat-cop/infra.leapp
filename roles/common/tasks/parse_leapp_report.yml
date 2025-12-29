@@ -26,7 +26,7 @@
     - name: parse_leapp_report | Parse report results
       ansible.builtin.set_fact:
         cacheable: "{{ leapp_result_fact_cacheable }}"
-        leapp_report_txt: "{{ results_txt.content | b64decode | split('\n') }}"
+        leapp_report_txt: "{{ (results_txt.content | b64decode).split('\n') | list }}"
         leapp_report_json: "{{ results_json.content | b64decode | from_json }}"
 
     - name: parse_leapp_report | Check for inhibitors

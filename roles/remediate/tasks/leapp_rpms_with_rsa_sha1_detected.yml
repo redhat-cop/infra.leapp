@@ -25,7 +25,7 @@
       block:
         - name: leapp_rpms_with_rsa_sha1_detected | Parse bad_pkgs
           ansible.builtin.set_fact:
-            bad_pkgs: "{{ summary | split('The list of problematic packages:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+            bad_pkgs: "{{ summary.split('The list of problematic packages:') | last | trim | regex_findall('- ([^ ]+)', '\\1') | list }}"
 
         # TODO: Pass the bad_pkgs list directly to the dnf command?  Is there some reason
         # this has to be done one at a time?  It is much slower this way.
