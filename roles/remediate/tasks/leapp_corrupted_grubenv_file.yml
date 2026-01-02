@@ -22,7 +22,7 @@
     - name: leapp_corrupted_grubenv_file | Process remediation
       when: hint | length > 0
       vars:
-        files_grub: "{{ hint.context | regex_findall('Delete (.+?) file', '\\1') | first | split(',') | map('trim') }}"
+        files_grub: "{{ (hint.context | regex_findall('Delete (.+?) file', '\\1') | first).split(',') | map('trim') | list }}"
       block:
         - name: leapp_corrupted_grubenv_file | Backup file(s)
           ansible.builtin.copy:

@@ -24,13 +24,13 @@
       block:
         - name: leapp_nfs_detected | Get fstab_entries
           ansible.builtin.set_fact:
-            fstab_entries: "{{ item | split('- NFS shares found in /etc/fstab:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+            fstab_entries: "{{ item.split('- NFS shares found in /etc/fstab:') | last | trim | regex_findall('- ([^ ]+)', '\\1') | list }}"
           loop: "{{ split_summary }}"
           when: "'- NFS shares found in /etc/fstab:' in item"
 
         - name: leapp_nfs_detected | Get nfs_mounts
           ansible.builtin.set_fact:
-            nfs_mounts: "{{ item | split('- NFS shares currently mounted:') | last | trim | regex_findall('- ([^ ]+)', '\\1') }}"
+            nfs_mounts: "{{ item.split('- NFS shares currently mounted:') | last | trim | regex_findall('- ([^ ]+)', '\\1') | list }}"
           loop: "{{ split_summary }}"
           when: "'- NFS shares currently mounted:' in item"
 
