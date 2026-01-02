@@ -62,6 +62,5 @@
   ansible.builtin.reboot:
     reboot_timeout: "{{ leapp_reboot_timeout }}"
     post_reboot_delay: "{{ leapp_post_reboot_delay }}"
-  timeout: "{{ leapp_reboot_timeout }}"
 
 ...
