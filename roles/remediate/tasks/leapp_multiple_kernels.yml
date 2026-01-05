@@ -23,7 +23,6 @@
       ansible.builtin.reboot:
         reboot_timeout: "{{ leapp_reboot_timeout }}"
         post_reboot_delay: "{{ leapp_post_reboot_delay }}"
-      timeout: "{{ leapp_reboot_timeout }}"
       when: installed_kernels.stdout_lines[0] != current_kernel.stdout
 
     # TODO: This is slow.  Instead, use filters/map to construct the list
