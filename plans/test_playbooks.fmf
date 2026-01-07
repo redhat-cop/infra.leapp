@@ -17,7 +17,7 @@ adjust:
         role: control_node
         how: virtual
         connection: system
-        image: ${RHEL_9_8_image}
+        image: ${RHEL_9_latest_image}
   - when: >-
       initiator is not defined
       and 1minutetip is not defined
@@ -47,7 +47,7 @@ adjust:
         role: managed_node
         how: virtual
         connection: system
-        image: ${RHEL_9_6_image}
+        image: ${RHEL_9_7_image}
 
   # Running locally by provisioning 1minutetip VMs. Example run:
   # tmt -c 1minutetip=true -c COMPOSE_MANAGED_NODE=rhel8 try -p /plans/test_playbooks

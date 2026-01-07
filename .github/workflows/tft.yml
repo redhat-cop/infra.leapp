@@ -111,7 +111,7 @@ jobs:
             compose_managed_node: RHEL-8.10.0-Nightly
           - ansible_version: 2.17
             compose_controller: RHEL-9-Nightly
-            compose_managed_node: RHEL-9.6.0-Nightly
+            compose_managed_node: RHEL-9.7.0-Nightly
     runs-on: ubuntu-latest
     steps:
       - name: Set variables with DATETIME and artifact location
@@ -201,12 +201,12 @@ jobs:
             RHEL_7_9_EXTRAS_REPO_URL=${{ secrets.RHEL_7_9_EXTRAS_REPO_URL }};\
             RHEL_8_10_BASEOS_REPO_URL=${{ secrets.RHEL_8_10_BASEOS_REPO_URL }};\
             RHEL_8_10_APPSTREAM_REPO_URL=${{ secrets.RHEL_8_10_APPSTREAM_REPO_URL }};\
-            RHEL_9_6_BASEOS_REPO_URL=${{ secrets.RHEL_9_6_BASEOS_REPO_URL }};\
-            RHEL_9_6_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_6_APPSTREAM_REPO_URL }};\
-            RHEL_9_8_BASEOS_REPO_URL=${{ secrets.RHEL_9_8_BASEOS_REPO_URL }};\
-            RHEL_9_8_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_8_APPSTREAM_REPO_URL }};\
-            RHEL_10_0_BASEOS_REPO_URL=${{ secrets.RHEL_10_0_BASEOS_REPO_URL }};\
-            RHEL_10_0_APPSTREAM_REPO_URL=${{ secrets.RHEL_10_0_APPSTREAM_REPO_URL }};\
+            RHEL_9_7_BASEOS_REPO_URL=${{ secrets.RHEL_9_7_BASEOS_REPO_URL }};\
+            RHEL_9_7_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_7_APPSTREAM_REPO_URL }};\
+            RHEL_10_1_BASEOS_REPO_URL=${{ secrets.RHEL_10_1_BASEOS_REPO_URL }};\
+            RHEL_10_1_APPSTREAM_REPO_URL=${{ secrets.RHEL_10_1_APPSTREAM_REPO_URL }};\
+            RHEL_9_LATEST_BASEOS_REPO_URL=${{ secrets.RHEL_9_NIGHTLY_BASEOS_REPO_URL }};\
+            RHEL_9_LATEST_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_NIGHTLY_APPSTREAM_REPO_URL }};\
             BEAKERLIB_HARNESS_URL_NO_VER=${{ secrets.BEAKERLIB_HARNESS_URL_NO_VER }};\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
           tmt_context: "initiator=testing-farm"

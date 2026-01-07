@@ -13,12 +13,12 @@ repo_urls:
       url: "__RHEL_8_10_APPSTREAM_REPO_URL__"
   rhel9:
     baseos:
-      url: "__RHEL_9_6_BASEOS_REPO_URL__"
+      url: "__RHEL_9_7_BASEOS_REPO_URL__"
     appstream:
-      url: "__RHEL_9_6_APPSTREAM_REPO_URL__"
+      url: "__RHEL_9_7_APPSTREAM_REPO_URL__"
   rhel10:
     baseos:
-      url: "__RHEL_10_0_BASEOS_REPO_URL__"
+      url: "__RHEL_10_1_BASEOS_REPO_URL__"
     appstream:
-      url: "__RHEL_10_0_APPSTREAM_REPO_URL__"
+      url: "__RHEL_10_1_APPSTREAM_REPO_URL__"
 ...
