@@ -2,35 +2,46 @@
 - name: leapp_old_postgresql_data | Backup and then remove /var/lib/pgsql/data for remediation
   vars:
     postgresql_data_path: /var/lib/pgsql/data
+    postgresql_backup_path: /var/backups
   block:
     - name: leapp_old_postgresql_data | Check if /var/lib/pgsql/data exists
       ansible.builtin.stat:
         path: "{{ postgresql_data_path }}"
       register: pgsql_data_stat
 
-    - name: leapp_old_postgresql_data | End play if /var/lib/psql/data does not exist
+    - name: leapp_old_postgresql_data | End play if /var/lib/pgsql/data does not exist
       ansible.builtin.debug:
         msg: "{{ postgresql_data_path }} does not exist. Skipping this task."
       when: not pgsql_data_stat.stat.exists
 
     - name: leapp_old_postgresql_data | Process remediation
       when: pgsql_data_stat.stat.exists
+      vars:
+        backup_file_name: pgsql_data_backup_{{ ansible_facts['date_time'].iso8601_basic_short }}.tar.gz
       block:
+        - name: leapp_old_postgresql_data | Ensure tar is installed
+          ansible.builtin.package:
+            name: tar
+            state: present
+
         - name: leapp_old_postgresql_data | Ensure /var/backups exists
           ansible.builtin.file:
-            path: /var/backups
+            path: "{{ postgresql_backup_path }}"
             state: directory
             mode: "0755"
 
-        - name: leapp_old_postgresql_data | Backup /var/lib/pgsql/data
-          community.general.archive:
-            dest: /var/backups/{{ backup_filename }}
-            path: "{{ postgresql_data_path }}"
-            format: gz
-            force_archive: true
-            remove: true
-            mode: "0755"
-          vars:
-            backup_filename: pgsql_data_backup_{{ ansible_facts['date_time'].iso8601_basic_short }}.tar.gz
+        - name: leapp_old_postgresql_data | Create tar.gz archive of postgresql data
+          ansible.builtin.command: # noqa: command-instead-of-module
+            cmd: tar -czf {{ postgresql_backup_path }}/{{ backup_file_name }} {{ postgresql_data_path }}
+          changed_when: true
 
+        - name: leapp_old_postgresql_data | Set permissions on backup archive
+          ansible.builtin.file:
+            path: "{{ postgresql_backup_path }}/{{ backup_file_name }}"
+            mode: "0755"
+
+        - name: leapp_old_postgresql_data | Remove original postgresql data
+          ansible.builtin.file:
+            path: "{{ postgresql_data_path }}"
+            state: absent
 ...

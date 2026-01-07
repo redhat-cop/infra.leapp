@@ -1,0 +1,92 @@
+---
+- name: Test | leapp_old_postgresql_data remediation
+  hosts: all
+  tasks:
+    - name: Test | Ensure /var/lib/pgsql/data is absent before test
+      ansible.builtin.stat:
+        path: /var/lib/pgsql/data
+      register: pgsql_data_stat_pre
+
+    - name: Test | Fail if /var/lib/pgsql/data exists before test
+      ansible.builtin.assert:
+        that:
+          - not pgsql_data_stat_pre.stat.exists
+        fail_msg: >-
+          /var/lib/pgsql/data already exists; refusing to remove real data
+          during tests.
+
+    - name: Test | Capture existing backups
+      ansible.builtin.find:
+        paths: /var/backups
+        patterns: "pgsql_data_backup_*.tar.gz"
+        file_type: file
+      register: pgsql_backups_pre
+
+    - name: Test | Create mock postgresql data
+      ansible.builtin.file:
+        path: /var/lib/pgsql/data
+        state: directory
+        mode: "0755"
+
+    - name: Test | Add marker file
+      ansible.builtin.copy:
+        dest: /var/lib/pgsql/data/README.test
+        content: test-data
+        mode: "0644"
+
+    - name: Test | Run leapp_old_postgresql_data remediation
+      ansible.builtin.include_role:
+        name: infra.leapp.remediate
+        tasks_from: leapp_old_postgresql_data
+
+    - name: Test | Get /var/lib/pgsql/data stat
+      ansible.builtin.stat:
+        path: /var/lib/pgsql/data
+      register: pgsql_data_stat_post
+
+    - name: Test | Assert data directory removed
+      ansible.builtin.assert:
+        that:
+          - not pgsql_data_stat_post.stat.exists
+        fail_msg: /var/lib/pgsql/data still exists after remediation.
+
+    - name: Test | Capture backups after remediation
+      ansible.builtin.find:
+        paths: /var/backups
+        patterns: "pgsql_data_backup_*.tar.gz"
+        file_type: file
+      register: pgsql_backups_post
+
+    - name: Test | Select newly created backup
+      ansible.builtin.set_fact:
+        pgsql_new_backup: >-
+          {{
+            (pgsql_backups_post.files | map(attribute='path') | list)
+            | difference(pgsql_backups_pre.files | map(attribute='path') | list)
+            | first | default('')
+          }}
+
+    - name: Test | Assert backup created
+      ansible.builtin.assert:
+        that:
+          - pgsql_new_backup | length > 0
+        fail_msg: No new pgsql_data_backup_*.tar.gz created in /var/backups.
+
+    - name: Test | Verify backup contains expected directory
+      ansible.builtin.command: # noqa: command-instead-of-module
+        cmd: tar -tzf {{ pgsql_new_backup }}
+      register: pgsql_backup_contents
+      changed_when: false
+
+    - name: Test | Assert backup content includes pgsql data path
+      ansible.builtin.assert:
+        that:
+          - pgsql_backup_contents.stdout_lines | select("search", "var/lib/pgsql/data") | list | length > 0
+          - pgsql_backup_contents.stdout_lines | select("search", "var/lib/pgsql/data/README.test") | list | length > 0
+        fail_msg: Backup does not contain /var/lib/pgsql/data.
+
+    - name: Cleanup | Remove backup archive
+      ansible.builtin.file:
+        path: "{{ pgsql_new_backup }}"
+        state: absent
+      when: pgsql_new_backup | length > 0
