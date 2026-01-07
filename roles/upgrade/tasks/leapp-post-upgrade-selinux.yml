@@ -18,6 +18,7 @@
   ansible.builtin.reboot:
     reboot_timeout: "{{ leapp_reboot_timeout }}"
     post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_reboot_timeout }}"
   when: selinux_results.reboot_required
 
 - name: leapp-post-upgrade-selinux | Verify SELinux is set to {{ leapp_selinux_mode }}

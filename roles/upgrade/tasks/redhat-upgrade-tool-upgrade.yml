@@ -113,5 +113,6 @@
     msg: Host is starting OS upgrade now!
     reboot_timeout: "{{ leapp_upgrade_timeout }}"
     post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+  timeout: "{{ leapp_upgrade_timeout }}"
 
 ...
