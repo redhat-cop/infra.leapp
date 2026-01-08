@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Add warning about limited ongoing technical support for RHEL 6 upgrades.
+...

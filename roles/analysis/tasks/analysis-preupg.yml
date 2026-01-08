@@ -1,4 +1,12 @@
 ---
+- name: analysis-preupg | Warn about limited ongoing technical support for RHEL 6
+  ansible.builtin.warn:
+    msg: >-
+      RHEL 6 is in the Extended Life Phase which means that the current upgrade path
+      has limited ongoing technical support. To learn more about the RHEL in-place
+      upgrade support policy, please refer to the following article:
+      https://access.redhat.com/articles/7102732.
+
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: analysis-preupg | Register to upgrade activation key
   ansible.builtin.shell: >
