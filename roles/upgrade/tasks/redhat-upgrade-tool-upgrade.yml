@@ -1,4 +1,12 @@
 ---
+- name: redhat-upgrade-tool-upgrade | Warn about limited ongoing technical support for RHEL 6
+  ansible.builtin.warn:
+    msg: >-
+      RHEL 6 is in the Extended Life Phase which means that the current upgrade path
+      has limited ongoing technical support. To learn more about the RHEL in-place
+      upgrade support policy, please refer to the following article:
+      https://access.redhat.com/articles/7102732.
+
 - name: redhat-upgrade-tool-upgrade | Run preupg --riskcheck
   ansible.builtin.shell: >
     export PATH={{ leapp_os_path }};
