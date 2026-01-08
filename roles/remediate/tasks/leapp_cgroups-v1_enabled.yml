@@ -13,8 +13,8 @@
       if remediation_matches | length > 0 else {} }}"
   when:
     - not leapp_report_missing | default(false)
-    - ansible_distribution == 'RedHat'
-    - ansible_distribution_major_version | int == 9
+    - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int == 9
   block:
     - name: leapp_cgroups-v1_enabled | End remediation if a matching entry was not found in the leapp report
       ansible.builtin.debug:

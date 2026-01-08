@@ -37,7 +37,7 @@ leapp_upgrade_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' or leapp_upg
 
 leapp_repos_enabled: []
 # leapp_repos_enabled:
-#   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
+#   - satellite-client-6-for-rhel-{{ ansible_facts['distribution_major_version'] | int + 1 }}-x86_64-rpms
 
 # rhel_7_network_install_repo_url is deprecated, use leapp_rhel_7_network_install_repo_url instead
 # leapp_rhel_7_network_install_repo_url: http://capsule1.example.com/pub/ISO/RHEL7.9
@@ -229,7 +229,7 @@ leapp_kernel_modules_to_unload_before_upgrade: "{{ kernel_modules_to_unload_befo
 # Note: Leaving the deprecated 'post_7_to_8_python_interpreter' variable functional for now.
 leapp_post_upgrade_python_interpreter: >-
   {{ post_7_to_8_python_interpreter
-     if (ansible_distribution_major_version == '7'
+     if (ansible_facts['distribution_major_version'] == '7'
          and post_7_to_8_python_interpreter is defined)
      else '/usr/libexec/platform-python' }}
 

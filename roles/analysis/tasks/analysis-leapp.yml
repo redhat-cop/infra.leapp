@@ -24,21 +24,21 @@
     name: "{{ leapp_analysis_packages_el7 }}"
     enablerepo: "{{ leapp_analysis_repos_el7 }}"
     state: latest # noqa package-latest
-  when: ansible_distribution_major_version|int == 7
+  when: ansible_facts["distribution_major_version"]|int == 7
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 8
   ansible.builtin.package:
     name: "{{ leapp_analysis_packages_el8 }}"
     enablerepo: "{{ leapp_analysis_repos_el8 }}"
     state: latest # noqa package-latest
-  when: ansible_distribution_major_version|int == 8
+  when: ansible_facts["distribution_major_version"]|int == 8
 
 - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 9
   ansible.builtin.package:
     name: "{{ leapp_analysis_packages_el9 }}"
     enablerepo: "{{ leapp_analysis_repos_el9 }}"
     state: latest # noqa package-latest
-  when: ansible_distribution_major_version|int == 9
+  when: ansible_facts["distribution_major_version"]|int == 9
 
 - name: analysis-leapp | Ensure leapp log directory exists
   ansible.builtin.file:

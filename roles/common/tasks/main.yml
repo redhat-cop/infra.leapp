@@ -53,7 +53,7 @@
     cmd: >-
       set -o pipefail;
       export PATH={{ leapp_os_path }};
-      rpm -qa | grep -ve '[\.|+]el{{ ansible_distribution_major_version }}' |
+      rpm -qa | grep -ve '[\.|+]el{{ ansible_facts['distribution_major_version'] }}' |
       grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
       sort
   register: unsigned_packages_pre

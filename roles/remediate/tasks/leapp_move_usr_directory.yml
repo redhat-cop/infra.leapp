@@ -9,13 +9,13 @@
   vars:
     entry_title: The /usr/ directory is located on a separate partition. The in-place upgrade is not possible.
     entry_found: "{{ entry_title in (leapp_pre_upgrade_report_6to7.content | b64decode) }}"
-    usr_local_mount_source: "{{ ansible_mounts | selectattr('mount', 'eq', '/usr/local') | map(attribute='device') | d([''], true) | first }}"
-    usr_mount_source: "{{ ansible_mounts | selectattr('mount', 'eq', '/usr') | map(attribute='device') | d([''], true) | first }}"
-    root_mount_source: "{{ ansible_mounts | selectattr('mount', 'eq', '/') | map(attribute='device') | d([''], true) | first }}"
+    usr_local_mount_source: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/usr/local') | map(attribute='device') | d([''], true) | first }}"
+    usr_mount_source: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/usr') | map(attribute='device') | d([''], true) | first }}"
+    root_mount_source: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/') | map(attribute='device') | d([''], true) | first }}"
   when:
     - not leapp_report_missing_6to7 | default(false)
-    - ansible_distribution == 'RedHat'
-    - ansible_distribution_major_version | int == 6
+    - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int == 6
   block:
     - name: leapp_move_usr_directory | End execution of playbook if no entry found in leapp report
       ansible.builtin.debug:
@@ -48,19 +48,19 @@
         - name: leapp_move_usr_directory | Check available space on root filesystem
           ansible.builtin.set_fact:
             root_space: "{{ item.block_available * item.block_size }}"
-          loop: "{{ ansible_mounts }}"
+          loop: "{{ ansible_facts['mounts'] }}"
           when: item.mount == '/'
 
         - name: leapp_move_usr_directory | Get /usr size
           ansible.builtin.set_fact:
             usr_size: "{{ item.block_available * item.block_size }}"
-          loop: "{{ ansible_mounts }}"
+          loop: "{{ ansible_facts['mounts'] }}"
           when: item.mount == '/usr'
 
         - name: leapp_move_usr_directory | Get /usr/local size
           ansible.builtin.set_fact:
             usr_local_size: "{{ item.block_available * item.block_size }}"
-          loop: "{{ ansible_mounts }}"
+          loop: "{{ ansible_facts['mounts'] }}"
           when: item.mount == '/usr/local' and usr_local_mount_source | length > 0
 
         - name: leapp_move_usr_directory | Check if enough space on root filesystem

@@ -12,8 +12,8 @@
     summary: "{{ summaries | first if summaries | length > 0 else '' }}"
   when:
     - not leapp_report_missing | default(false)
-    - ansible_distribution == 'RedHat'
-    - ansible_distribution_major_version | int == 8
+    - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int == 8
   block:
     - name: leapp_rpms_with_rsa_sha1_detected | End execution of playbook if no entry found in leapp report
       ansible.builtin.debug:

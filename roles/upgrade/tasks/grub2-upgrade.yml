@@ -23,16 +23,16 @@
   block:
     - name: grub2-upgrade | Determine if /boot is a mount point
       ansible.builtin.set_fact:
-        boot_mounted: "{{ ansible_mounts | selectattr('mount', 'eq', '/boot') | list | length | bool }}"
+        boot_mounted: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/boot') | list | length | bool }}"
 
     - name: grub2-upgrade | Get boot device dict from /boot
       ansible.builtin.set_fact:
-        boot_device_dict: "{{ ansible_mounts | selectattr('mount', 'eq', '/boot') | list | first }}"
+        boot_device_dict: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/boot') | list | first }}"
       when: boot_mounted
 
     - name: grub2-upgrade | Get boot device dict from /
       ansible.builtin.set_fact:
-        boot_device_dict: "{{ ansible_mounts | selectattr('mount', 'eq', '/') | list | first }}"
+        boot_device_dict: "{{ ansible_facts['mounts'] | selectattr('mount', 'eq', '/') | list | first }}"
       when: not boot_mounted
 
     - name: grub2-upgrade | Get boot device from boot device dict
