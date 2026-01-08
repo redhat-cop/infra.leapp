@@ -60,7 +60,7 @@ leapp_satellite_activation_key_pre_leapp: null
 leapp_satellite_activation_key_leapp: null
 
 # leapp_repos_enabled:
-#   - satellite-client-6-for-rhel-{{ ansible_distribution_major_version | int + 1 }}-x86_64-rpms
+#   - satellite-client-6-for-rhel-{{ ansible_facts['distribution_major_version'] | int + 1 }}-x86_64-rpms
 leapp_repos_enabled: []
 
 # Treat all high risk findings as inhibitors, not just those exclusively marked as inhibitors by Leapp

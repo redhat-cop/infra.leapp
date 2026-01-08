@@ -32,7 +32,7 @@
 - name: Rename log file
   ansible.builtin.shell: |
     export PATH={{ leapp_os_path }}
-    mv {{ leapp_log_file }} {{ leapp_log_file }}-{{ ansible_date_time.iso8601_basic_short }}
+    mv {{ leapp_log_file }} {{ leapp_log_file }}-{{ ansible_facts['date_time'].iso8601_basic_short }}
   listen: Archive log file
   changed_when: true
   when: log_file_stat.stat.exists

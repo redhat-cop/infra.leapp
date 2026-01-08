@@ -1,7 +1,7 @@
 ---
 - name: setup | version_lock | Install versionlock module
   ansible.builtin.package:
-    name: "{{ 'yum-plugin-versionlock' if ansible_distribution_major_version | int == 7 else 'python3-dnf-plugin-versionlock' }}"
+    name: "{{ 'yum-plugin-versionlock' if ansible_facts['distribution_major_version'] | int == 7 else 'python3-dnf-plugin-versionlock' }}"
     state: present
 
 - name: setup | version_lock | Version lock the dracut package

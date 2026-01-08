@@ -18,8 +18,8 @@
         tests_upgrade_custom | Skip test if already upgraded or not RHEL
         {{ rhel_base_ver }}
       when: >-
-          ansible_distribution not in ['CentOS', 'RedHat']
-          or ansible_distribution_major_version | int != rhel_base_ver
+          ansible_facts["distribution"] not in ['CentOS', 'RedHat']
+          or ansible_facts["distribution_major_version"] | int != rhel_base_ver
           or leapp_upgrade_completed is defined
           or leapp_log_stat.stat.exists
       ansible.builtin.meta: end_play
@@ -30,12 +30,12 @@
     - name: tests_upgrade_custom | Assert that the system has been upgraded
       ansible.builtin.assert:
         that:
-          - ansible_distribution in ['CentOS', 'RedHat']
-          - ansible_distribution_major_version | int == rhel_target_ver
+          - ansible_facts["distribution"] in ['CentOS', 'RedHat']
+          - ansible_facts["distribution_major_version"] | int == rhel_target_ver
         fail_msg: >-
           System was not upgraded to RHEL {{ rhel_target_ver }}.
-          Current OS: {{ ansible_distribution }}
-          {{ ansible_distribution_version }}
+          Current OS: {{ ansible_facts['distribution'] }}
+          {{ ansible_facts['distribution_version'] }}
         success_msg: >-
           System successfully upgraded to RHEL {{ rhel_target_ver }}
       when: leapp_test_upgrade | d(true)

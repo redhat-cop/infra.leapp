@@ -1,0 +1,4 @@
+minor_changes:
+    - refactor - handle INJECT_FACTS_AS_VARS=false by using ansible_facts instead
+
+...

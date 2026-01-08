@@ -11,7 +11,7 @@
       ansible.builtin.copy:
         remote_src: true
         src: /etc/yum.repos.d/{{ item }}
-        dest: /etc/yum.repos.d/{{ item }}.{{ ansible_date_time.iso8601_basic_short }}
+        dest: /etc/yum.repos.d/{{ item }}.{{ ansible_facts['date_time'].iso8601_basic_short }}
         owner: root
         group: root
         mode: "0644"

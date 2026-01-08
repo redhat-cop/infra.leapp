@@ -8,11 +8,11 @@
 
 - name: Include tasks for preupg assistant analysis
   ansible.builtin.include_tasks: analysis-preupg.yml
-  when: ansible_distribution_major_version|int == 6
+  when: ansible_facts["distribution_major_version"]|int == 6
 
 - name: Include tasks for leapp preupgrade analysis
   ansible.builtin.include_tasks: analysis-leapp.yml
-  when: ansible_distribution_major_version|int >= 7
+  when: ansible_facts["distribution_major_version"]|int >= 7
 
 - name: Set stats for leapp_inhibitors
   ansible.builtin.set_stats:

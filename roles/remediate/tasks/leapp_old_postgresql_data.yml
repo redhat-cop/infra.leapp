@@ -31,6 +31,6 @@
             remove: true
             mode: "0755"
           vars:
-            backup_filename: pgsql_data_backup_{{ ansible_date_time.iso8601_basic_short }}.tar.gz
+            backup_filename: pgsql_data_backup_{{ ansible_facts['date_time'].iso8601_basic_short }}.tar.gz
 
 ...

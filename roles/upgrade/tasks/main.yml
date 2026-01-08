@@ -8,11 +8,11 @@
 
 - name: Include tasks for upgrade using redhat-upgrade-tool
   ansible.builtin.include_tasks: redhat-upgrade-tool-upgrade.yml
-  when: ansible_distribution_major_version|int == 6
+  when: ansible_facts["distribution_major_version"]|int == 6
 
 - name: Include tasks for leapp upgrade
   ansible.builtin.include_tasks: leapp-upgrade.yml
-  when: ansible_distribution_major_version|int >= 7
+  when: ansible_facts["distribution_major_version"]|int >= 7
 
 - name: Include post upgrade validation
   ansible.builtin.include_tasks: upgrade-validation.yml

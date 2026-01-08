@@ -1,8 +1,8 @@
 ---
 - name: leapp_custom_network_scripts_detected | Move custom network-scripts to NetworkManager dispatcher scripts
   when:
-    - ansible_distribution == 'RedHat'
-    - ansible_distribution_major_version | int == 8
+    - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int == 8
   block:
     - name: leapp_custom_network_scripts_detected | Check if pre up script exists
       ansible.builtin.stat:
