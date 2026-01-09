@@ -17,7 +17,7 @@
 - name: Set stats for leapp_inhibitors
   ansible.builtin.set_stats:
     data:
-      leapp_inhibitors: "{{ leapp_inhibitors }}"
+      leapp_inhibitors: "{{ leapp_inhibitors | default([]) }}"
 
 - name: Notify analysis report is done handler
   ansible.builtin.assert:
