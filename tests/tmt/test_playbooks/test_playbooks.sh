@@ -147,10 +147,10 @@ rlJournalStart
         [ -n "$RHEL_7_9_EXTRAS_REPO_URL" ] && sed -i "s|__RHEL_7_9_EXTRAS_REPO_URL__|$RHEL_7_9_EXTRAS_REPO_URL|g" "$repo_vars_file"
         [ -n "$RHEL_8_10_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_8_10_BASEOS_REPO_URL__|$RHEL_8_10_BASEOS_REPO_URL|g" "$repo_vars_file"
         [ -n "$RHEL_8_10_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_8_10_APPSTREAM_REPO_URL__|$RHEL_8_10_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_9_6_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_9_6_BASEOS_REPO_URL__|$RHEL_9_6_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_9_6_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_9_6_APPSTREAM_REPO_URL__|$RHEL_9_6_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_10_0_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_10_0_BASEOS_REPO_URL__|$RHEL_10_0_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_10_0_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_0_APPSTREAM_REPO_URL__|$RHEL_10_0_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+        [ -n "$RHEL_9_7_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_9_7_BASEOS_REPO_URL__|$RHEL_9_7_BASEOS_REPO_URL|g" "$repo_vars_file"
+        [ -n "$RHEL_9_7_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_9_7_APPSTREAM_REPO_URL__|$RHEL_9_7_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+        [ -n "$RHEL_10_1_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_10_1_BASEOS_REPO_URL__|$RHEL_10_1_BASEOS_REPO_URL|g" "$repo_vars_file"
+        [ -n "$RHEL_10_1_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_1_APPSTREAM_REPO_URL__|$RHEL_10_1_APPSTREAM_REPO_URL|g" "$repo_vars_file"
         rlRun "cat $repo_vars_file"
         leappDebugRepos
 
