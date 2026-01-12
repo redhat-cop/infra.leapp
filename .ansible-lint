@@ -30,7 +30,7 @@ mock_modules:
   - community.general.modprobe
   - community.general.archive
   - community.general.rhsm_repository
-  - ansible.posix.selinux
+  - fedora.linux_system_roles.selinux
   - ansible.posix.mount
 
 # mock_roles:

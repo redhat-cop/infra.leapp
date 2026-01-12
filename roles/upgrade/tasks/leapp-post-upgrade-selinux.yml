@@ -7,25 +7,37 @@
 #   register: ausearch_results
 #   changed_when: false
 #   failed_when: ausearch_results.stdout != "<no matches>"
+#
 
-- name: leapp-post-upgrade-selinux | SELinux mode is set to {{ leapp_selinux_mode }}
-  ansible.posix.selinux:
-    policy: targeted
-    state: "{{ leapp_selinux_mode }}"
-  register: selinux_results
+- name: leapp-post-upgrade-selinux | Ensure SELinux mode is set (handles reboot)
+  block:
+    - name: leapp-post-upgrade-selinux | Apply SELinux settings via system role
+      ansible.builtin.include_role:
+        name: fedora.linux_system_roles.selinux
+      vars:
+        selinux_policy: targeted
+        selinux_state: "{{ leapp_selinux_mode }}"
 
-- name: leapp-post-upgrade-selinux | Reboot when required for SELinux change
-  ansible.builtin.reboot:
-    reboot_timeout: "{{ leapp_reboot_timeout }}"
-    post_reboot_delay: "{{ leapp_post_reboot_delay }}"
-  timeout: "{{ leapp_reboot_timeout }}"
-  when: selinux_results.reboot_required
+  rescue:
+    - name: leapp-post-upgrade-selinux | Fail if SELinux role failed for a reason other than reboot required
+      ansible.builtin.fail:
+        msg: "SELinux role failed for a reason other than reboot requirement."
+      when: not (selinux_reboot_required | default(false))
 
-- name: leapp-post-upgrade-selinux | Verify SELinux is set to {{ leapp_selinux_mode }}
-  ansible.posix.selinux:
-    policy: targeted
-    state: "{{ leapp_selinux_mode }}"
-  check_mode: true
-  register: selinux_check_results
-  failed_when: selinux_check_results.changed
-...
+    - name: leapp-post-upgrade-selinux | Reboot to complete SELinux change
+      ansible.builtin.reboot:
+        reboot_timeout: "{{ leapp_reboot_timeout }}"
+        post_reboot_delay: "{{ leapp_post_reboot_delay }}"
+      timeout: "{{ leapp_reboot_timeout }}"
+
+    - name: leapp-post-upgrade-selinux | Wait for managed host to come back
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: "{{ leapp_reboot_timeout }}"
+
+    - name: leapp-post-upgrade-selinux | Re-apply SELinux settings via system role after reboot
+      ansible.builtin.include_role:
+        name: fedora.linux_system_roles.selinux
+      vars:
+        selinux_policy: targeted
+        selinux_state: "{{ leapp_selinux_mode }}"
