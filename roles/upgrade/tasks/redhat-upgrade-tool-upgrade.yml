@@ -68,11 +68,18 @@
 - name: redhat-upgrade-tool-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
-- name: redhat-upgrade-tool-upgrade | Disable RHEL 6 repos
-  community.general.rhsm_repository:
-    name: "*"
-    state: disabled
+- name: redhat-upgrade-tool-upgrade | Get enabled RHEL 6 repositories
+  ansible.builtin.command: subscription-manager repos --list-enabled
+  register: __rhel6_enabled_repos
+  changed_when: false
   failed_when: false
+
+- name: redhat-upgrade-tool-upgrade | Disable RHEL 6 repositories
+  ansible.builtin.command: subscription-manager repos --disable="*"
+  changed_when: true
+  when:
+    - __rhel6_enabled_repos.rc == 0
+    - "'Repo ID' in __rhel6_enabled_repos.stdout"
 
 - name: redhat-upgrade-tool-upgrade | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
