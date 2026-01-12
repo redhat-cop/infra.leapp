@@ -205,8 +205,8 @@ jobs:
             RHEL_9_7_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_7_APPSTREAM_REPO_URL }};\
             RHEL_10_1_BASEOS_REPO_URL=${{ secrets.RHEL_10_1_BASEOS_REPO_URL }};\
             RHEL_10_1_APPSTREAM_REPO_URL=${{ secrets.RHEL_10_1_APPSTREAM_REPO_URL }};\
-            RHEL_9_LATEST_BASEOS_REPO_URL=${{ secrets.RHEL_9_NIGHTLY_BASEOS_REPO_URL }};\
-            RHEL_9_LATEST_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_NIGHTLY_APPSTREAM_REPO_URL }};\
+            RHEL_9_LATEST_BASEOS_REPO_URL=${{ secrets.RHEL_9_LATEST_BASEOS_REPO_URL }};\
+            RHEL_9_LATEST_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_LATEST_APPSTREAM_REPO_URL }};\
             BEAKERLIB_HARNESS_URL_NO_VER=${{ secrets.BEAKERLIB_HARNESS_URL_NO_VER }};\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
           tmt_context: "initiator=testing-farm"
