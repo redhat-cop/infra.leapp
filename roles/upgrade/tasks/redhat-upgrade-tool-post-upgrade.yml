@@ -34,7 +34,7 @@
 - name: redhat-upgrade-tool-post-upgrade | Include grub2-upgrade.yml
   ansible.builtin.include_tasks: grub2-upgrade.yml
   when:
-    - ansible_architecture == 'x86_64'
+    - ansible_facts["architecture"] == 'x86_64'
     - leapp_update_grub_to_grub_2
 
 - name: redhat-upgrade-tool-post-upgrade | Include update-and-reboot.yml

@@ -1,7 +1,7 @@
 ---
 - name: postupgrade | version_lock | Check if the versionlock module is still installed
   ansible.builtin.package:
-    name: "{{ 'yum-plugin-versionlock' if ansible_distribution_major_version | int == 7 else 'python3-dnf-plugin-versionlock' }}"
+    name: "{{ 'yum-plugin-versionlock' if ansible_facts['distribution_major_version'] | int == 7 else 'python3-dnf-plugin-versionlock' }}"
     state: present
 
 - name: postupgrade | version_lock | Check if the version lock on dracut package was cleared
@@ -25,5 +25,5 @@
       - package_info.stdout is search(pattern, multiline=true)
   vars:
     pattern: >-
-      ^Release\s*:\s*.*[.]el{{ ansible_distribution_major_version }}
+      ^Release\s*:\s*.*[.]el{{ ansible_facts['distribution_major_version'] }}
 ...
