@@ -155,6 +155,19 @@ prepare:
       # Configure repositories for RHEL 8+
       BASEOS_VAR="RHEL_${OS_VERSION_UNDERSCORE}_BASEOS_REPO_URL"
       APPSTREAM_VAR="RHEL_${OS_VERSION_UNDERSCORE}_APPSTREAM_REPO_URL"
+
+      # Configure repositories on the control node running latest RHEL
+      # Control node is running latest RHEL 9 from CI, its repositories are set
+      # in variables in the form RHEL_9_LATEST_, no RHEL_X_Y
+      if [ -z "${!BASEOS_VAR}" ] && [ -z "${!APPSTREAM_VAR}" ]; then
+        BASEOS_VAR="RHEL_9_LATEST_BASEOS_REPO_URL"
+        APPSTREAM_VAR="RHEL_9_LATEST_APPSTREAM_REPO_URL"
+      elif [ -z "${!BASEOS_VAR}" ] || [ -z "${!APPSTREAM_VAR}" ]; then
+        echo "One of the repositories is not set:"
+        echo "BASEOS_VAR($BASEOS_VAR)=${!BASEOS_VAR}"
+        echo "APPSTREAM_VAR($APPSTREAM_VAR)=${!APPSTREAM_VAR}"
+        exit 1
+      fi
       {
         echo "[rhel-${OS_MAJOR_VERSION}-for-x86_64-baseos-rpms]"
         echo "name=BaseOS for x86_64"
