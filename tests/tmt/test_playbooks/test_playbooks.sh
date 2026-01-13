@@ -100,6 +100,14 @@ SR_RESERVE_SYSTEMS="${SR_RESERVE_SYSTEMS:-false}"
 #   TMT sets True, False with capital letters, need to reset it to bash style
 [ "$SR_RESERVE_SYSTEMS" = True ] && export SR_RESERVE_SYSTEMS=true
 [ "$SR_RESERVE_SYSTEMS" = False ] && export SR_RESERVE_SYSTEMS=false
+#
+# SR_ANSIBLE_INJECT_FACT_VARS
+#   Set to true if you want ansible to convert facts into vars like ansible_distribution
+#   This is deprecated in newer version of ansible and will be removed in 2.24
+SR_ANSIBLE_INJECT_FACT_VARS="${SR_ANSIBLE_INJECT_FACT_VARS:-false}"
+#   TMT sets True, False with capital letters, need to reset it to bash style
+[ "$SR_ANSIBLE_INJECT_FACT_VARS" = True ] && export SR_ANSIBLE_INJECT_FACT_VARS=true
+[ "$SR_ANSIBLE_INJECT_FACT_VARS" = False ] && export SR_ANSIBLE_INJECT_FACT_VARS=false
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "~~~ Environment Variables Definition - BEGIN"
@@ -162,6 +170,7 @@ rlJournalStart
         #     done
         # fi
         # lsrSetAnsibleGathering "$SR_ANSIBLE_GATHERING"
+        lsrSetAnsibleInjectFactVars "$SR_ANSIBLE_INJECT_FACT_VARS"
         lsrPrepareNodesInventories
         managed_nodes=$(lsrGetManagedNodes)
     rlPhaseEnd
