@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Set SR_ANSIBLE_INJECT_FACT_VARS to false by default in the CI.
+
+...

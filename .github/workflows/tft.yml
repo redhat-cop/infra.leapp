@@ -208,6 +208,7 @@ jobs:
             RHEL_9_LATEST_BASEOS_REPO_URL=${{ secrets.RHEL_9_LATEST_BASEOS_REPO_URL }};\
             RHEL_9_LATEST_APPSTREAM_REPO_URL=${{ secrets.RHEL_9_LATEST_APPSTREAM_REPO_URL }};\
             BEAKERLIB_HARNESS_URL_NO_VER=${{ secrets.BEAKERLIB_HARNESS_URL_NO_VER }};\
+            SR_ANSIBLE_INJECT_FACT_VARS=false;\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
           tmt_context: "initiator=testing-farm"
           # Note that LINUXSYSTEMROLES_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
