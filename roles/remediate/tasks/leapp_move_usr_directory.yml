@@ -95,36 +95,39 @@
             group: root
           when: usr_local_mount_source | length > 0
 
-        - name: leapp_move_usr_directory | Ensure /root partition is mounted to /mnt/root
-          ansible.posix.mount:
-            path: /mnt/root
-            src: /
-            fstype: ext4
-            opts: bind
-            state: mounted
+        - name: leapp_move_usr_directory | Ensure bind mounts for /, /usr, and /usr/local exist
+          ansible.builtin.include_role:
+            name: fedora.linux_system_roles.storage
+          vars:
+            storage_safe_mode: true
+            _volumes_base:
+              - name: leapp_bind_root_to_mnt_root
+                state: present
+                fs_type: unformatted
+                mount_point: /mnt/root
+                mount_options: bind
+                device: /
+              - name: leapp_bind_usr_to_mnt_usr
+                state: present
+                fs_type: unformatted
+                mount_point: /mnt/usr
+                mount_options: bind
+                device: /usr
+            _volumes_local:
+              - name: leapp_bind_usrlocal_to_mnt_usr_local
+                state: present
+                fs_type: unformatted
+                mount_point: /mnt/usr_local
+                mount_options: bind
+                device: /usr/local
 
-        - name: leapp_move_usr_directory | Ensure /usr partition is mounted to /mnt/usr
-          ansible.posix.mount:
-            path: /mnt/usr
-            src: /usr
-            fstype: ext4
-            opts: bind
-            state: mounted
+            storage_volumes: "{{ _volumes_base + (_volumes_local if (usr_local_mount_source | length > 0) else []) }}"
 
         - name: leapp_move_usr_directory | Copy /usr to /mnt/root/usr
           ansible.builtin.shell: |
             set -o pipefail
             rsync -aHAXv /mnt/usr/* /mnt/root/usr/
           changed_when: true
-
-        - name: leapp_move_usr_directory | Ensure /usr/local partition is mounted to /mnt/usr_local
-          ansible.posix.mount:
-            path: /mnt/usr_local
-            src: /usr/local
-            fstype: ext4
-            opts: bind
-            state: mounted
-          when: usr_local_mount_source | length > 0
 
         - name: leapp_move_usr_directory | Copy /usr/local to /mnt/root/usr/local
           ansible.builtin.shell: |

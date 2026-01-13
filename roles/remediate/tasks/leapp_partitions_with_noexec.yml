@@ -6,18 +6,31 @@
         set -o pipefail
         mount | grep -E '(/var|/var/lib|/var/lib/leapp).*noexec'
       register: mountpoints
-      changed_when: mountpoints is success
+      changed_when: false
       failed_when: false
 
-    - name: leapp_partitions_with_noexec | Go through the the mountpoints and remount
-      ansible.posix.mount:
-        path: "{{ item.split(' ')[2] }}"
-        src: "{{ item.split(' ')[0] }}"
-        fstype: "{{ item.split(' ')[4] }}"
-        opts: "{{ item.split(' ')[5].replace('(', '').replace(')', '').replace('noexec', 'exec') }}"
-        state: remounted
-      with_items: "{{ mountpoints.stdout_lines }}"
+    - name: leapp_partitions_with_noexec | Build storage volumes for remount
+      ansible.builtin.set_fact:
+        leapp_target_volumes: "{{ leapp_target_volumes | default([]) + [volume_item] }}"
+      vars:
+        parts: "{{ item.split(' ') }}"
+        volume_item:
+          name: "{{ parts[2] | regex_replace('^/', '') | replace('/', '_') }}"
+          type: disk
+          mount_point: "{{ parts[2] }}"
+          fs_type: "{{ parts[4] }}"
+          mount_options: "{{ parts[5].replace('(', '').replace(')', '').replace('noexec', 'exec') }}"
+          state: remount
+      loop: "{{ mountpoints.stdout_lines }}"
       when: mountpoints.stdout_lines | length > 0
+
+    - name: leapp_partitions_with_noexec | Remount using storage system role
+      ansible.builtin.include_role:
+        name: linux-system-roles.storage
+      vars:
+        storage_volumes: "{{ leapp_target_volumes }}"
+        storage_safe_mode: true
+      when: leapp_target_volumes | d([]) | length > 0
 
     - name: leapp_partitions_with_noexec | Modify /etc/fstab to replace the noexec option
       ansible.builtin.shell: |
@@ -26,5 +39,4 @@
       register: sed_result
       changed_when: sed_result is success
       when: mountpoints.stdout_lines | length > 0
-
 ...

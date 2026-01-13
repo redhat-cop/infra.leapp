@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - Replace ansible.posix.mount module with the storage system role
+...

@@ -31,7 +31,7 @@ mock_modules:
   - community.general.archive
   - community.general.rhsm_repository
   - fedora.linux_system_roles.selinux
-  - ansible.posix.mount
+  - fedora.linux_system_roles.storage
 
 # mock_roles:
 #   - mocked_role
