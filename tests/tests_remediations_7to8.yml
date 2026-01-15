@@ -9,7 +9,7 @@
     leapp_test_remediations: true
     rhel_base_ver: 7
     rhel_target_ver: 8
-    local_repos_leapp:
+    leapp_local_repos:
       - name: rhel-8-for-x86_64-baseos-rpms
         description: BaseOS for x86_64
         baseurl: "{{ repo_urls.rhel8.baseos.url }}"

@@ -7,7 +7,7 @@
   vars:
     rhel_base_ver: 9
     rhel_target_ver: 10
-    local_repos_leapp:
+    leapp_local_repos:
       - name: rhel-10-for-x86_64-baseos-rpms
         description: BaseOS for x86_64
         baseurl: "{{ repo_urls.rhel10.baseos.url }}"
