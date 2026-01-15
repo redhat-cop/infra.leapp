@@ -42,7 +42,7 @@
     cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock clear"
   changed_when: true
   when:
-    - versionlock_list is success
+    - versionlock_list.rc == 0
     - versionlock_list.stdout | d("") != ""
 
 - name: leapp-upgrade | Install packages for upgrade from RHEL 7
