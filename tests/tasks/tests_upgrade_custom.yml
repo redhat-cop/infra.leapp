@@ -3,10 +3,10 @@
   vars:
     leapp_upgrade_type: custom
     leapp_upgrade_opts: "--no-rhsm"
-    # Define local_repos_post_upgrade by adding file key to local_repos_leapp
-    local_repos_post_upgrade: "{{ local_repos_leapp | map('combine', {'file': '/etc/yum.repos.d/rhel' ~ rhel_target_ver ~ '.repo'}) | list }}"
+    # Define leapp_local_repos_post_upgrade by adding file key to leapp_local_repos
+    leapp_local_repos_post_upgrade: "{{ leapp_local_repos | map('combine', {'file': '/etc/yum.repos.d/rhel' ~ rhel_target_ver ~ '.repo'}) | list }}"
     # This repo is created in prepare phase in plans/test_playbooks.fmf
-    repo_files_to_remove_at_upgrade:
+    leapp_repo_files_to_remove_at_upgrade:
       - rhel{{ rhel_base_ver }}.repo
   block:
     - name: tests_upgrade_custom | Check if leapp upgrade log exists
