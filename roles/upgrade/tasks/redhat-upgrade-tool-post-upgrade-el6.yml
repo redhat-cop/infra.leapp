@@ -1,11 +1,11 @@
 ---
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
-- name: redhat-upgrade-tool-post-upgrade | Ensure redhat-upgrade-cmdline-instrepo.repo file is absent
+- name: redhat-upgrade-tool-post-upgrade-el6 | Ensure redhat-upgrade-cmdline-instrepo.repo file is absent
   ansible.builtin.file:
     path: /etc/yum.repos.d/redhat-upgrade-cmdline-instrepo.repo
     state: absent
 
-- name: redhat-upgrade-tool-post-upgrade | "Register to post upgrade activation key"
+- name: redhat-upgrade-tool-post-upgrade-el6 | "Register to post upgrade activation key"
   ansible.builtin.shell: >
     export PATH={{ leapp_os_path }};
     subscription-manager register
@@ -20,7 +20,7 @@
   failed_when: false
   changed_when: true
 
-- name: redhat-upgrade-tool-post-upgrade | Include custom_local_repos for local_repos_post_upgrade
+- name: redhat-upgrade-tool-post-upgrade-el6 | Include custom_local_repos for local_repos_post_upgrade
   vars:
     __repos: "{{ leapp_local_repos_post_upgrade }}"
   ansible.builtin.include_role:
@@ -28,15 +28,15 @@
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
-- name: redhat-upgrade-tool-post-upgrade | Include handle-old-packages.yml
+- name: redhat-upgrade-tool-post-upgrade-el6 | Include handle-old-packages.yml
   ansible.builtin.include_tasks: handle-old-packages.yml
 
-- name: redhat-upgrade-tool-post-upgrade | Include grub2-upgrade.yml
+- name: redhat-upgrade-tool-post-upgrade-el6 | Include grub2-upgrade.yml
   ansible.builtin.include_tasks: grub2-upgrade.yml
   when:
     - ansible_facts["architecture"] == 'x86_64'
     - leapp_update_grub_to_grub_2
 
-- name: redhat-upgrade-tool-post-upgrade | Include update-and-reboot.yml
+- name: redhat-upgrade-tool-post-upgrade-el6 | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 ...
