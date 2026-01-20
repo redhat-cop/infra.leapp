@@ -27,9 +27,6 @@ exclude_paths:
 # not being able to pull community.general (not being validated)
 mock_modules:
   - community.general.redhat_subscription
-  - community.general.modprobe
-  - community.general.archive
-  - community.general.rhsm_repository
   - fedora.linux_system_roles.selinux
   - ansible.posix.mount
 

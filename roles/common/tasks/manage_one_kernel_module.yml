@@ -3,7 +3,7 @@
 # - leapp_kernel_module_state - REQUIRED - state of the kernel modules - present or absent
 ---
 - name: manage_one_kernel_module | Load or unload kernel module
-  community.general.modprobe:
+  infra.leapp.modprobe:
     name: "{{ leapp_kernel_module }}"
     state: "{{ leapp_kernel_module_state }}"
 
