@@ -28,7 +28,7 @@ exclude_paths:
 mock_modules:
   - community.general.redhat_subscription
   - fedora.linux_system_roles.selinux
-  - ansible.posix.mount
+  - fedora.linux_system_roles.storage
 
 # mock_roles:
 #   - mocked_role
