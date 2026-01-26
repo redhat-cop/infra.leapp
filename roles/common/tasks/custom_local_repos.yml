@@ -6,11 +6,19 @@
   when:
     - __leapp_repo_file is defined
 
+- name: custom_local_repos | Validate repo definitions have baseurl or metalink
+  ansible.builtin.assert:
+    that:
+      - item.baseurl is defined or item.metalink is defined
+    fail_msg: "Custom repo '{{ item.repoid | default(item.name | default('unnamed')) }}' must define baseurl or metalink."
+  loop: "{{ __repos }}"
+
 - name: custom_local_repos | Enable custom upgrade yum repositories
   ansible.builtin.yum_repository:
     name: "{{ item.name }}"
     description: "{{ item.description }}"
-    baseurl: "{{ item.baseurl }}"
+    baseurl: "{{ item.baseurl | default(omit) }}"
+    metalink: "{{ item.metalink | default(omit) }}"
     enabled: "{{ item.enabled | default(1) }}"
     gpgcheck: "{{ item.gpgcheck | default(0) }}"
     gpgkey: "{{ item.gpgkey | default(omit) }}"
@@ -22,5 +30,4 @@
     mode: "0644"
   loop: "{{ __repos }}"
   # no_log: true
-
 ...
