@@ -7,32 +7,50 @@
 - name: leapp_relative_symlinks | Change symbolic links in root directory to be relative
   when: not leapp_report_missing | default(false)
   vars:
-    entry_title: Upgrade requires links in root directory to be relative
-    remediation_matches: "{{ leapp_report_data.entries | selectattr('title', 'match', entry_title) |
-      map(attribute='detail.remediations') | flatten | list }}"
-    remediation: "{{ remediation_matches | selectattr('type', 'eq', 'command') | first
-      if remediation_matches | length > 0 else {} }}"
+    leapp_inhibitor_keys:
+      - 3d895ad37ceaf4157864d439edb6bd75562061fa
+    leapp_inhibitor_title: Upgrade requires links in root directory to be relative
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    leapp_remediation_matches: "{{ leapp_inhibitor_entries
+      | map(attribute='detail.remediations') | flatten
+      | list }}"
+    leapp_inhibitor_remediation: "{{ leapp_remediation_matches | selectattr('type', 'eq', 'command') | first
+      if leapp_remediation_matches | length > 0 else {} }}"
   block:
     - name: leapp_relative_symlinks | End execution of playbook if no entry found in leapp report
       ansible.builtin.debug:
         msg: "No matching entry found in leapp report. Skipping this task."
-      when: remediation | length == 0
+      when:
+        - leapp_inhibitor_remediation | length == 0
+          or leapp_inhibitor_remediation.context | default([]) | length == 0
 
     - name: leapp_relative_symlinks | Process remediation
-      when: remediation | length > 0
+      when:
+        - leapp_inhibitor_remediation | length > 0
+        - leapp_inhibitor_remediation.context | default([]) | length > 0
       block:
         - name: leapp_relative_symlinks | Output command to be executed
           ansible.builtin.debug:
-            msg: "{{ remediation.context }}"
+            msg: "{{ leapp_inhibitor_remediation.context }}"
 
         # The old version passed the list directly to the command.  I didn't think
         # this was possible.  Guard against something weird here.  Assume non-string
         # is a list.
         - name: leapp_relative_symlinks | Set links in root directory to be relative
           ansible.builtin.command:
-            argv: "{{ remediation.context if not remediation.context is string else omit }}"
-            cmd: "{{ remediation.context if remediation.context is string else omit }}"
+            argv: "{{ leapp_inhibitor_remediation.context if not leapp_inhibitor_remediation.context is string else omit }}"
+            cmd: "{{ leapp_inhibitor_remediation.context if leapp_inhibitor_remediation.context is string else omit }}"
           register: leapp_relative_symlinks
           changed_when: leapp_relative_symlinks is success
-
 ...

@@ -6,11 +6,26 @@
 
 - name: leapp_cgroups-v1_enabled | Disable cgroups-v1 in favor of the new version cgroups-v2
   vars:
+    leapp_inhibitor_keys:
+      - 4d9174ec75e27f2713b672d8932a06ebaa84dfb3
     leapp_inhibitor_title: cgroups-v1 enabled on the system
-    remediation_matches: "{{ leapp_report_data.entries | selectattr('title', 'match', leapp_inhibitor_title) |
-      map(attribute='detail.remediations') | flatten | list }}"
-    leapp_inhibitor_remediation: "{{ remediation_matches | selectattr('type', 'eq', 'command') | first
-      if remediation_matches | length > 0 else {} }}"
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    leapp_remediation_matches: "{{ leapp_inhibitor_entries
+      | map(attribute='detail.remediations') | flatten
+      | list }}"
+    leapp_inhibitor_remediation: "{{ leapp_remediation_matches | selectattr('type', 'eq', 'command') | first
+      if leapp_remediation_matches | length > 0 else {} }}"
   when:
     - not leapp_report_missing | default(false)
     - ansible_facts['distribution'] == 'RedHat'
@@ -19,10 +34,14 @@
     - name: leapp_cgroups-v1_enabled | End remediation if a matching entry was not found in the leapp report
       ansible.builtin.debug:
         msg: "No matching entry found in leapp report. Skipping this task."
-      when: leapp_inhibitor_remediation | length == 0
+      when:
+        - leapp_inhibitor_remediation | length == 0
+          or leapp_inhibitor_remediation.context | default([]) | length == 0
 
     - name: leapp_cgroups-v1_enabled | Process remediation
-      when: leapp_inhibitor_remediation | length > 0
+      when:
+        - leapp_inhibitor_remediation | length > 0
+        - leapp_inhibitor_remediation.context | default([]) | length > 0
       block:
         - name: leapp_cgroups-v1_enabled | Show the remediation command
           ansible.builtin.debug:
@@ -38,5 +57,4 @@
         - name: leapp_cgroups-v1_enabled | Show the remediation command result
           ansible.builtin.debug:
             msg: leapp_disable_cgroupsv1.stdout_lines
-
 ...
