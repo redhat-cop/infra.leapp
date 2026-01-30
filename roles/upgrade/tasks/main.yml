@@ -7,7 +7,7 @@
     job_name: RIPU in-place OS upgrade
 
 - name: Include tasks for upgrade using redhat-upgrade-tool
-  ansible.builtin.include_tasks: redhat-upgrade-tool-upgrade.yml
+  ansible.builtin.include_tasks: redhat-upgrade-tool-upgrade-el6.yml
   when: ansible_facts["distribution_major_version"]|int == 6
 
 - name: Include tasks for leapp upgrade
@@ -18,7 +18,7 @@
   ansible.builtin.include_tasks: upgrade-validation.yml
 
 - name: Include tasks for redhat-upgrade-tool post upgrade
-  ansible.builtin.include_tasks: redhat-upgrade-tool-post-upgrade.yml
+  ansible.builtin.include_tasks: redhat-upgrade-tool-post-upgrade-el6.yml
   when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int == 6
 
 - name: Include tasks for leapp post upgrade

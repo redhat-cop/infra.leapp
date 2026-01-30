@@ -1,5 +1,13 @@
 ---
-- name: redhat-upgrade-tool-upgrade | Run preupg --riskcheck
+- name: redhat-upgrade-tool-upgrade-el6 | Warn about limited ongoing technical support for RHEL 6
+  ansible.builtin.warn:
+    msg: >-
+      RHEL 6 is in the Extended Life Phase which means that the current upgrade path
+      has limited ongoing technical support. To learn more about the RHEL in-place
+      upgrade support policy, please refer to the following article:
+      https://access.redhat.com/articles/7102732.
+
+- name: redhat-upgrade-tool-upgrade-el6 | Run preupg --riskcheck
   ansible.builtin.shell: >
     export PATH={{ leapp_os_path }};
     preupg --riskcheck
@@ -8,14 +16,14 @@
   failed_when: false
   when: leapp_check_analysis_results
 
-- name: redhat-upgrade-tool-upgrade | Assert that preupg was successful
+- name: redhat-upgrade-tool-upgrade-el6 | Assert that preupg was successful
   ansible.builtin.assert:
     that: not __leapp_preupg_return_codes[preupg.rc].inhibited
     msg: "{{ __leapp_preupg_return_codes[preupg.rc].msg }}"
   when: leapp_check_analysis_results
 
 # TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
-- name: redhat-upgrade-tool-upgrade | Register to leapp activation key
+- name: redhat-upgrade-tool-upgrade-el6 | Register to leapp activation key
   ansible.builtin.shell: >
     set -o pipefail;
     export PATH={{ leapp_os_path }};
@@ -31,7 +39,7 @@
   failed_when: false
   changed_when: true
 
-- name: redhat-upgrade-tool-upgrade | Include custom_local_repos for local_repos_post_upgrade
+- name: redhat-upgrade-tool-upgrade-el6 | Include custom_local_repos for local_repos_post_upgrade
   vars:
     __repos: "{{ leapp_local_repos_pre }}"
   ansible.builtin.include_role:
@@ -39,17 +47,17 @@
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
-- name: redhat-upgrade-tool-upgrade | Gather package facts
+- name: redhat-upgrade-tool-upgrade-el6 | Gather package facts
   ansible.builtin.package_facts:
 
-- name: redhat-upgrade-tool-upgrade | Get package version lock entries
+- name: redhat-upgrade-tool-upgrade-el6 | Get package version lock entries
   ansible.builtin.command: # noqa: command-instead-of-module
     cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock list"
   register: versionlock_list
   changed_when: false
   failed_when: false
 
-- name: redhat-upgrade-tool-upgrade | Remove all package version locks
+- name: redhat-upgrade-tool-upgrade-el6 | Remove all package version locks
   ansible.builtin.command: # noqa: command-instead-of-module
     cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock clear"
   changed_when: true
@@ -59,40 +67,40 @@
 
 # Clean up upgrade repository from failed previous runs.
 # So upgrade-and-reboot.yml can succeed.
-- name: redhat-upgrade-tool-upgrade | Disable redhat-upgrade-cmdline-instrepo.repo
+- name: redhat-upgrade-tool-upgrade-el6 | Disable redhat-upgrade-cmdline-instrepo.repo
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
   loop:
     - redhat-upgrade-cmdline-instrepo.repo
   when: leapp_upgrade_type == "custom"
 
-- name: redhat-upgrade-tool-upgrade | Include update-and-reboot.yml
+- name: redhat-upgrade-tool-upgrade-el6 | Include update-and-reboot.yml
   ansible.builtin.include_tasks: update-and-reboot.yml
 
-- name: redhat-upgrade-tool-upgrade | Get enabled RHEL 6 repositories
+- name: redhat-upgrade-tool-upgrade-el6 | Get enabled RHEL 6 repositories
   ansible.builtin.command: subscription-manager repos --list-enabled
   register: __rhel6_enabled_repos
   changed_when: false
   failed_when: false
 
-- name: redhat-upgrade-tool-upgrade | Disable RHEL 6 repositories
+- name: redhat-upgrade-tool-upgrade-el6 | Disable RHEL 6 repositories
   ansible.builtin.command: subscription-manager repos --disable="*"
   changed_when: true
   when:
     - __rhel6_enabled_repos.rc == 0
     - "'Repo ID' in __rhel6_enabled_repos.stdout"
 
-- name: redhat-upgrade-tool-upgrade | Include disable-previous-repo-files.yml
+- name: redhat-upgrade-tool-upgrade-el6 | Include disable-previous-repo-files.yml
   ansible.builtin.include_tasks: disable-previous-repo-files.yml
   loop: "{{ leapp_repo_files_to_remove_at_upgrade }}"
   when: leapp_upgrade_type == "custom"
 
-- name: redhat-upgrade-tool-upgrade | Install RPM Key for RHEL 7 ISO Repository
+- name: redhat-upgrade-tool-upgrade-el6 | Install RPM Key for RHEL 7 ISO Repository
   ansible.builtin.rpm_key:
     key: "{{ leapp_rhel_7_network_install_repo_url }}/RPM-GPG-KEY-redhat-release"
     state: present
   when: leapp_upgrade_type == "custom"
 
-- name: redhat-upgrade-tool-upgrade | Unload kernel modules before upgrade
+- name: redhat-upgrade-tool-upgrade-el6 | Unload kernel modules before upgrade
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: manage_kernel_modules.yml
@@ -101,7 +109,7 @@
     leapp_kernel_modules_state: absent
 
 # --cleanup-post removes Red Hat signed RHEL 6 packages and in theory should be safe.
-- name: redhat-upgrade-tool-upgrade | Run redhat-upgrade-tool
+- name: redhat-upgrade-tool-upgrade-el6 | Run redhat-upgrade-tool
   ansible.builtin.shell: >
     set -o pipefail;
     export PATH={{ leapp_os_path }};
@@ -115,7 +123,7 @@
   # failed_when: false
   changed_when: true
 
-- name: redhat-upgrade-tool-upgrade | Reboot to continue OS upgrade
+- name: redhat-upgrade-tool-upgrade-el6 | Reboot to continue OS upgrade
   ansible.builtin.reboot:
     msg: Host is starting OS upgrade now!
     reboot_timeout: "{{ leapp_upgrade_timeout }}"

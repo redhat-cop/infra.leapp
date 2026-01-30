@@ -12,29 +12,32 @@ This collection provides Ansible roles you can use to perform RHEL in-place upgr
 
 These are the roles included in the collection. Follow the links below to see the detailed documentation and example playbooks for each role.
 
-- [`analysis`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/analysis) - executes the Leapp pre-upgrade phase
-- [`upgrade`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/upgrade/) - executes the Leapp OS upgrade
-- [`remediate`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/remediate/) - assists in the remediation of a system (RHEL 7->8 and 8->9 only)
+- [`analysis`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/analysis) - executes the Leapp pre-upgrade phase (or Preupgrade Assistant in case of RHEL 6)
+- [`upgrade`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/upgrade/) - executes the Leapp OS upgrade (or Red Hat Upgrade Tool in case of RHEL 6)
+- [`remediate`](https://github.com/redhat-cop/infra.leapp/tree/main/roles/remediate/) - assists in the remediation of a system
 
-## Supported RHEL versions
+## Available RHEL upgrade paths
 
-The collection supports RHEL in-place upgrades for the following RHEL versions:
+The collection allows for RHEL in-place upgrades for the following RHEL versions while utilizing either Preupgrade Assistant (PA) and RedHat Upgrade Tool (RUT), or Leapp:
 
-- RHEL 6 to RHEL 7 (RUT)
+- RHEL 6 to RHEL 7 (PA & RUT)
 - RHEL 7 to RHEL 8 (Leapp)
 - RHEL 8 to RHEL 9 (Leapp)
 - RHEL 9 to RHEL 10 (Leapp)
 
-The collection may be used for the RHEL upgrade paths and minor versions supported by the indicated upgrade utilities (Leapp or RUT). Refer the to Red Hat knowledge solution article [Supported in-place upgrade paths for Red Hat Enterprise Linux](https://access.redhat.com/articles/4263361) for the latest support details.
+> [!IMPORTANT]
+> Not all available upgrade paths have to be supported by Red Hat. Please refer to the article [RHEL In-place upgrade Support Policy](https://access.redhat.com/articles/7102732) for more information.
+
+The collection may be used for the mentioned RHEL upgrade paths with the minor versions supported by the indicated upgrade utilities (Leapp or PA & RUT). Refer to the Red Hat knowledge solution article [Supported in-place upgrade paths for Red Hat Enterprise Linux](https://access.redhat.com/articles/4263361) for the latest support details.
 
 The roles in this collection have been successfully used in a number of different environments including on-prem bare metal servers and VMs pulling RHEL packages from Red Hat CDN repos, Satellite content views, or mirrored repos internal to disconnected networks. Upgrading RHEL on Amazon EC2 instances pulling from bring-your-own-subscription CDN repos or pay-as-you-go RHUI repos have also been tested. Upgrading RHEL on other public clouds should be possible as well after setting the documented role variables as required.
 
 > [!IMPORTANT]
-> Targeting RHEL 6 nodes requires an Ansible-core version <= 2.12
+> Targeting RHEL 6 nodes requires an Ansible-core version <= 2.12 or Red Hat Ansible Automation Platform with an Execution Environment 2.1, both being end-of-life and not supported.
 >
-> Targeting RHEL 7 nodes requires an Ansible-core version <= 2.16
+> Targeting RHEL 7 nodes requires an Ansible-core version <= 2.16.
 >
-> See [this knowledgebase article](https://access.redhat.com/articles/6977724) for details
+> See [Ansible Core compatibility with RHEL 7 and RHEL 6 managed nodes](https://access.redhat.com/articles/6977724) and [Red Hat Ansible Automation Platform Life Cycle](https://access.redhat.com/support/policy/updates/ansible-automation-platform) for more information.
 
 ## Not in scope
 

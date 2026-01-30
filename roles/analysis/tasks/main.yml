@@ -7,7 +7,7 @@
     job_name: RIPU preupgrade analysis
 
 - name: Include tasks for preupg assistant analysis
-  ansible.builtin.include_tasks: analysis-preupg.yml
+  ansible.builtin.include_tasks: analysis-preupg-el6.yml
   when: ansible_facts["distribution_major_version"]|int == 6
 
 - name: Include tasks for leapp preupgrade analysis
