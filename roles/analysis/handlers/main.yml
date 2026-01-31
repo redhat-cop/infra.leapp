@@ -1,18 +1,22 @@
 ---
 # handlers file for analysis
-- name: Register to pre leapp activation key
-  community.general.redhat_subscription:
-    state: present
-    activationkey: "{{ leapp_satellite_activation_key_pre_leapp }}"
-    org_id: "{{ leapp_satellite_organization }}"
-    force_register: true
+- name: Register with pre-leapp Satellite activation key
+  ansible.builtin.include_role:
+    name: "{{ leapp_infra_upgrade_system_roles_collection }}.rhc"
+  vars:
+    rhc_state: reconnect
+    rhc_organization: "{{ leapp_satellite_organization }}"
+    rhc_auth:
+      activation_keys:
+        keys:
+          - "{{ leapp_satellite_activation_key_pre_leapp }}"
   when:
     - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization is not none
-    - leapp_satellite_activation_key_pre_leapp is not none
+    - leapp_satellite_organization | default('') | length > 0
+    - leapp_satellite_activation_key_pre_leapp | default('') | length > 0
 
-# TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
-- name: Register to pre leapp activation key RHEL 6
+# Note: RHEL 6 does not support the rhc role - using subscription-manager directly.
+- name: Register with pre-leapp Satellite activation key (RHEL 6)
   ansible.builtin.shell: >
     export PATH={{ leapp_os_path }};
     subscription-manager register

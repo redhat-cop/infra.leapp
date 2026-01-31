@@ -11,16 +11,20 @@
     msg: Inhibitors found, please investigate and rerun analysis.
   when: leapp_check_analysis_results
 
-- name: leapp-upgrade | Register to leapp activation key
-  community.general.redhat_subscription:
-    state: present
-    activationkey: "{{ leapp_satellite_activation_key_leapp }}"
-    org_id: "{{ leapp_satellite_organization }}"
-    force_register: true
+- name: leapp-upgrade | Register with Satellite activation key
+  ansible.builtin.include_role:
+    name: "{{ leapp_infra_upgrade_system_roles_collection }}.rhc"
+  vars:
+    rhc_state: reconnect
+    rhc_organization: "{{ leapp_satellite_organization }}"
+    rhc_auth:
+      activation_keys:
+        keys:
+          - "{{ leapp_satellite_activation_key_leapp }}"
   when:
     - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization is not none
-    - leapp_satellite_activation_key_leapp is not none
+    - leapp_satellite_organization | default('') | length > 0
+    - leapp_satellite_activation_key_leapp | default('') | length > 0
 
 - name: leapp-upgrade | Include custom_local_repos for local_repos_pre_leapp
   vars:

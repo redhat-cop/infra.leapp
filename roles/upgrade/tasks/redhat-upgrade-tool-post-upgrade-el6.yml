@@ -1,11 +1,11 @@
 ---
-# TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
 - name: redhat-upgrade-tool-post-upgrade-el6 | Ensure redhat-upgrade-cmdline-instrepo.repo file is absent
   ansible.builtin.file:
     path: /etc/yum.repos.d/redhat-upgrade-cmdline-instrepo.repo
     state: absent
 
-- name: redhat-upgrade-tool-post-upgrade-el6 | "Register to post upgrade activation key"
+# Note: RHEL 6 does not support the rhc role - using subscription-manager directly.
+- name: redhat-upgrade-tool-post-upgrade-el6 | Register with post-leapp Satellite activation key
   ansible.builtin.shell: >
     export PATH={{ leapp_os_path }};
     subscription-manager register
@@ -15,8 +15,8 @@
   register: sub_man_reg
   when:
     - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization is not none
-    - leapp_satellite_activation_key_post_leapp is not none
+    - leapp_satellite_organization | default('') | length > 0
+    - leapp_satellite_activation_key_post_leapp | default('') | length > 0
   failed_when: false
   changed_when: true
 
