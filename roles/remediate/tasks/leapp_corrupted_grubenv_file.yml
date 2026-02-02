@@ -7,22 +7,41 @@
 - name: leapp_corrupted_grubenv_file | Detected a corrupted grubenv file
   when: not leapp_report_missing | default(false)
   vars:
-    entry_title: Detected a corrupted grubenv file
-    remediation_matches: "{{ leapp_report_data.entries | selectattr('title', 'match', entry_title) |
-      map(attribute='detail.remediations') | flatten | list }}"
-    hints: "{{ remediation_matches | selectattr('type', 'eq', 'hint') | list
-      if remediation_matches | length > 0 else [] }}"
-    hint: "{{ hints | first if hints | length > 0 else {} }}"
+    leapp_inhibitor_keys:
+      - f32345b6140b5a318c1c01e1cbc6ef1c0321e04a
+    leapp_inhibitor_title: Detected a corrupted grubenv file
+    leapp_inhibitor_hint_pattern: Delete (.+?) file
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    leapp_remediation_matches: "{{ leapp_inhibitor_entries
+      | map(attribute='detail.remediations')
+      | flatten
+      | list }}"
+    leapp_inhibitor_remediation_hint: "{{ leapp_remediation_matches | selectattr('type', 'eq', 'hint') | first
+      if leapp_remediation_matches | length > 0 else {} }}"
   block:
     - name: leapp_corrupted_grubenv_file | End execution of playbook if no entry found in leapp report
       ansible.builtin.debug:
         msg: "No matching entry found in leapp report. Skipping this task."
-      when: hint | length == 0
+      when: leapp_inhibitor_remediation_hint | length == 0
 
     - name: leapp_corrupted_grubenv_file | Process remediation
-      when: hint | length > 0
+      when: leapp_inhibitor_remediation_hint | length > 0
       vars:
-        files_grub: "{{ (hint.context | regex_findall('Delete (.+?) file', '\\1') | first).split(',') | map('trim') | list }}"
+        files_grub: >-
+          {{ (leapp_inhibitor_remediation_hint.context | regex_findall(leapp_inhibitor_hint_pattern, '\\1') | first).split(',')
+            | map('trim')
+            | list }}
       block:
         - name: leapp_corrupted_grubenv_file | Backup file(s)
           ansible.builtin.copy:

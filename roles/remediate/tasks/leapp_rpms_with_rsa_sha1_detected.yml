@@ -6,10 +6,26 @@
 
 - name: leapp_rpms_with_rsa_sha1_detected | Remove RPMs with RSA/SHA1 signature
   vars:
-    entry_title: Detected RPMs with RSA/SHA1 signature
-    summaries: "{{ leapp_report_data.entries | selectattr('title', 'match', entry_title) |
-      map(attribute='summary') | list }}"
-    summary: "{{ summaries | first if summaries | length > 0 else '' }}"
+    leapp_inhibitor_keys:
+      - f16f40f49c2329a2691c0801b94d31b6b3d4f876
+    leapp_inhibitor_title: Detected RPMs with RSA/SHA1 signature
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    leapp_inhibitor_summary: "{{ leapp_inhibitor_entries
+      | selectattr('summary', 'defined')
+      | rejectattr('summary', 'eq', '')
+      | map(attribute='summary')
+      | first | default('') }}"
   when:
     - not leapp_report_missing | default(false)
     - ansible_facts['distribution'] == 'RedHat'
@@ -18,14 +34,14 @@
     - name: leapp_rpms_with_rsa_sha1_detected | End execution of playbook if no entry found in leapp report
       ansible.builtin.debug:
         msg: "No matching entry found in leapp report. Skipping this task."
-      when: summary | length == 0
+      when: leapp_inhibitor_summary | length == 0
 
     - name: leapp_rpms_with_rsa_sha1_detected | Process remediation
-      when: summary | length > 0
+      when: leapp_inhibitor_summary | length > 0
       block:
         - name: leapp_rpms_with_rsa_sha1_detected | Parse bad_pkgs
           ansible.builtin.set_fact:
-            bad_pkgs: "{{ summary.split('The list of problematic packages:') | last | trim | regex_findall('- ([^ ]+)', '\\1') | list }}"
+            bad_pkgs: "{{ leapp_inhibitor_summary.split('The list of problematic packages:') | last | trim | regex_findall('- ([^ ]+)', '\\1') | list }}"
 
         # TODO: Pass the bad_pkgs list directly to the dnf command?  Is there some reason
         # this has to be done one at a time?  It is much slower this way.

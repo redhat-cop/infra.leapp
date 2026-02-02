@@ -6,31 +6,50 @@
 
 - name: leapp_loaded_removed_kernel_drivers | Unload kernel drivers which have been removed in next RHEL release
   vars:
-    entry_title_pattern: Leapp detected loaded kernel drivers which have been removed in RHEL \d+. Upgrade cannot proceed.
-    unsupported_modules: "{{ leapp_report_data.entries | selectattr('title', 'match', entry_title_pattern) |
-      selectattr('summary', 'defined') | rejectattr('summary', 'eq', '') |
-      map(attribute='summary') | flatten | map('regex_findall', '(?<=- ).*') | flatten | list }}"
+
+    leapp_inhibitor_keys:
+      - f08a07da902958defa4f5c2699fae9ec2eb67c5b
+      - 7ae2961239eec9905e2580fa6309a589b1dca953
+      - 48e04852631245aa4afee9adcdc7c2375b8cffb8
+    leapp_inhibitor_title: Leapp detected loaded kernel drivers which have been removed in RHEL \d+. Upgrade cannot proceed.
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    leapp_unsupported_modules: "{{ leapp_inhibitor_entries
+      | selectattr('summary', 'defined')
+      | rejectattr('summary', 'eq', '')
+      | map(attribute='summary') | flatten
+      | map('regex_findall', '(?m)^\\s*-\\s+(.+)$') | flatten
+      | list }}"
   when: not leapp_report_missing | default(false)
   block:
     - name: leapp_loaded_removed_kernel_drivers | End execution of playbook if no entry found in leapp report
       ansible.builtin.debug:
         msg: "No matching entry found in leapp report. Skipping this task."
-      when: unsupported_modules | length == 0
+      when: leapp_unsupported_modules | length == 0
 
     - name: leapp_loaded_removed_kernel_drivers | Process remediation
-      when: unsupported_modules | length > 0
+      when: leapp_unsupported_modules | length > 0
       block:
         - name: leapp_loaded_removed_kernel_drivers | Print unsupported modules
           ansible.builtin.debug:
-            var: unsupported_modules
+            var: leapp_unsupported_modules
 
         - name: leapp_loaded_removed_kernel_drivers | Unload unsupported modules
           ansible.builtin.include_role:
             name: infra.leapp.common
             tasks_from: manage_kernel_modules.yml
           vars:
-            leapp_kernel_modules: "{{ unsupported_modules }}"
+            leapp_kernel_modules: "{{ leapp_unsupported_modules }}"
             leapp_kernel_modules_state: absent
-          when: unsupported_modules | length > 0
-
+          when: leapp_unsupported_modules | length > 0
 ...

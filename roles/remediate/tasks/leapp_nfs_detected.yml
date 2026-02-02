@@ -6,47 +6,64 @@
 
 - name: leapp_nfs_detected | Disable NFS temporarily for the upgrade
   vars:
-    entry_title: Use of NFS detected. Upgrade can't proceed
-    summaries: "{{ leapp_report_data.entries | selectattr('title', 'match', entry_title) | map(attribute='summary') | list }}"
-    summary: "{{ summaries | first if summaries | length > 0 else '' }}"
-    split_summary: "{{ summary.split('- NFS')[1:] | map('regex_replace', '^[\\s\\n]+', '- NFS ') | list }}"
+    leapp_inhibitor_keys:
+      - 9881b25faceeeaa7a6478bcdac29afd7f6baaaed
+    leapp_inhibitor_title: Use of NFS detected. Upgrade can't proceed
+    leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
+    leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
+      | selectattr('key', 'defined')
+      | selectattr('key', 'in', leapp_inhibitor_keys)
+      | list }}"
+    leapp_inhibitor_entries_by_title: "{{ leapp_report_entries
+      | selectattr('title', 'defined')
+      | selectattr('title', 'match', '(?i)' ~ leapp_inhibitor_title)
+      | list }}"
+    leapp_inhibitor_entries: "{{ leapp_inhibitor_entries_by_key
+      if leapp_inhibitor_entries_by_key | length > 0
+      else leapp_inhibitor_entries_by_title }}"
+    leapp_inhibitor_summary: "{{ leapp_inhibitor_entries
+      | selectattr('summary', 'defined')
+      | rejectattr('summary', 'eq', '')
+      | map(attribute='summary')
+      | first | default('') }}"
+    split_summary: "{{ leapp_inhibitor_summary.split('- NFS')[1:]
+      | map('regex_replace', '^[\\s\\n]+', '- NFS ')
+      | list }}"
+    fstab_entries: "{{ split_summary
+      | select('search', '- NFS shares found in /etc/fstab:')
+      | map('regex_replace', '^.*- NFS shares found in /etc/fstab:\\s*', '')
+      | map('regex_findall', '- ([^ ]+)') | flatten
+      | list }}"
+    nfs_mounts: "{{ split_summary
+      | select('search', '- NFS shares currently mounted:')
+      | map('regex_replace', '^.*- NFS shares currently mounted:\\s*', '')
+      | map('regex_findall', '- ([^ ]+)') | flatten
+      | list }}"
   when: not leapp_report_missing | default(false)
   block:
     - name: leapp_nfs_detected | End execution of playbook if no entry found in leapp report
       ansible.builtin.debug:
         msg: "No matching entry found in leapp report. Skipping this task."
-      when: summary | length == 0 or split_summary | length == 0
+      when: leapp_inhibitor_summary | length == 0 or split_summary | length == 0
 
     - name: leapp_nfs_detected | Process remediation
       when:
-        - summary | length > 0
+        - leapp_inhibitor_summary | length > 0
         - split_summary | length > 0
       block:
-        - name: leapp_nfs_detected | Get fstab_entries
-          ansible.builtin.set_fact:
-            fstab_entries: "{{ item.split('- NFS shares found in /etc/fstab:') | last | trim | regex_findall('- ([^ ]+)', '\\1') | list }}"
-          loop: "{{ split_summary }}"
-          when: "'- NFS shares found in /etc/fstab:' in item"
-
-        - name: leapp_nfs_detected | Get nfs_mounts
-          ansible.builtin.set_fact:
-            nfs_mounts: "{{ item.split('- NFS shares currently mounted:') | last | trim | regex_findall('- ([^ ]+)', '\\1') | list }}"
-          loop: "{{ split_summary }}"
-          when: "'- NFS shares currently mounted:' in item"
-
         - name: leapp_nfs_detected | Comment NFS shares in /etc/fstab
           loop: "{{ fstab_entries }}"
           ansible.builtin.shell: |
             set -o pipefail
             entry="{{ item }}"
             grep -qF "$entry" /etc/fstab && sed -i "s|^$entry|# $entry|" /etc/fstab
-          when: fstab_entries is defined
-          changed_when: fstab_entries is defined
+          when: fstab_entries | length > 0
+          changed_when: fstab_entries | length > 0
 
         - name: leapp_nfs_detected | Unmount NFS Mounts
           ansible.builtin.command: umount -l {{ item | quote }}
           loop: "{{ nfs_mounts }}"
-          when: nfs_mounts is defined
-          changed_when: nfs_mounts is defined
+          when: nfs_mounts | length > 0
+          changed_when: nfs_mounts | length > 0
 
 ...
