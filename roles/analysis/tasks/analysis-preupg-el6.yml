@@ -15,14 +15,14 @@
     --org="{{ leapp_satellite_organization }}"
     --activationkey="{{ leapp_satellite_activation_key_pre_leapp }}"
     --force
+  register: sub_man_reg
+  failed_when: false
+  changed_when: true
   when:
     - leapp_upgrade_type == 'satellite'
     - leapp_satellite_organization | default('') | length > 0
     - leapp_satellite_activation_key_pre_leapp | default('') | length > 0
-  notify: Register with pre-leapp Satellite activation key (RHEL 6)
-  register: sub_man_reg
-  failed_when: false
-  changed_when: true
+  notify: Register with pre-analysis Satellite activation key (RHEL 6)
 
 - name: analysis-preupg-el6 | Include custom_local_repos for local_repos_pre_leapp
   vars:
