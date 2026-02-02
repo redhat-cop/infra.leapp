@@ -7,22 +7,22 @@
       upgrade support policy, please refer to the following article:
       https://access.redhat.com/articles/7102732.
 
-# TODO: Having issues with community.general.redhat_subscription and subscription-manager on RHEL 6.
-- name: analysis-preupg-el6 | Register to upgrade activation key
+# Note: RHEL 6 does not support the rhc role - using subscription-manager directly.
+- name: analysis-preupg-el6 | Register with Satellite activation key
   ansible.builtin.shell: >
     export PATH={{ leapp_os_path }};
     subscription-manager register
     --org="{{ leapp_satellite_organization }}"
     --activationkey="{{ leapp_satellite_activation_key_pre_leapp }}"
     --force
-  when:
-    - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization is not none
-    - leapp_satellite_activation_key_pre_leapp is not none
-  notify: Register to pre leapp activation key RHEL 6
   register: sub_man_reg
   failed_when: false
   changed_when: true
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - leapp_satellite_organization | default('') | length > 0
+    - leapp_satellite_activation_key_pre_leapp | default('') | length > 0
+  notify: Register with pre-analysis Satellite activation key (RHEL 6)
 
 - name: analysis-preupg-el6 | Include custom_local_repos for local_repos_pre_leapp
   vars:

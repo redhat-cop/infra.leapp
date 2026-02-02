@@ -26,7 +26,7 @@ exclude_paths:
 # Mocking these modules so they do not give errors due to the galaxy importer
 # not being able to pull community.general (not being validated)
 mock_modules:
-  - community.general.redhat_subscription
+  - fedora.linux_system_roles.rhc
   - fedora.linux_system_roles.selinux
   - fedora.linux_system_roles.storage
 
