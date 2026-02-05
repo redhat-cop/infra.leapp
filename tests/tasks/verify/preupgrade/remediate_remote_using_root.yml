@@ -1,0 +1,13 @@
+# verify the remote using root remediation
+# verify that the lines are present or absent depending on the value of leapp_remediate_ssh_password_auth
+---
+- name: preupgrade | remediate_remote_using_root | Verify the remote using root remediation
+  ansible.builtin.command: grep -E '^{{ item }}' /etc/ssh/sshd_config
+  changed_when: false
+  register: grep_sshd_config
+  failed_when: (leapp_remediate_ssh_password_auth and grep_sshd_config.rc != 0) or
+    (not leapp_remediate_ssh_password_auth and grep_sshd_config.rc == 0)
+  loop:
+    - PasswordAuthentication no
+    - PermitRootLogin prohibit-password
+...

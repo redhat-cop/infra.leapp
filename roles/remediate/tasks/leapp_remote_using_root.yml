@@ -7,9 +7,11 @@
         regex: "^(#)?{{ item.key }}"
         line: "{{ item.key }} {{ item.value }}"
         state: present
-      loop:
-        - {key: "PermitRootLogin", value: "prohibit-password"}
-        - {key: "PasswordAuthentication", value: "no"}
+      loop: "{{ settings if leapp_remediate_ssh_password_auth else [] }}"
+      vars:
+        settings:
+          - {key: "PermitRootLogin", value: "prohibit-password"}
+          - {key: "PasswordAuthentication", value: "no"}
       notify:
         - Restart sshd
 

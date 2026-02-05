@@ -26,4 +26,11 @@ leapp_remediation_playbooks: "{{ remediation_playbooks |
 # remediation_todo is deprecated, use leapp_remediation_todo instead
 # leapp_remediation_todo: []
 leapp_remediation_todo: "{{ remediation_todo | default([]) }}"
+
+# leapp_remediate_ssh_password_auth
+# Whether to remediate SSH password authentication by setting PasswordAuthentication to no
+# and PermitRootLogin to prohibit-password
+# by default this is true, which is the old default
+leapp_remediate_ssh_password_auth: true
+
 ...
