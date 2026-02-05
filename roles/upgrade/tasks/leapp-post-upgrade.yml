@@ -138,8 +138,8 @@
           - "{{ leapp_satellite_activation_key_post_leapp }}"
   when:
     - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization | default('') | length > 0
-    - leapp_satellite_activation_key_post_leapp | default('') | length > 0
+    - leapp_satellite_organization | default('', true) | length > 0
+    - leapp_satellite_activation_key_post_leapp | default('', true) | length > 0
 
 - name: leapp-post-upgrade | Include custom_local_repos for local_repos_post_upgrade
   vars:

@@ -22,7 +22,6 @@
     - leapp_upgrade_type == 'satellite'
     - leapp_satellite_organization | default('') | length > 0
     - leapp_satellite_activation_key_pre_leapp | default('') | length > 0
-  notify: Register with pre-analysis Satellite activation key (RHEL 6)
 
 - name: analysis-preupg-el6 | Include custom_local_repos for local_repos_pre_leapp
   vars:
@@ -92,6 +91,23 @@
     name: infra.leapp.common
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
+
+# If the analysis required a different Satellite activation key, re-register with
+# the original activation key to restore the system to its pre-analysis state.
+- name: analysis-preupg-el6 | Restore original Satellite activation key (RHEL 6)
+  ansible.builtin.shell: >
+    export PATH={{ leapp_os_path }};
+    subscription-manager register
+    --org="{{ leapp_satellite_organization }}"
+    --activationkey="{{ leapp_satellite_activation_key_pre_leapp }}"
+    --force
+  register: sub_man_reg
+  changed_when: true
+  failed_when: false
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - leapp_satellite_organization | default('') | length > 0
+    - leapp_satellite_activation_key_pre_leapp | default('') | length > 0
 
 - name: analysis-preupg-el6 | Include check-results-file.yml
   ansible.builtin.include_tasks: check-results-file.yml

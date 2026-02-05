@@ -1,36 +1,6 @@
 ---
 # handlers file for analysis
 
-# Registers with the satellite key used before the analysis when the content view
-# for analysis is different from what the system uses by default.
-# This is triggered by defining leapp_satellite_activation_key_pre_leapp variable (see README.md).
-# Note: Handlers don't support include_role directly, so we use include_tasks instead.
-- name: Register with pre-analysis Satellite activation key
-  ansible.builtin.include_tasks:
-    file: register-satellite.yml
-  vars:
-    __satellite_activation_key: "{{ leapp_satellite_activation_key_pre_leapp }}"
-  when:
-    - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_activation_key_pre_leapp | default('') | length > 0
-
-# Similar to the above, but for RHEL 6.
-# Note: RHEL 6 does not support the rhc role - using subscription-manager directly.
-- name: Register with pre-analysis Satellite activation key (RHEL 6)
-  ansible.builtin.shell: >
-    export PATH={{ leapp_os_path }};
-    subscription-manager register
-    --org="{{ leapp_satellite_organization }}"
-    --activationkey="{{ leapp_satellite_activation_key_pre_leapp }}"
-    --force
-  register: sub_man_reg
-  changed_when: true
-  failed_when: false
-  when:
-    - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization | default('') | length > 0
-    - leapp_satellite_activation_key_pre_leapp | default('') | length > 0
-
 - name: Remove lynx package
   ansible.builtin.package:
     name: lynx
