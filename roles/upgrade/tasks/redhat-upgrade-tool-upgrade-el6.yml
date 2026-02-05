@@ -32,12 +32,12 @@
     activationkey: "{{ leapp_satellite_activation_key_leapp }}"
     force_register: true
   register: sub_man_reg
-  when:
-    - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization | default('') | length > 0
-    - leapp_satellite_activation_key_leapp | default('') | length > 0
   failed_when: false
   changed_when: true
+  when:
+    - leapp_upgrade_type == 'satellite'
+    - leapp_satellite_organization | default('', true) | length > 0
+    - leapp_satellite_activation_key_leapp | default('', true) | length > 0
 
 - name: redhat-upgrade-tool-upgrade-el6 | Include custom_local_repos for local_repos_post_upgrade
   vars:
