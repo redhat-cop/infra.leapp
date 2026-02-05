@@ -18,9 +18,9 @@ Activation keys provide a method to identify content views available from Red Ha
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| leapp_satellite_organization  | String   | null | Organization used in Satellite definition |
-| leapp_satellite_activation_key_pre_leapp | String | null | Activation key for the current RHEL version content view |
-| leapp_satellite_activation_key_leapp     | String | null | Activation key for the content view including both the current RHEL version and the next version |
+| leapp_satellite_organization  | String   | "" | Organization used in Satellite definition |
+| leapp_satellite_activation_key_pre_leapp | String | "" | Activation key for the current RHEL version content view to re-register to after analysis |
+| leapp_satellite_activation_key_leapp     | String | "" | Activation key for the content view including both the current RHEL version and the next version |
 | leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
 
 ## Custom repos variables
@@ -46,6 +46,7 @@ See comments in defaults/main.yml for additional details.
 | leapp_async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds) |
 | leapp_async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds) |
 | leapp_bypass_fs_checks | Boolean | false | Set to `true` to bypass filesystem capacity checks |
+| leapp_infra_upgrade_system_roles_collection | String | fedora.linux_system_roles | Can be one of:<br>- 'fedora.linux_system_roles'<br>- 'redhat.rhel_system_roles' |
 
 ## Example playbook
 

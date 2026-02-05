@@ -40,9 +40,9 @@ Activation keys provide a method to identify content views available from Red Ha
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| leapp_satellite_organization  | String   | null | Organization used in Satellite definition |
-| leapp_satellite_activation_key_leapp     | String | null | Activation key for the content view including both the current RHEL version and the next version |
-| leapp_satellite_activation_key_post_leapp     | String | null | Activation key for the content view for the next version post leapp |
+| leapp_satellite_organization  | String   | "" | Organization used in Satellite definition |
+| leapp_satellite_activation_key_leapp     | String | "" | Activation key for the content view including both the current RHEL version and the next version |
+| leapp_satellite_activation_key_post_leapp     | String | "" | Activation key for the content view for the next version post leapp |
 | leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
 
 ## Custom repos variables
