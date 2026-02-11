@@ -47,7 +47,7 @@ leapp_rhel_7_network_install_repo_url: "{{ rhel_7_network_install_repo_url | def
 # unless the content view already in use has all required repositories.
 leapp_satellite_organization: ""
 leapp_satellite_activation_key_leapp: ""
-leapp_satellite_activation_key_post_leapp: ""
+leapp_satellite_activation_key_post_leapp: "{{ leapp_satellite_activation_key_leapp }}"
 
 # For leapp_upgrade_type == "custom"
 # Used to configure repos before running leapp analysis / installing leapp packages.

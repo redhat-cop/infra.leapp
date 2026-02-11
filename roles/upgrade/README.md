@@ -36,13 +36,13 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 
 ## Satellite variables
 
-Activation keys provide a method to identify content views available from Red Hat Satellite. To do in-place upgrades using Satellite, a content view including both the current RHEL version and the next version must be created. Use these variables to specify the activation keys for the required content views.
+Activation keys provide a method to identify content views available from Red Hat Satellite. To do in-place upgrades using Satellite, both the current RHEL version and the next RHEL version repositories must be available. Use these variables to specify the activation keys for the required content views. In case the system should be registered to a different activation key after the upgrade, one can specify the `leapp_satellite_activation_key_post_leapp` in order to re-register to it after the upgrade concludes. If not specified, the system will remain registered to the `leapp_satellite_activation_key_leapp` used during the upgrade.
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
 | leapp_satellite_organization  | String   | "" | Organization used in Satellite definition |
 | leapp_satellite_activation_key_leapp     | String | "" | Activation key for the content view including both the current RHEL version and the next version |
-| leapp_satellite_activation_key_post_leapp     | String | "" | Activation key for the content view for the next version post leapp |
+| leapp_satellite_activation_key_post_leapp     | String | leapp_satellite_activation_key_leapp | Activation key for the content view with the next RHEL version to register to after the upgrade |
 | leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
 
 ## Custom repos variables
