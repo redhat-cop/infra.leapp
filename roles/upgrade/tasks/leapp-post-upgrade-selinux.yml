@@ -13,7 +13,7 @@
   block:
     - name: leapp-post-upgrade-selinux | Apply SELinux settings via system role
       ansible.builtin.include_role:
-        name: fedora.linux_system_roles.selinux
+        name: "{{ leapp_infra_upgrade_system_roles_collection }}.selinux"
       vars:
         selinux_policy: targeted
         selinux_state: "{{ leapp_selinux_mode }}"
@@ -37,7 +37,7 @@
 
     - name: leapp-post-upgrade-selinux | Re-apply SELinux settings via system role after reboot
       ansible.builtin.include_role:
-        name: fedora.linux_system_roles.selinux
+        name: "{{ leapp_infra_upgrade_system_roles_collection }}.selinux"
       vars:
         selinux_policy: targeted
         selinux_state: "{{ leapp_selinux_mode }}"
