@@ -46,7 +46,7 @@ See comments in defaults/main.yml for additional details.
 | leapp_async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds) |
 | leapp_async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds) |
 | leapp_bypass_fs_checks | Boolean | false | Set to `true` to bypass filesystem capacity checks |
-| leapp_infra_upgrade_system_roles_collection | fedora.linux_system_roles | Set which Ansible Collection to use for System Roles. For community/upstream, use 'fedora.linux_system_roles'. For the RHEL, AAP, use 'redhat.rhel_system_roles'. |
+| leapp_infra_upgrade_system_roles_collection | String | fedora.linux_system_roles | Set which Ansible Collection to use for System Roles. For community/upstream, use 'fedora.linux_system_roles'. For the RHEL, AAP, use 'redhat.rhel_system_roles'. |
 
 ## Example playbook
 
