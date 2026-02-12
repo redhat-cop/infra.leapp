@@ -30,7 +30,7 @@ Additionally a list of any non-Red Hat RPM packages that were installed on the s
 | leapp_post_upgrade_release    |                       | Optional string used to set a specific RHSM release lock after the Leapp upgrade, but before the final update pass. |
 | leapp_kernel_modules_to_unload_before_upgrade | []    | A list of kernel modules to be unloaded prior to running leapp. |
 | leapp_post_upgrade_python_interpreter | /usr/libexec/platform-python | Set interpreter used by Ansible after the upgrade to execute post-upgrade tasks. Usually you do not need to change this variable because the default value is the system-level python interpreter that is always present. |
-| leapp_infra_upgrade_system_roles_collection | fedora.linux_system_roles | Can be one of:<br>- 'fedora.linux_system_roles'<br>- 'redhat.rhel_system_roles' |
+| leapp_infra_upgrade_system_roles_collection | fedora.linux_system_roles | Set which Ansible Collection to use for System Roles. For community/upstream, use 'fedora.linux_system_roles'. For the RHEL, AAP, use 'redhat.rhel_system_roles'. |
 | leapp_remove_old_rhel_packages | true                 | Boolean to control whether the previous version RHEL packages should be removed. Change to false to maintain behavior of infra.leapp prior to  release 1.6.0. |
 | leapp_grub_boot_device | null | Optional device path (e.g., /dev/sda) for grub2-install. If not defined, will be auto-detected from /boot or / mount point. |
 
