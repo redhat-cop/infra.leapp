@@ -46,8 +46,8 @@ leapp_analysis_repos_el9: "{{ analysis_repos_el9 | default([]) }}"
 #   [remove_pam_pkcs11_module_check]
 #   confirm = True
 
-leapp_upgrade_type: satellite
-# leapp_upgrade_type: cdn
+leapp_upgrade_type: cdn
+# leapp_upgrade_type: satellite
 # leapp_upgrade_type: rhui
 # leapp_upgrade_type: custom
 
@@ -55,9 +55,9 @@ leapp_preupg_opts: "{{ '--no-rhsm' if leapp_upgrade_type == 'rhui' or leapp_upgr
 
 # Satellite Organization and Activation Keys are required if using Satellite to change content views
 # unless the content view already in use has all required repositories.
-leapp_satellite_organization: null
-leapp_satellite_activation_key_pre_leapp: null
-leapp_satellite_activation_key_leapp: null
+leapp_satellite_organization: ""
+leapp_satellite_activation_key_leapp: ""
+leapp_satellite_activation_key_pre_leapp: "{{ leapp_satellite_activation_key_leapp }}"
 
 # leapp_repos_enabled:
 #   - satellite-client-6-for-rhel-{{ ansible_facts['distribution_major_version'] | int + 1 }}-x86_64-rpms
@@ -179,4 +179,13 @@ leapp_async_timeout_maximum: "{{ async_timeout_maximum | default(7200) }}"
 leapp_async_poll_interval: "{{ async_poll_interval | default(60) }}"
 
 leapp_bypass_fs_checks: false
+
+# Set which Ansible Collection to use for the Linux System Roles.
+# For community/upstream, use 'fedora.linux_system_roles'
+# For the RHEL System Roles, use 'redhat.rhel_system_roles'
+# - fedora.linux_system_roles
+# - redhat.rhel_system_roles
+# infra_leapp_upgrade_system_roles_collection is deprecated, use leapp_infra_upgrade_system_roles_collection instead
+# leapp_infra_upgrade_system_roles_collection: fedora.linux_system_roles
+leapp_infra_upgrade_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
 ...

@@ -28,8 +28,8 @@ leapp_upgrade_repos_el8: "{{ upgrade_repos_el8 | default([]) }}"
 # leapp_upgrade_repos_el9: []
 leapp_upgrade_repos_el9: "{{ upgrade_repos_el9 | default([]) }}"
 
-leapp_upgrade_type: satellite
-# leapp_upgrade_type: cdn
+leapp_upgrade_type: cdn
+# leapp_upgrade_type: satellite
 # leapp_upgrade_type: rhui
 # leapp_upgrade_type: custom
 
@@ -45,9 +45,9 @@ leapp_rhel_7_network_install_repo_url: "{{ rhel_7_network_install_repo_url | def
 
 # Satellite Organization and Activation Keys are required if using Satellite to change content views
 # unless the content view already in use has all required repositories.
-leapp_satellite_organization: null
-leapp_satellite_activation_key_leapp: null
-leapp_satellite_activation_key_post_leapp: null
+leapp_satellite_organization: ""
+leapp_satellite_activation_key_leapp: ""
+leapp_satellite_activation_key_post_leapp: "{{ leapp_satellite_activation_key_leapp }}"
 
 # For leapp_upgrade_type == "custom"
 # Used to configure repos before running leapp analysis / installing leapp packages.

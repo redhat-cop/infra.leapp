@@ -22,22 +22,14 @@
     msg: "{{ __leapp_preupg_return_codes[preupg.rc].msg }}"
   when: leapp_check_analysis_results
 
-# Note: RHEL 6 does not support the rhc role - using subscription-manager directly.
 - name: redhat-upgrade-tool-upgrade-el6 | Register with Satellite activation key
-  ansible.builtin.shell: >
-    set -o pipefail;
-    export PATH={{ leapp_os_path }};
-    subscription-manager register
-    --org_id: "{{ leapp_satellite_organization }}"
-    activationkey: "{{ leapp_satellite_activation_key_leapp }}"
-    force_register: true
-  register: sub_man_reg
-  when:
-    - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization | default('') | length > 0
-    - leapp_satellite_activation_key_leapp | default('') | length > 0
-  failed_when: false
-  changed_when: true
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: register-satellite-el6.yml
+  vars:
+    satellite_organization: "{{ leapp_satellite_organization }}"
+    satellite_activation_key: "{{ leapp_satellite_activation_key_leapp }}"
+  when: leapp_upgrade_type == 'satellite'
 
 - name: redhat-upgrade-tool-upgrade-el6 | Include custom_local_repos for local_repos_post_upgrade
   vars:

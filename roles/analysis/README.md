@@ -14,13 +14,13 @@ This role will not fail if there are inhibitors found, it will throw a warning. 
 
 ## Satellite variables
 
-Activation keys provide a method to identify content views available from Red Hat Satellite. To do in-place upgrades using Satellite, a content view including both the current RHEL version and the next version must be created. Use these variables to specify the activation keys for the required content views.
+Activation keys provide a method to identify content views available from Red Hat Satellite. To do in-place upgrades using Satellite, both the current RHEL version and the next RHEL version repositories must be available. Use these variables to specify the activation keys for the required content views. In case the system uses a different content view than the one used for the upgrade, one can specify the `leapp_satellite_activation_key_pre_leapp` in order to re-register to it after the analysis concludes, leaving the system in its original state. If not specified, the system will remain registered to the `leapp_satellite_activation_key_leapp` used during the analysis.
 
 | Name                  | Type | Default value           | Description                                     |
 |-----------------------|------|-------------------------|-------------------------------------------------|
-| leapp_satellite_organization  | String   | null | Organization used in Satellite definition |
-| leapp_satellite_activation_key_pre_leapp | String | null | Activation key for the current RHEL version content view |
-| leapp_satellite_activation_key_leapp     | String | null | Activation key for the content view including both the current RHEL version and the next version |
+| leapp_satellite_organization  | String   | "" | Organization used in Satellite definition |
+| leapp_satellite_activation_key_leapp     | String | "" | Activation key for the content view including both the current RHEL version and the next version |
+| leapp_satellite_activation_key_pre_leapp | String | leapp_satellite_activation_key_leapp | Activation key for the current RHEL version content view to re-register to after analysis |
 | leapp_repos_enabled    | List | [] | Satellite repo for the satellite client RPM install |
 
 ## Custom repos variables
@@ -46,6 +46,7 @@ See comments in defaults/main.yml for additional details.
 | leapp_async_timeout_maximum   | Int | 7200                  | Variable used to set the asynchronous task timeout value (in seconds) |
 | leapp_async_poll_interval     | Int | 60                    | Variable used to set the asynchronous task polling internal value (in seconds) |
 | leapp_bypass_fs_checks | Boolean | false | Set to `true` to bypass filesystem capacity checks |
+| leapp_infra_upgrade_system_roles_collection | String | fedora.linux_system_roles | Can be one of:<br>- 'fedora.linux_system_roles'<br>- 'redhat.rhel_system_roles' |
 
 ## Example playbook
 

@@ -126,20 +126,16 @@
     - leapp_upgrade_type == 'rhui'
     - leapp_post_upgrade_release | length > 0
 
-- name: leapp-post-upgrade | Register with post-leapp Satellite activation key
+- name: leapp-post-upgrade | Register with post-upgrade Satellite activation key
   ansible.builtin.include_role:
-    name: "{{ leapp_infra_upgrade_system_roles_collection }}.rhc"
+    name: infra.leapp.common
+    tasks_from: register-satellite.yml
   vars:
-    rhc_state: reconnect
-    rhc_organization: "{{ leapp_satellite_organization }}"
-    rhc_auth:
-      activation_keys:
-        keys:
-          - "{{ leapp_satellite_activation_key_post_leapp }}"
+    satellite_organization: "{{ leapp_satellite_organization }}"
+    satellite_activation_key: "{{ leapp_satellite_activation_key_post_leapp }}"
   when:
     - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_organization | default('') | length > 0
-    - leapp_satellite_activation_key_post_leapp | default('') | length > 0
+    - leapp_satellite_activation_key_post_leapp != leapp_satellite_activation_key_leapp
 
 - name: leapp-post-upgrade | Include custom_local_repos for local_repos_post_upgrade
   vars:
