@@ -1,0 +1,7 @@
+# set up the test system to test not remediating SSH password authentication
+---
+- name: setup | remediate_remote_using_root | Set the parameter to not remediate SSH password authentication
+  ansible.builtin.set_fact:
+    leapp_remediate_ssh_password_auth: false
+
+...

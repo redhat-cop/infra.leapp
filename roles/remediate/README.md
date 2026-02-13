@@ -14,6 +14,10 @@ The `remediation` role is to assist in the remediation of a system. This role co
 | leapp_reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete.     |
 | leapp_pre_reboot_delay        | 60                    | Integer to pass to the reboot pre_reboot_delay option. |
 | leapp_post_reboot_delay       | 120                   | Integer to pass to the reboot post_reboot_delay option. |
+| leapp_remediate_ssh_password_auth | true              | Add "PasswordAuthentcation no" and "PermitRootLogin prohibit-password" to sshd config |
+
+NOTE: If you use password authentication for Ansible (`--user root --ask-pass`), then setting `leapp_remediate_ssh_password_auth: true`
+might lock out your Ansible session and the play will fail.
 
 `leapp_remediation_todo` is a list of remediation playbooks to run. The list is empty by default. The list can be populated by the titles from [Remediation playbooks](#remediation-playbooks) section. For example:
 
