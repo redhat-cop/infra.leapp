@@ -1,2 +1,0 @@
-minor_changes:
-  - sshd_remediation - remove when condition from sshd_remediation.yml which prevents the issue where the analysis role flags an inhibitor for sshd_config during a RHEL 8 to RHEL 9 upgrade but the remediation role skips it as it's not RHEL 7

@@ -1,4 +1,0 @@
-minor_changes:
-  - Vendor community.general.modprobe module as infra.leapp.modprobe to remove dependency on community.general collection.
-
-...

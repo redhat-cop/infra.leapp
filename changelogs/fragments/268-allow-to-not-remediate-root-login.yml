@@ -1,9 +1,0 @@
----
-bugfixes:
-  - Add parameter leapp_remediate_ssh_password_auth with default value true to remediate role.
-  - This parameter is used to determine whether to remediate SSH password authentication by setting PasswordAuthentication to no
-  - and PermitRootLogin to prohibit-password.
-  - By default, this is true, which is the old default.
-  - The default leapp_remediate_ssh_password_auth true might lock out your Ansible session and the play will
-  - fail if you are using Ansible with ssh and password authentication.
-...

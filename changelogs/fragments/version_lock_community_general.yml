@@ -1,4 +1,0 @@
----
-bugfixes:
-  - version locking dependencies for community.general to be less than 12"
-...

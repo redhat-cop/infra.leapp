@@ -1,5 +1,0 @@
----
-minor_changes:
-  - Remove the dependency on the community.general.archive module.
-  - Add unit test for the leapp_old_postgresql_data remediation.
-...

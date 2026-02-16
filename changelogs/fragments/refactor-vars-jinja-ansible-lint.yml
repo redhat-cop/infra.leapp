@@ -1,9 +1,0 @@
----
-minor_changes:
-  - Fix jinja warnings - use default variables for lists instead of jinja.
-  - Remove leapp-upgrade package before each test to ensure role will install it.
-  - Remove leapp_inhibitors from vars file - it is a set_fact.
-  - Get default remediations by reading files from remediation tasks directory.
-  - Move common variables from analysis and upgrade into common.
-
-...

@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Replace community.general.redhat_subscription module with the rhc system role.
-...

@@ -1,4 +1,0 @@
-bugfixes:
-  - Use the split string method instead of the filter for 2.9 support.
-
-...

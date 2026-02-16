@@ -1,6 +1,0 @@
----
-bugfixes:
-  - Fixed Satellite registration handling.
-minor_changes:
-  - Variables for pre-upgrade and post-upgrade Satellite activation keys now default to the upgrade activation key, making them optional but recommended.
-...

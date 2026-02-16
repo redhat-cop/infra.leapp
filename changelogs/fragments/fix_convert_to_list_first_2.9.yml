@@ -1,4 +1,0 @@
-bugfixes:
-  - Convert pipeline to list and use first to get first element for Ansible 2.9 support
-
-...

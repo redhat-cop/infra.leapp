@@ -1,5 +1,0 @@
-minor_changes:
-  - Remove outdated (pre-upgrade) bootloader kernel entries.
-  - Do not output information about included custom repositories to avoid exposing URLs.
-
-...
