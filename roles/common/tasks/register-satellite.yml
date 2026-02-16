@@ -1,7 +1,7 @@
 # Inputs:
 # - satellite_activation_key - REQUIRED - the activation key to use for registration
 # - satellite_organization - REQUIRED - the organization to register with
-# - leapp_infra_upgrade_system_roles_collection - REQUIRED - system roles collection that has rhc role (fedora.linux_system_roles or redhat.rhel_system_roles)
+# - leapp_system_roles_collection - REQUIRED - system roles collection that has rhc role (fedora.linux_system_roles or redhat.rhel_system_roles)
 ---
 - name: register-satellite | Validate provided organization and activation key format
   ansible.builtin.assert:
@@ -15,7 +15,7 @@
 
 - name: register-satellite | Register with Satellite activation key
   ansible.builtin.include_role:
-    name: "{{ leapp_infra_upgrade_system_roles_collection }}.rhc"
+    name: "{{ leapp_system_roles_collection }}.rhc"
   vars:
     rhc_state: reconnect
     rhc_organization: "{{ satellite_organization }}"
