@@ -33,4 +33,10 @@ leapp_remediation_todo: "{{ remediation_todo | default([]) }}"
 # by default this is true, which is the old default
 leapp_remediate_ssh_password_auth: true
 
+# Set which Ansible Collection to use for System Roles.
+# For community/upstream, use 'fedora.linux_system_roles'.
+# For the RHEL, AAP, use 'redhat.rhel_system_roles'
+# infra_leapp_upgrade_system_roles_collection is deprecated, use leapp_infra_upgrade_system_roles_collection instead
+# leapp_infra_upgrade_system_roles_collection: fedora.linux_system_roles
+leapp_infra_upgrade_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
 ...

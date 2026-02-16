@@ -97,7 +97,7 @@
 
         - name: leapp_move_usr_directory | Ensure bind mounts for /, /usr, and /usr/local exist
           ansible.builtin.include_role:
-            name: fedora.linux_system_roles.storage
+            name: "{{ leapp_infra_upgrade_system_roles_collection }}.storage"
           vars:
             storage_safe_mode: true
             _volumes_base:
