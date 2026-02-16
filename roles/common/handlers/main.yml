@@ -22,12 +22,14 @@
   register: ripu_log_file_slurp
   listen: Archive log file
   when: log_file_stat.stat.exists
+  no_log: true
 
 - name: Decode ripu.log file
   ansible.builtin.set_fact:
     ripu_log_file: "{{ (ripu_log_file_slurp.content | b64decode).split('\n') }}"
   listen: Archive log file
   when: log_file_stat.stat.exists
+  no_log: true
 
 - name: Rename log file
   ansible.builtin.shell: |

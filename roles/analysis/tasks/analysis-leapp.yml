@@ -112,4 +112,12 @@
     name: infra.leapp.common
     tasks_from: parse_leapp_report.yml
 
+- name: analysis-leapp | Copy reports to the controller
+  ansible.builtin.include_tasks: copy_reports_to_controller.yml
+  when: leapp_copy_reports
+
+- name: analysis-leapp | Create remediation hostvars
+  ansible.builtin.include_tasks: create_remediation_hostvars.yml
+  when: leapp_create_remediation_hostvars
+
 ...
