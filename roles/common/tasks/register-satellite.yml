@@ -1,18 +1,8 @@
 # Inputs:
-# - satellite_activation_key - REQUIRED - the activation key to use for registration
-# - satellite_organization - REQUIRED - the organization to register with
+# - satellite_activation_key - the activation key to use for registration (skipped if empty)
+# - satellite_organization - the organization to register with (skipped if empty)
 # - leapp_system_roles_collection - REQUIRED - system roles collection that has rhc role (fedora.linux_system_roles or redhat.rhel_system_roles)
 ---
-- name: register-satellite | Validate provided organization and activation key format
-  ansible.builtin.assert:
-    that:
-      - satellite_organization | default(none) is not none
-      - satellite_organization | string | length > 0
-      - satellite_activation_key | default(none) is not none
-      - satellite_activation_key | string | length > 0
-    fail_msg: >
-      Specify valid Satellite Organization and Activation key.
-
 - name: register-satellite | Register with Satellite activation key
   ansible.builtin.include_role:
     name: "{{ leapp_system_roles_collection }}.rhc"
@@ -23,4 +13,7 @@
       activation_keys:
         keys:
           - "{{ satellite_activation_key }}"
+  when:
+    - satellite_organization | length > 0
+    - satellite_activation_key | length > 0
 ...

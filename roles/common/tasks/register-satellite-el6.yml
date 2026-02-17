@@ -1,17 +1,7 @@
 # Inputs:
-# - satellite_activation_key - REQUIRED - the activation key to use for registration
-# - satellite_organization - REQUIRED - the organization to register with
+# - satellite_activation_key - the activation key to use for registration (skipped if empty)
+# - satellite_organization - the organization to register with (skipped if empty)
 ---
-- name: register-satellite-el6 | Validate provided organization and activation key format
-  ansible.builtin.assert:
-    that:
-      - satellite_organization | default(none) is not none
-      - satellite_organization | string | length > 0
-      - satellite_activation_key | default(none) is not none
-      - satellite_activation_key | string | length > 0
-    fail_msg: >
-      Specify valid Satellite Organization and Activation key.
-
 # Note: RHEL 6 does not support the rhc role - using subscription-manager directly.
 - name: register-satellite-el6 | Register with Satellite activation key
   ansible.builtin.shell: >
@@ -23,4 +13,7 @@
   register: rhsm_register
   failed_when: false
   changed_when: true
+  when:
+    - satellite_organization | length > 0
+    - satellite_activation_key | length > 0
 ...
