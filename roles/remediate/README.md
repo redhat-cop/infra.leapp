@@ -6,19 +6,19 @@ The `remediation` role is to assist in the remediation of a system. This role co
 
 ## Role variables
 
-| Name                    | Default value         | Description                                         |
-|-------------------------|-----------------------|-----------------------------------------------------|
-| leapp_report_location   | /var/log/leapp/leapp-report.json | Location of the leapp report file.       |
-| leapp_remediation_playbooks   | see [Remediation playbooks](#remediation-playbooks) | List of available remediation playbooks.|
-| leapp_remediation_todo        | []                    | List of remediation playbooks to run.               |
-| leapp_reboot_timeout          | 7200                  | Integer for maximum seconds to wait for reboot to complete.     |
-| leapp_pre_reboot_delay        | 60                    | Integer to pass to the reboot pre_reboot_delay option. |
-| leapp_post_reboot_delay       | 120                   | Integer to pass to the reboot post_reboot_delay option. |
-| leapp_remediate_ssh_password_auth | true              | Add "PasswordAuthentcation no" and "PermitRootLogin prohibit-password" to sshd config |
+| Name                              | Type    | Default value                                       | Description |
+|-----------------------------------|---------|-----------------------------------------------------|-------------|
+| leapp_report_location             | String  | "/var/log/leapp/leapp-report.json"                  | Location of the leapp report file. |
+| leapp_remediation_playbooks       | List    | see [Remediation playbooks](#remediation-playbooks) | List of available remediation playbooks. |
+| leapp_remediation_todo            | List    | []                                                  | List of remediation playbooks to run. |
+| leapp_reboot_timeout              | Int     | 7200                                                | Integer for maximum seconds to wait for reboot to complete. |
+| leapp_pre_reboot_delay            | Int     | 60                                                  | Integer to pass to the reboot pre_reboot_delay option. |
+| leapp_post_reboot_delay           | Int     | 120                                                 | Integer to pass to the reboot post_reboot_delay option. |
+| leapp_remediate_ssh_password_auth | Boolean | true                                                | Add "PasswordAuthentcation no" and "PermitRootLogin prohibit-password" to sshd config |
+| leapp_system_roles_collection     | String  | "fedora.linux_system_roles"                         | Set which Ansible Collection to use for System Roles. For community/upstream, use "fedora.linux_system_roles". For the RHEL, AAP, use "redhat.rhel_system_roles". |
 
 NOTE: If you use password authentication for Ansible (`--user root --ask-pass`), then setting `leapp_remediate_ssh_password_auth: true`
 might lock out your Ansible session and the play will fail.
-| leapp_system_roles_collection | fedora.linux_system_roles | Set which Ansible Collection to use for System Roles. For community/upstream, use 'fedora.linux_system_roles'. For the RHEL, AAP, use 'redhat.rhel_system_roles'. |
 
 `leapp_remediation_todo` is a list of remediation playbooks to run. The list is empty by default. The list can be populated by the titles from [Remediation playbooks](#remediation-playbooks) section. For example:
 
