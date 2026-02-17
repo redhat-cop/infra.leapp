@@ -1,4 +1,0 @@
----
-minor_changes:
-  - upgrade - Replaced the post_7_to_8_python_interpreter variable with leapp_post_upgrade_python_interpreter that affects Ansible interpreter used after a leapp upgrade to execute post-upgrade tasks. This change leaves the original variable functional, however, it is considered deprecated.
-...

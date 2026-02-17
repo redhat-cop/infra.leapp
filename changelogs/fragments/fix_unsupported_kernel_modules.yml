@@ -1,7 +1,0 @@
-bugfixes:
-  - Ensure that unsupported kernel modules are unloaded before running leapp upgrade.
-minor_changes:
-  - Refactor kernel modules management into common manage_kernel_modules.yml task.
-  - Add test for unsupported kernel modules remediation.
-
-...

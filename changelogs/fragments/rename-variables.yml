@@ -1,5 +1,0 @@
----
-deprecated_features:
-  - Rename variables of ALL roles in the collection to prefix them with __leapp_ to avoid conflicts with other roles. Older variables names are deprecated and will be removed in a future release.
-
-...

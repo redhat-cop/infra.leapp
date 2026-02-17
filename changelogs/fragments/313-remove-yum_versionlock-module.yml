@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Remove the dependency on the community.general.yum_versionlock module.
-...

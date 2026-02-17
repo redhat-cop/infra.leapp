@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Ensure job_name is defined in all tests.
-...

@@ -1,8 +1,0 @@
----
-bugfixes:
-  - Add leapp_infra_upgrade_system_roles_collection to roles where it's applicable. Both to README and defaults/main.yml.
-minor_changes:
-  - Remove extra collection dependencies from readmes and collection-requirements.yml files.
-  - Remove roles/upgrade/meta/argument_spec.yml because it listed only a single outdated variable.
-  - Remove roles/upgrade/meta/collection-requirements.yml because meta/collection-requirements.yml should be on the collection root level only.
-...

@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Fixed task responsible for removing package version locks that would fail if versionlock sub-command for dnf/yum was not available.
-...

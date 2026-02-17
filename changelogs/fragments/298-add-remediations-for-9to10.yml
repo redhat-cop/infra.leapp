@@ -1,7 +1,0 @@
----
-minor_changes:
-  - Enable the remediate role for the RHEL 9 to 10 upgrade path.
-  - Add a remediation for the "Legacy network configuration found" inhibitor on the RHEL 9 to 10 upgrade path.
-  - Add a remediation for the "cgroups-v1 enabled on the system" inhibitor on the RHEL 9 to 10 upgrade path.
-
-...

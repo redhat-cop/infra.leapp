@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Updated remediate role to search for Leapp inhibitors by key first, with a fallback to title search. This improves search reliability when report titles are modified by Leapp.
-...

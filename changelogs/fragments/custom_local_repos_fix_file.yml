@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Fix configuring local_repos_leapp yum repositories file. Previously, it was hardcoded to __leapp_repo_file regardless of whether file key was provided with one of local_repos_leapp
-...

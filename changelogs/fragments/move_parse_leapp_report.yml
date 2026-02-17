@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Move parse_leapp_report to common role instead of being a standalone role.
-...
