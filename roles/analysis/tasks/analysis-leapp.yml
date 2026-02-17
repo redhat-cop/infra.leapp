@@ -5,7 +5,7 @@
     tasks_from: register-satellite.yml
   vars:
     satellite_organization: "{{ leapp_satellite_organization }}"
-    satellite_activation_key: "{{ leapp_satellite_activation_key_leapp }}"
+    satellite_activation_key: "{{ leapp_satellite_activation_key }}"
   when: leapp_upgrade_type == 'satellite'
 
 - name: analysis-leapp | Include custom_local_repos for local_repos_pre_leapp
@@ -99,10 +99,10 @@
     tasks_from: register-satellite.yml
   vars:
     satellite_organization: "{{ leapp_satellite_organization }}"
-    satellite_activation_key: "{{ leapp_satellite_activation_key_pre_leapp }}"
+    satellite_activation_key: "{{ leapp_satellite_activation_key_post_analysis }}"
   when:
     - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_activation_key_pre_leapp != leapp_satellite_activation_key_leapp
+    - leapp_satellite_activation_key_post_analysis != leapp_satellite_activation_key
 
 - name: analysis-leapp | Include check-results-file.yml
   ansible.builtin.include_tasks: check-results-file.yml

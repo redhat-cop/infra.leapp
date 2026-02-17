@@ -7,9 +7,10 @@
   force_handlers: true
 
   vars:
+    leapp_upgrade_type: satellite
     leapp_satellite_organization: My Satellite Organization
-    leapp_satellite_activation_key_pre_leapp: MY_ACTIVATION_KEY_PRE
-    leapp_satellite_activation_key_leapp: MY_ACTIVATION_KEY
+    leapp_satellite_activation_key_post_analysis: MY_ACTIVATION_KEY_POST_ANALYSIS
+    leapp_satellite_activation_key: MY_ACTIVATION_KEY
     # By default the analysis role will use:
     # analysis_repos_el7: rhel-7-server-extras-rpms
     # Optionally override the default analysis_repos_el7 to use the upstream copr leapp repository:
