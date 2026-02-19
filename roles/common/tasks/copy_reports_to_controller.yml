@@ -1,0 +1,41 @@
+---
+# Copies logs to the controller.
+# Logs copied:
+# - /var/log/leapp/leapp-report.txt
+# - /var/log/leapp/leapp-report.json
+# - /var/log/leapp/ansible_leapp_<job_name>.log
+#
+# This task file requires the following variables to be set:
+# leapp_reports_controller_dir
+# leapp_reports_dir
+# leapp_log_file_basename
+# leapp_log_file
+# leapp_timestamp
+# leapp_report_txt
+# leapp_report_json
+
+- name: copy_reports_to_controller | Copy reports to the controller
+  block:
+    - name: copy_reports_to_controller | Ensure reports directory on controller
+      ansible.builtin.file:
+        path: "{{ leapp_reports_controller_dir }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+
+    - name: copy_reports_to_controller | Copy report files to the controller
+      ansible.builtin.fetch:
+        src: "{{ item }}"
+        dest: "{{ leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
+        flat: true
+      loop:
+        - "{{ leapp_report_txt }}"
+        - "{{ leapp_report_json }}"
+
+    - name: copy_reports_to_controller | Copy log file to the controller
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: copy_archive_leapp_log.yml
+
+...

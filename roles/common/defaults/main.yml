@@ -1,6 +1,4 @@
 ---
 # defaults file for common
 leapp_os_path: $PATH
-leapp_log_directory: /var/log/ripu
-leapp_log_file: "{{ leapp_log_directory }}/ripu.log"
 ...

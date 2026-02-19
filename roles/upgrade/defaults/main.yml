@@ -246,4 +246,11 @@ leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection |
 # leapp_remove_old_rhel_packages: true
 leapp_remove_old_rhel_packages: "{{ remove_old_rhel_packages | default(true) }}"
 
+# Directory to store leapp pre-upgrade reports and remediation hostvars
+leapp_workdir_controller: "{{ playbook_dir }}"
+
+# Copy leapp report files (JSON and text) from managed nodes to the controller
+# Reports are stored in a timestamped directory: playbook_dir/leapp_reports_YYYY-MM-DD_HH-MM-SS
+leapp_copy_reports: true
+
 ...

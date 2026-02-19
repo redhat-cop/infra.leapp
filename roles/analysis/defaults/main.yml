@@ -197,4 +197,7 @@ leapp_create_remediation_hostvars: true
 # infra_leapp_upgrade_system_roles_collection is deprecated, use leapp_system_roles_collection instead
 # leapp_system_roles_collection: fedora.linux_system_roles
 leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
+
+# Directory to store leapp pre-upgrade reports and remediation hostvars
+leapp_workdir_controller: "{{ playbook_dir }}"
 ...

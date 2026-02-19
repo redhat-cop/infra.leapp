@@ -53,6 +53,9 @@
         cmd: |
           set -euxo pipefail
           rm -f /var/log/leapp/leapp-upgrade.log
+          rm -f /var/log/leapp/*.log
+          rm -f /var/log/leapp/*.json
+          rm -f /var/log/leapp/*.txt
           rm -f /var/log/ripu/ripu.log*
       changed_when: true
 ...

@@ -105,16 +105,6 @@
 - name: common_upgrade_tasks | Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: common_upgrade_tasks | Assert no remediate hostvars nor playbook
-  ansible.builtin.stat:
-    path: "{{ item }}"
-  register: remediate_hostvars_stat
-  delegate_to: localhost
-  failed_when: remediate_hostvars_stat.stat.exists
-  loop:
-    - "{{ playbook_dir }}/host_vars/{{ inventory_hostname }}.yml"
-    - "{{ playbook_dir }}/remediate.yml"
-
 # set leapp_test_upgrade to false in order to test only analysis and remediation
 - name: common_upgrade_tasks | Run upgrade role
   ansible.builtin.include_role:

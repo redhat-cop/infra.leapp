@@ -1,4 +1,12 @@
 ---
+__leapp_logs_name: ansible_leapp_analysis
+__leapp_reports_controller_dir: "{{ leapp_workdir_controller }}/{{ __leapp_logs_name }}_logs_{{ __leapp_timestamp }}"
+__leapp_reports_dir: /var/log/leapp
+__leapp_log_file_basename: "{{ __leapp_logs_name }}.log"
+__leapp_log_file: "{{ __leapp_reports_dir }}/{{ __leapp_log_file_basename }}"
+__leapp_report_json: "{{ __leapp_reports_dir }}/leapp-report.json"
+__leapp_report_txt: "{{ __leapp_reports_dir }}/leapp-report.txt"
+
 # Maps the title attribute of an inhibitor from a report to a remediation task file name
 __leapp_inhibitors_title_map:
   "cgroups-v1 enabled on the system": leapp_cgroups-v1_enabled

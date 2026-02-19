@@ -1,5 +1,5 @@
 # Inputs:
-# - leapp_result_filename - REQUIRED - path to the Leapp pre-upgrade report file
+# - leapp_result_filename - REQUIRED - path to the Leapp pre-upgrade report file. It is set in common role vars.
 ---
 - name: parse_leapp_report | Parse Leapp Report
   vars:
@@ -12,6 +12,13 @@
     - name: parse_leapp_report | Default upgrade_inhibited to false
       ansible.builtin.set_fact:
         upgrade_inhibited: false
+
+    # Analysis role runs this at the end of the run, so the failure is applicable in the upgrade role only.
+    - name: parse_leapp_report | Fail if pre-upgrade analysis was not run
+      ansible.builtin.stat:
+        path: "{{ leapp_result_filename }}"
+      register: results_txt_stat
+      failed_when: not results_txt_stat.stat.exists
 
     - name: parse_leapp_report | Collect human readable report results
       ansible.builtin.slurp:

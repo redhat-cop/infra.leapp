@@ -14,12 +14,6 @@ Define job_name in the import as seen below.
 
 ## Role variables
 
-| Name                | Type   | Default value                               | Description |
-|---------------------|--------|---------------------------------------------|-------------|
-| job_name            | String |                                             | The string describes the job run. This variable is required. |
-| leapp_log_directory | String | "/var/log/ripu"                             | Directory under which local log files will be written. This directory will be created if it is not already present. |
-| leapp_log_file      | String | "{{ leapp_log_directory }}/ripu.log"        | Local log filename. When a playbook job finishes, a timestamp suffix is appended to the end of the specified filename. |
-
 ### Role variables used with parse_leapp_report.yml
 
 **NOTE:** `leapp_result_filename` is **REQUIRED**.  The other leapp_result_filename* parameters will be derived from it if not explicitly given.

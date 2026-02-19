@@ -28,6 +28,6 @@
     msg: >-
       The preupgrade analysis report generation is now complete.
       {{ 'WARNING: Inhibitors' if upgrade_inhibited else 'SUCCESS: No inhibitors' }} found.
-      Review the tasks above or the result file at {{ leapp_result_filename }}.
+      Review the tasks above or the result file at {{ __leapp_report_txt }}.
 
 ...
