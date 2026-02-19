@@ -47,8 +47,12 @@
         # The old version passed the list directly to the command.  I didn't think
         # this was possible.  Guard against something weird here.  Assume non-string
         # is a list.
+        # NOTE: As of today (2026-02-19), Automation Hub is using ansible-lint 24.12.2 for gating,
+        #       which throws an inline-env-var error here because it cannot tell if the context
+        #       contains an envvar=value specification.  Note that the current version of ansible-lint
+        #       26.* does not throw this error.
         - name: leapp_relative_symlinks | Set links in root directory to be relative
-          ansible.builtin.command:
+          ansible.builtin.command: # noqa: inline-env-var
             argv: "{{ leapp_inhibitor_remediation.context if not leapp_inhibitor_remediation.context is string else omit }}"
             cmd: "{{ leapp_inhibitor_remediation.context if leapp_inhibitor_remediation.context is string else omit }}"
           register: leapp_relative_symlinks
