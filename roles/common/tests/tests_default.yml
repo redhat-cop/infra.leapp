@@ -21,7 +21,7 @@
             that:
               - ansible_failed_result is defined
               - ansible_failed_result.msg is defined
-              - ansible_failed_result.msg | select("search", err_pat) | list | length > 0
+              - ansible_failed_result.msg is search (err_pat)
       always:
         - name: Test | Include cleanup logs
           ansible.builtin.include_role:

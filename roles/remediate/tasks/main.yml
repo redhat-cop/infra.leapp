@@ -23,7 +23,7 @@
     - name: Parse leapp report
       ansible.builtin.set_fact:
         leapp_report_data: "{{ leapp_report_content.content | b64decode | from_json }}"
-      when: leapp_report_content.content | length > 0
+      when: leapp_report_content.content | d("") | length > 0
 
     - name: Check that the 6to7 preupgrade report exists
       ansible.builtin.stat:
