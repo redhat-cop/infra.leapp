@@ -151,8 +151,8 @@ leapp_env_vars: {}
 # Default selinux_mode to what was found during the pre-upgrade analysis automation.
 # The config_mode fact is not created if selinux is disabled so default the variable to "disabled"
 # selinux_mode is deprecated, use leapp_selinux_mode instead
-# leapp_selinux_mode: "{{ ansible_facts.ansible_local.pre_ripu.selinux.config_mode | default('disabled') }}"
-leapp_selinux_mode: "{{ selinux_mode | default(ansible_facts.ansible_local.pre_ripu.selinux.config_mode | default('disabled')) }}"
+# leapp_selinux_mode: "{{ ansible_facts.ansible_local.pre_leapp.selinux.config_mode | default('disabled') }}"
+leapp_selinux_mode: "{{ selinux_mode | default(ansible_facts.ansible_local.pre_leapp.selinux.config_mode | default('disabled')) }}"
 
 # System-wide cryptographic policies
 # set_crypto_policies is deprecated, use leapp_set_crypto_policies instead

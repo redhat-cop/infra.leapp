@@ -22,16 +22,16 @@
     mode: "0644"
   when: log_file_stat.stat.exists
 
-- name: copy_archive_leapp_log | Slurp ripu.log file
+- name: copy_archive_leapp_log | Slurp file {{ leapp_log_file }}
   ansible.builtin.slurp:
     src: "{{ leapp_log_file }}"
-  register: ripu_log_file_slurp
+  register: leapp_log_file_slurp
   when: log_file_stat.stat.exists
   no_log: true
 
-- name: copy_archive_leapp_log | Decode ripu.log file
+- name: copy_archive_leapp_log | Decode file {{ leapp_log_file }}
   ansible.builtin.set_fact:
-    ripu_log_file: "{{ (ripu_log_file_slurp.content | b64decode).split('\n') }}"
+    leapp_log_file_content: "{{ (leapp_log_file_slurp.content | b64decode).split('\n') }}"
   when: log_file_stat.stat.exists
   no_log: true
 

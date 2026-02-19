@@ -1,0 +1,8 @@
+---
+- name: cleanup_logs | Cleanup | Remove log files
+  ansible.builtin.shell: |
+    set -euxo pipefail
+    rm -f /var/log/leapp/*.log
+    rm -f /var/log/leapp/*.json
+    rm -f /var/log/leapp/*.txt
+  changed_when: true
