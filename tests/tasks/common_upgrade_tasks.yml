@@ -69,20 +69,13 @@
         - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_report_txt | basename }}"
         - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_report_json | basename }}"
 
-    # Note: We cannot use ansible.builtin.import_playbook here because import_playbook
-    # can only be used at the playbook level, not in task files. Therefore, we execute
-    # the generated playbook using ansible-playbook command with the same intontory
-    # as the parent playbook.
-    - name: common_upgrade_tasks | Run remediation using generated playbook
-      ansible.builtin.command: >-
-        ansible-playbook
-        -i {{ inventory_file }}
-        --become
-        {{ playbook_dir }}/remediate.yml
-      delegate_to: localhost
-      run_once: true
-      environment: "{{ ansible_env | default({}) }}"
-      changed_when: true
+    # Not running from {{ playbook_dir }}/remediate.yml because we cannot use
+    # ansible.builtin.import_playbook here. import_playbook # can only be used
+    # at the playbook level, not in task files.
+    - name: common_upgrade_tasks | Include remediate role
+      ansible.builtin.include_role:
+        name: infra.leapp.remediate
+        public: true
 
 - name: common_upgrade_tasks | Gather verify remediation tasks
   ansible.builtin.find:
