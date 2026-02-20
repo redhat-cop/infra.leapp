@@ -10,14 +10,9 @@
           ansible.builtin.include_role:
             name: infra.leapp.analysis
       always:
-        - name: Cleanup | Remove log files
-          tags: tests::cleanup
-          ansible.builtin.shell:
-            executable: /bin/bash
-            cmd: |
-              set -euxo pipefail
-              rm -f /var/log/leapp/leapp-upgrade.log
-              rm -f /var/log/ripu/ripu.log*
-          changed_when: true
+        - name: Test | Include cleanup logs
+          ansible.builtin.include_role:
+            name: infra.leapp.common
+            tasks_from: cleanup_logs.yml
 
 ...

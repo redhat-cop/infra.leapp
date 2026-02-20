@@ -1,5 +1,5 @@
 # Inputs:
-# - leapp_result_filename - REQUIRED - path to the Leapp pre-upgrade report file
+# - leapp_result_filename - REQUIRED - path to the Leapp pre-upgrade report file. It is set in common role vars.
 ---
 - name: parse_leapp_report | Parse Leapp Report
   vars:
@@ -13,21 +13,35 @@
       ansible.builtin.set_fact:
         upgrade_inhibited: false
 
+    # Analysis role runs this at the end of the run, so the failure is applicable in the upgrade role only.
+    - name: parse_leapp_report | Fail if pre-upgrade analysis was not run
+      ansible.builtin.stat:
+        path: "{{ leapp_result_filename }}"
+      register: results_txt_stat
+      failed_when: not results_txt_stat.stat.exists
+
     - name: parse_leapp_report | Collect human readable report results
       ansible.builtin.slurp:
         src: "{{ leapp_result_filename }}"
       register: results_txt
+      no_log: true
 
     - name: parse_leapp_report | Collect JSON report results
       ansible.builtin.slurp:
         src: "{{ leapp_result_filename_json }}"
       register: results_json
+      no_log: true
 
     - name: parse_leapp_report | Parse report results
       ansible.builtin.set_fact:
         cacheable: "{{ leapp_result_fact_cacheable }}"
         leapp_report_txt: "{{ (results_txt.content | b64decode).split('\n') | list }}"
         leapp_report_json: "{{ results_json.content | b64decode | from_json }}"
+      no_log: true
+
+    - name: parse_leapp_report | Clear leapp_inhibitors
+      ansible.builtin.set_fact:
+        leapp_inhibitors: []
 
     - name: parse_leapp_report | Check for inhibitors
       ansible.builtin.set_fact:

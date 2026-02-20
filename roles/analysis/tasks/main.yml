@@ -1,10 +1,20 @@
 ---
-# tasks file for analysis
+# If we store timestamp variable in vars, it  is processed dynamically at
+# runtime, hence timestamp changes on each variable invocation. We want the
+# timestamp to be stable so that logs are stored in the same directory.
+- name: Lock timestamped variables
+  ansible.builtin.set_fact:
+    __leapp_timestamp: "{{ now(fmt='%Y-%m-%d_%H-%M-%S', utc=true) }}"
+
 - name: Initialize lock, logging, and common vars
-  ansible.builtin.import_role:
+  ansible.builtin.include_role:
     name: infra.leapp.common
+    tasks_from: init_leapp_log.yml
+    public: true
   vars:
-    job_name: RIPU preupgrade analysis
+    job_name: Ansible Leapp preupgrade analysis
+    leapp_reports_dir: "{{ __leapp_reports_dir }}"
+    leapp_log_file: "{{ __leapp_log_file }}"
 
 - name: Include tasks for preupg assistant analysis
   ansible.builtin.include_tasks: analysis-preupg-el6.yml

@@ -4,7 +4,7 @@
 
 - name: upgrade-validation | Determine rhel_dest_major_version
   ansible.builtin.set_fact:
-    rhel_dest_major_version: "{{ ((ansible_facts.ansible_local.pre_ripu.distribution_major_version | int) + 1) | string }}"
+    rhel_dest_major_version: "{{ ((ansible_facts.ansible_local.pre_leapp.distribution_major_version | int) + 1) | string }}"
 
 - name: upgrade-validation | Validate current OS major version
   ansible.builtin.assert:
@@ -22,5 +22,5 @@
 
 - name: upgrade-validation | Include leapp post upgrade validation
   ansible.builtin.include_tasks: leapp-upgrade-validation.yml
-  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version|int >= 7
+  when: ansible_facts.ansible_local.pre_leapp.distribution_major_version|int >= 7
 ...

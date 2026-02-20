@@ -8,7 +8,7 @@
 
 # leapp 7 to 8 documentation cleans up old kernels
 - name: leapp-post-upgrade | Block for RHEL 7 kernel cleanup
-  when: ansible_facts.ansible_local.pre_ripu.distribution_major_version | int == 7
+  when: ansible_facts.ansible_local.pre_leapp.distribution_major_version | int == 7
   block:
     - name: leapp-post-upgrade | Find old kernels
       ansible.builtin.find:
@@ -44,12 +44,12 @@
 # Grep for title matching RHEL, then get kernel path from 4 lines above
 - name: >-
     leapp-post-upgrade | Find kernel paths for outdated RHEL
-    {{ ansible_facts.ansible_local.pre_ripu.distribution_major_version }}
+    {{ ansible_facts.ansible_local.pre_leapp.distribution_major_version }}
   ansible.builtin.shell: >-
     set -o pipefail;
     export PATH={{ leapp_os_path }};
     grubby --info=ALL | grep -E "^title=.* {{
-    ansible_facts.ansible_local.pre_ripu.distribution_major_version
+    ansible_facts.ansible_local.pre_leapp.distribution_major_version
     }}\.[0-9]+ " -B 4 | grep "^kernel"
     | sed -n 's/.*kernel="\([^"]*\)".*/\1/p' || echo ""
   register: leapp_upgrade_outdated_kernels
@@ -181,4 +181,19 @@
 - name: leapp-post-upgrade | Include tasks for leapp post upgrade crypto policies
   ansible.builtin.include_tasks: leapp-post-upgrade-crypto.yml
   when: leapp_set_crypto_policies | bool
+
+- name: leapp-post-upgrade | Copy reports to the controller
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: copy_reports_to_controller.yml
+  vars:
+    leapp_reports_controller_dir: "{{ __leapp_reports_controller_dir }}"
+    leapp_reports_dir: "{{ __leapp_reports_dir }}"
+    leapp_log_file_basename: "{{ __leapp_log_file_basename }}"
+    leapp_log_file: "{{ __leapp_log_file }}"
+    leapp_timestamp: "{{ __leapp_timestamp }}"
+    leapp_report_txt: "{{ __leapp_report_txt }}"
+    leapp_report_json: "{{ __leapp_report_json }}"
+  when: leapp_copy_reports
+
 ...

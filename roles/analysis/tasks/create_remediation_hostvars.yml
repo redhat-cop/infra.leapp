@@ -1,0 +1,77 @@
+---
+- name: create_remediation_hostvars | Clear remediation_todo
+  ansible.builtin.set_fact:
+    leapp_remediation_todo: []
+
+- name: create_remediation_hostvars | Map inhibitors to remediation_todo
+  ansible.builtin.set_fact:
+    leapp_remediation_todo: "{{ leapp_remediation_todo | default([]) + [todo_item] }}"
+  loop: "{{ leapp_inhibitors | default([]) }}"
+  loop_control:
+    loop_var: inhibitor
+  vars:
+    inhibitor_key: "{{ inhibitor.key | default('') }}"
+    inhibitor_title: "{{ inhibitor.title | default('') }}"
+    todo_item: >-
+      {{ __leapp_inhibitors_key_map[inhibitor_key]
+        if inhibitor_key in __leapp_inhibitors_key_map
+        else __leapp_inhibitors_title_map[inhibitor_title] }}
+  when: >-
+    inhibitor_key in __leapp_inhibitors_key_map
+    or inhibitor_title in __leapp_inhibitors_title_map
+
+- name: create_remediation_hostvars | Write host_vars and playbook for remediation
+  when: leapp_remediation_todo | default([]) | length > 0
+  delegate_to: localhost
+  block:
+    - name: create_remediation_hostvars | Ensure host_vars directory exists
+      ansible.builtin.file:
+        path: "{{ leapp_workdir_controller }}/host_vars"
+        state: directory
+        mode: "0755"
+      run_once: true
+
+    - name: create_remediation_hostvars | Check if host_vars file exists
+      ansible.builtin.stat:
+        path: "{{ leapp_workdir_controller }}/host_vars/{{ inventory_hostname }}.yml"
+      register: host_vars_inventory_stat
+      delegate_to: localhost
+
+    - name: create_remediation_hostvars | Read existing host_vars file
+      ansible.builtin.slurp:
+        src: "{{ leapp_workdir_controller }}/host_vars/{{ inventory_hostname }}.yml"
+      register: existing_host_vars_content
+      when: host_vars_inventory_stat.stat.exists
+
+    - name: create_remediation_hostvars | Write host_vars file
+      vars:
+        file_exists: "{{ host_vars_inventory_stat.stat.exists | default(false) }}"
+        host_vars_content_raw: "{{ (existing_host_vars_content.content | default('')) if (file_exists and existing_host_vars_content is defined) else '' }}"
+        host_vars_parsed: "{{ (host_vars_content_raw | b64decode | from_yaml) if host_vars_content_raw else {} }}"
+        existing_remediation_todo: "{{ host_vars_parsed.leapp_remediation_todo | default([]) }}"
+        merged_remediation_todo: "{{ (existing_remediation_todo | union(leapp_remediation_todo) | unique | list) if file_exists else leapp_remediation_todo }}"
+        final_host_vars: "{{ host_vars_parsed | combine({'leapp_remediation_todo': merged_remediation_todo}, recursive=False) }}"
+        host_vars_content: |
+          ---
+          {{ final_host_vars | to_nice_yaml }}
+      ansible.builtin.copy:
+        content: "{{ host_vars_content }}"
+        dest: "{{ leapp_workdir_controller }}/host_vars/{{ inventory_hostname }}.yml"
+        mode: "0644"
+
+    - name: create_remediation_hostvars | Create remediation playbook file
+      ansible.builtin.copy:
+        content: |
+          ---
+          - name: Remediate
+            hosts: all
+            become: true
+            tasks:
+              - name: Perform remediations on the system
+                ansible.builtin.include_role:
+                  name: infra.leapp.remediate
+        dest: "{{ leapp_workdir_controller }}/remediate.yml"
+        mode: "0644"
+      run_once: true
+
+...

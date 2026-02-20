@@ -73,7 +73,7 @@
     leapp preupgrade --report-schema=1.2.0
     {{ leapp_preupg_opts }}
     {{ __leapp_enable_repos_args }}
-    2>&1 | tee -a {{ leapp_log_file }}
+    2>&1 | tee -a {{ __leapp_log_file }}
   environment: "{{ leapp_env_vars }}"
   changed_when: true
   register: leapp
@@ -111,5 +111,23 @@
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: parse_leapp_report.yml
+
+- name: analysis-leapp | Copy reports to the controller
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: copy_reports_to_controller.yml
+  vars:
+    leapp_reports_controller_dir: "{{ __leapp_reports_controller_dir }}"
+    leapp_reports_dir: "{{ __leapp_reports_dir }}"
+    leapp_log_file_basename: "{{ __leapp_log_file_basename }}"
+    leapp_log_file: "{{ __leapp_log_file }}"
+    leapp_timestamp: "{{ __leapp_timestamp }}"
+    leapp_report_txt: "{{ __leapp_report_txt }}"
+    leapp_report_json: "{{ __leapp_report_json }}"
+  when: leapp_copy_reports
+
+- name: analysis-leapp | Create remediation hostvars
+  ansible.builtin.include_tasks: create_remediation_hostvars.yml
+  when: leapp_create_remediation_hostvars
 
 ...

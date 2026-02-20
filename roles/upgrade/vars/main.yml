@@ -1,3 +1,10 @@
 ---
-# vars file for upgrade
+__leapp_logs_name: ansible_leapp_upgrade
+__leapp_reports_controller_dir: "{{ leapp_workdir_controller }}/{{ __leapp_logs_name }}_logs_{{ __leapp_timestamp }}"
+__leapp_reports_dir: /var/log/leapp
+__leapp_log_file_basename: "{{ __leapp_logs_name }}.log"
+__leapp_log_file: "{{ __leapp_reports_dir }}/{{ __leapp_log_file_basename }}"
+__leapp_report_json: "{{ __leapp_reports_dir }}/leapp-report.json"
+__leapp_report_txt: "{{ __leapp_reports_dir }}/leapp-report.txt"
+
 ...

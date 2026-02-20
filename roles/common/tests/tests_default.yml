@@ -9,14 +9,23 @@
         - name: Test | Run role common
           ansible.builtin.include_role:
             name: infra.leapp.common
+      rescue:
+        - name: Test | Check error
+          ansible.builtin.debug:
+            msg: errors {{ ansible_failed_result | to_nice_json }}
+
+        - name: Test | Ensure correct error
+          vars:
+            err_pat: You must run the role with tasks_from
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result is defined
+              - ansible_failed_result.msg is defined
+              - ansible_failed_result.msg is search (err_pat)
       always:
-        - name: Cleanup | Remove log files
-          tags: tests::cleanup
-          ansible.builtin.shell:
-            executable: /bin/bash
-            cmd: |
-              set -euxo pipefail
-              rm -f /var/log/leapp/leapp-upgrade.log
-              rm -f /var/log/ripu/ripu.log*
-          changed_when: true
+        - name: Test | Include cleanup logs
+          ansible.builtin.include_role:
+            name: infra.leapp.common
+            tasks_from: cleanup_logs.yml
+
 ...

@@ -1,0 +1,70 @@
+---
+# This file is run from copy_reports_to_controller.yml.
+# Copies log files to the controller then backs up the original log file to a timestamped location
+#
+# Variables that this file uses:
+# leapp_reports_controller_dir
+# leapp_reports_dir
+# leapp_log_file_basename
+# leapp_log_file
+# leapp_timestamp
+- name: copy_archive_leapp_log | Check for log file
+  ansible.builtin.stat:
+    path: "{{ leapp_log_file }}"
+  register: log_file_stat
+
+- name: copy_archive_leapp_log | Add end time to log file
+  ansible.builtin.lineinfile:
+    path: "{{ leapp_log_file }}"
+    line: Job ended at {{ now(fmt='%Y-%m-%dT%H:%M:%SZ', utc=true) }}
+    owner: root
+    group: root
+    mode: "0644"
+  when: log_file_stat.stat.exists
+
+- name: copy_archive_leapp_log | Slurp file {{ leapp_log_file }}
+  ansible.builtin.slurp:
+    src: "{{ leapp_log_file }}"
+  register: leapp_log_file_slurp
+  when: log_file_stat.stat.exists
+  no_log: true
+
+- name: copy_archive_leapp_log | Decode file {{ leapp_log_file }}
+  ansible.builtin.set_fact:
+    leapp_log_file_content: "{{ (leapp_log_file_slurp.content | b64decode).split('\n') }}"
+  when: log_file_stat.stat.exists
+  no_log: true
+
+- name: copy_archive_leapp_log | Ensure reports directory on controller
+  ansible.builtin.file:
+    path: "{{ leapp_reports_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  run_once: true
+
+- name: copy_archive_leapp_log | Copy ansible leapp log to the controller
+  ansible.builtin.fetch:
+    src: "{{ leapp_log_file }}"
+    dest: "{{ leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ leapp_log_file_basename }}"
+    flat: true
+
+- name: copy_archive_leapp_log | Copy log file to timestamped location
+  vars:
+    leapp_log_file_timestamped: >-
+      {{ leapp_log_file | dirname }}/{{ leapp_log_file_basename
+      | splitext | first }}_{{ leapp_timestamp }}.log
+  ansible.builtin.copy:
+    src: "{{ leapp_log_file }}"
+    dest: "{{ leapp_log_file_timestamped }}"
+    remote_src: true
+    mode: preserve
+  when: log_file_stat.stat.exists
+
+- name: copy_archive_leapp_log | Remove original log file
+  ansible.builtin.file:
+    path: "{{ leapp_log_file }}"
+    state: absent
+  when: log_file_stat.stat.exists
+
+...

@@ -182,10 +182,22 @@ leapp_async_poll_interval: "{{ async_poll_interval | default(60) }}"
 
 leapp_bypass_fs_checks: false
 
+# Copy leapp report files (JSON and text) from managed nodes to the controller
+# Reports are stored in a timestamped directory: playbook_dir/leapp_reports_YYYY-MM-DD_HH-MM-SS
+leapp_copy_reports: true
+
+# Create host_vars files and a remediation playbook on the controller
+# Each host gets its own host_vars file with leapp_remediation_todo variable
+# A remediate.yml playbook is created that uses these host variables
+leapp_create_remediation_hostvars: true
+
 # Set which Ansible Collection to use for System Roles.
 # For community/upstream, use 'fedora.linux_system_roles'.
 # For the RHEL, AAP, use 'redhat.rhel_system_roles'
 # infra_leapp_upgrade_system_roles_collection is deprecated, use leapp_system_roles_collection instead
 # leapp_system_roles_collection: fedora.linux_system_roles
 leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection | default('fedora.linux_system_roles') }}"
+
+# Directory to store leapp pre-upgrade reports and remediation hostvars
+leapp_workdir_controller: "{{ playbook_dir }}"
 ...

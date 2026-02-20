@@ -46,13 +46,9 @@
       ansible.builtin.set_fact:
         leapp_upgrade_completed: true
   always:
-    - name: tests_upgrade_custom | Cleanup | Remove log files
-      tags: tests::cleanup
-      ansible.builtin.shell:
-        executable: /bin/bash
-        cmd: |
-          set -euxo pipefail
-          rm -f /var/log/leapp/leapp-upgrade.log
-          rm -f /var/log/ripu/ripu.log*
-      changed_when: true
+    - name: tests_upgrade_custom | Include cleanup logs
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: cleanup_logs.yml
+
 ...
