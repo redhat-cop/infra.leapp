@@ -43,7 +43,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: copy_archive_leapp_log | Copy report files to the controller
+- name: copy_archive_leapp_log | Copy ansible leapp log to the controller
   ansible.builtin.fetch:
     src: "{{ leapp_log_file }}"
     dest: "{{ leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ leapp_log_file_basename }}"

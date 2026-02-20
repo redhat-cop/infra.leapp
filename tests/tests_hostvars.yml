@@ -1,0 +1,137 @@
+---
+- name: Test how analysis role generates hostvars file when it exists
+  hosts: all
+  vars_files:
+    - vars/common_upgrade_vars.yml
+    - vars/repo_urls.yml
+  vars:
+    leapp_upgrade_type: custom
+    leapp_upgrade_opts: "--no-rhsm"
+  tasks:
+    # Tasks from Сommon_upgrade_tasks needed to setup inhibitors
+    - name: Сommon_upgrade_tasks | Remove leapp packages
+      ansible.builtin.package:
+        name: "{{ leapp_remove_test_packages }}"
+        state: absent
+
+    - name: Сommon_upgrade_tasks | Gather setup tasks
+      ansible.builtin.find:
+        paths: "{{ playbook_dir }}/tasks/setup"
+        patterns: "*.yml"
+      register: setup_tasks
+      delegate_to: localhost
+
+    - name: Сommon_upgrade_tasks | Do remediation setup tasks
+      ansible.builtin.include_tasks: "{{ setup_task_file }}"
+      loop: "{{ setup_task_files }}"
+      loop_control:
+        loop_var: setup_task_file
+      vars:
+        setup_task_files: "{{ setup_tasks.files | map(attribute='path') | select('search', '/remediate_') | list }}"
+      when:
+        - setup_task_files | length > 0
+        - leapp_test_remediations | d(false)
+
+    - name: Сommon_upgrade_tasks | Do setup tasks
+      ansible.builtin.include_tasks: "{{ setup_task_file }}"
+      loop: "{{ setup_task_files }}"
+      loop_control:
+        loop_var: setup_task_file
+      vars:
+        setup_task_files: "{{ setup_tasks.files | map(attribute='path') | reject('search', '/remediate_') | list }}"
+      when:
+        - setup_task_files | length > 0
+        - not (leapp_test_remediations | d(false))
+
+    - name: Test | Prepare controller workdir
+      delegate_to: localhost
+      block:
+        - name: Test | Create tempdir directory for workdir controller
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: workdir_controller
+          register: workdir_controller_tempfile
+
+        - name: Test | Prepare hostvars directory
+          ansible.builtin.file:
+            path: "{{ workdir_controller_tempfile.path }}/host_vars"
+            state: directory
+            mode: "0755"
+
+        - name: Test | Set fact with hostvars file
+          ansible.builtin.set_fact:
+            leapp_hostvars_file: "{{ workdir_controller_tempfile.path }}/host_vars/{{ inventory_hostname }}.yml"
+
+        - name: Test | Write a sample hostvars file
+          ansible.builtin.copy:
+            content: |
+              ---
+              leapp_string_variable: "test value"
+              leapp_dict_variable:
+                key1: value1
+                key2: value2
+              leapp_list_variable:
+                - value1
+                - value2
+                - value3
+              leapp_int_variable: 123
+              leapp_bool_variable: true
+              leapp_null_variable: null
+            dest: "{{ leapp_hostvars_file }}"
+            mode: preserve
+
+        - name: Test | Print hostvars file content
+          ansible.builtin.slurp:
+            src: "{{ leapp_hostvars_file }}"
+          register: hostvars_file_content
+          no_log: true
+
+    - name: Test | Run role analysis
+      ansible.builtin.include_role:
+        name: infra.leapp.analysis
+      vars:
+        leapp_workdir_controller: "{{ workdir_controller_tempfile.path }}"
+
+    - name: Test | Validate hostvars file
+      delegate_to: localhost
+      block:
+        - name: Test | Read hostvars file content
+          ansible.builtin.slurp:
+            src: "{{ leapp_hostvars_file }}"
+          register: hostvars_file_new_content
+          no_log: true
+
+        - name: Test | Assert that hostvars file contains remediation_todo
+          ansible.builtin.assert:
+            that: >-
+              {{ 'leapp_remediation_todo' in (hostvars_file_new_content.content
+              | b64decode | from_yaml) }}
+
+        - name: Test | Print hostvars_file_content
+          ansible.builtin.debug:
+            var: hostvars_file_content.content | b64decode | from_yaml
+
+        - name: Test | Print hostvars_file_new_content
+          ansible.builtin.debug:
+            var: hostvars_file_new_content.content | b64decode | from_yaml
+
+        - name: Test | Print hostvars_file_new_content without remediation_todo
+          ansible.builtin.debug:
+            var: hostvars_file_new_content.content | b64decode | from_yaml
+              | dict2items
+              | rejectattr('key', 'equalto', 'leapp_remediation_todo')
+              | items2dict
+
+        - name: Test | Print hostvars_file_content
+          ansible.builtin.debug:
+            var: hostvars_file_content.content | b64decode | from_yaml
+
+        - name: >-
+            Test | Assert that hostvars_file_new_content without
+            remediation_todo is equal to hostvars_file_content
+          ansible.builtin.assert:
+            that: >-
+              {{ (hostvars_file_new_content.content | b64decode | from_yaml
+              | dict2items | rejectattr('key', 'equalto', 'leapp_remediation_todo')
+              | items2dict) == (hostvars_file_content.content | b64decode | from_yaml) }}
+...
