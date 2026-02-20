@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Refactor code to remove some ansible-lint warnings and errors.
-...

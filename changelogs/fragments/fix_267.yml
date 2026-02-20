@@ -1,4 +1,0 @@
----
-bugfixes:
-  - fixed missing leapp package when upgrade role is run without running the analysis role first
-...

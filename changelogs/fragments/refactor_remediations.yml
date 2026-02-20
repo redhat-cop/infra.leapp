@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Refactor remediations - extract common code into remediation main.yml - use conditionals/blocks instead of fail/rescue for flow control.
-...

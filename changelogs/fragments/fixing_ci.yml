@@ -1,4 +1,0 @@
----
-bugfixes:
-  - Fixing CI workflow to rebuild collection for Automation Hub using redhat.rhel_system_roles collection as dependency.
-...

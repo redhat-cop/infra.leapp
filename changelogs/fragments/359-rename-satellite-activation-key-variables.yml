@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Renamed Satellite activation key variables for clarity. ``leapp_satellite_activation_key_leapp`` is now ``leapp_satellite_activation_key``, ``leapp_satellite_activation_key_pre_leapp`` is now ``leapp_satellite_activation_key_post_analysis``, and ``leapp_satellite_activation_key_post_leapp`` is now ``leapp_satellite_activation_key_post_upgrade``. The old variables are now deprecated.
-...

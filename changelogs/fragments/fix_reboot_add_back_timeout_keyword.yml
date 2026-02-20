@@ -1,3 +1,0 @@
-bugfixes:
-  - The reboot module does use the `timeout` keyword.  Do not worry about 2.9 support.
-...

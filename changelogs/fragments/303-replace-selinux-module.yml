@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Replace ansible.posix.selinux module with the selinux system role
-...
