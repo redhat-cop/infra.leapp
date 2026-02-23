@@ -11,10 +11,10 @@ This role will not fail if there are inhibitors found, it will throw a warning. 
 Analysis role generates hostvars files for each node that runs pre-upgrade.
 It reads pre-upgrade reports and matches found inhibitors to available remediations provided by the `remediation` role.
 
-`analysis` role creates the directory `host_vars` in the path from which you run your analysis playbook.
+`analysis` role creates the directory `host_vars` in the `{{ leapp_workdir_controller }}` directory.
 It generates variable files that set the `leapp_remediation_todo` variable with available remediations for existing inhibitors, based on each node's pre-upgrade report.
 
-The role also generates a `remediate.yml` playbook that you can run to run remediation for all nodes.
+The role also generates a `remediate.yml` playbook that you can use to run remediation for all nodes.
 
 ## Role variables
 

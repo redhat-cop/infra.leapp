@@ -54,7 +54,7 @@
     owner: root
     group: root
   loop:
-    - /etc/ansible/facts.d/pre_leapp.fact
+    - /etc/ansible/facts.d/pre_ipu.fact
     - "{{ leapp_log_file }}"
 
 - name: init_leapp_log | Capture a list of non-rhel versioned packages

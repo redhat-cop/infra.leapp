@@ -1,10 +1,7 @@
 ---
 major_changes:
-  - Generate remediation vars and playbook from the analysis role.
-  - Analysis role generates hostvars files for each node that runs pre-upgrade.
-  - It reads pre-upgrade reports and matches found inhibitors to available remediations provided by the remediation role.
-  - analysis role creates the directory host_vars in the path from which you run your analysis playbook.
-  - It generates variable files that set the leapp_remediation_todo variable with available remediations for existing inhibitors, based on each node's pre-upgrade report.
-  - The role also generates a remediate.yml playbook that you can run to run remediation for all nodes.
-
+  - The analysis role now generates per-host remediation variables and a remediate.yml playbook. It reads pre-upgrade reports, matches found inhibitors to available remediations provided
+    by the remediation role, and creates a host_vars directory containing variable files that set leapp_remediation_todo for each host.
+  - Refactored log handling to use timestamped directories on the controller, controlled by the new leapp_workdir_controller variable.
+  - Added leapp_copy_reports and leapp_create_remediation_hostvars variables to control the new analysis role behavior.
 ...
