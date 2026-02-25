@@ -1,4 +1,0 @@
----
-minor_changes:
-  - Satellite registration is now optional. When ``satellite_organization`` and ``satellite_activation_key`` are not provided, registration is skipped, expecting the system to already be registered to the correct content view.
-...

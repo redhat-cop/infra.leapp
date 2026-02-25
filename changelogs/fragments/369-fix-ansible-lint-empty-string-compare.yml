@@ -1,4 +1,0 @@
-minor_changes:
-  - Fix ansible-lint empty string compare error.
-
-...

@@ -4,6 +4,30 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.1
+======
+
+Major Changes
+-------------
+
+- Added leapp_copy_reports and leapp_create_remediation_hostvars variables to control the new analysis role behavior.
+- Refactored log handling to use timestamped directories on the controller, controlled by the new leapp_workdir_controller variable.
+- The analysis role now generates per-host remediation variables and a remediate.yml playbook. It reads pre-upgrade reports, matches found inhibitors to available remediations provided by the remediation role, and creates a host_vars directory containing variable files that set leapp_remediation_todo for each host.
+
+Minor Changes
+-------------
+
+- 26.* does not throw this error.
+- Add Fedora 43, remove Fedora 41.
+- Add support for checkout@v6 action.
+- Fix ansible-lint empty string compare error.
+- Remove debug print from TFT workflow.
+- Satellite registration is now optional. When ``satellite_organization`` and ``satellite_activation_key`` are not provided, registration is skipped, expecting the system to already be registered to the correct content view.
+- Suppress inline-env-var error in leapp_relative_symlinks remediation.
+- This is only needed because Automation Hub is using ansible-lint 24.12.2 for gating,
+- contains an envvar=value specification.  Note that the current version of ansible-lint
+- which throws an inline-env-var error here because it cannot tell if the context
+
 v1.7.0
 ======
 

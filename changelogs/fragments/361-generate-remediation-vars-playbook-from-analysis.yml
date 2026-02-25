@@ -1,7 +1,0 @@
----
-major_changes:
-  - The analysis role now generates per-host remediation variables and a remediate.yml playbook. It reads pre-upgrade reports, matches found inhibitors to available remediations provided
-    by the remediation role, and creates a host_vars directory containing variable files that set leapp_remediation_todo for each host.
-  - Refactored log handling to use timestamped directories on the controller, controlled by the new leapp_workdir_controller variable.
-  - Added leapp_copy_reports and leapp_create_remediation_hostvars variables to control the new analysis role behavior.
-...

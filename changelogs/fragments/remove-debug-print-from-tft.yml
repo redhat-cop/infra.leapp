@@ -1,7 +1,0 @@
----
-minor_changes:
-  - Remove debug print from TFT workflow.
-  - Add support for checkout@v6 action.
-  - Add Fedora 43, remove Fedora 41.
-
-...

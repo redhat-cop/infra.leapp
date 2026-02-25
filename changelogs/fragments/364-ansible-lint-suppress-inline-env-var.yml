@@ -1,9 +1,0 @@
----
-minor_changes:
-  - Suppress inline-env-var error in leapp_relative_symlinks remediation.
-  - This is only needed because Automation Hub is using ansible-lint 24.12.2 for gating,
-  - which throws an inline-env-var error here because it cannot tell if the context
-  - contains an envvar=value specification.  Note that the current version of ansible-lint
-  - 26.* does not throw this error.
-
-...
