@@ -103,7 +103,7 @@
         leapp upgrade --report-schema=1.2.0
         {{ leapp_upgrade_opts }}
         {{ __leapp_enable_repos_args }}
-        2>&1 | tee -a {{ leapp_log_file }}
+        2>&1 | tee -a {{ __leapp_log_file }}
       environment: "{{ leapp_env_vars }}"
       args:
         executable: /bin/bash
