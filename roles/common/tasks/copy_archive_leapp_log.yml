@@ -37,7 +37,7 @@
 
 - name: copy_archive_leapp_log | Ensure reports directory on controller
   ansible.builtin.file:
-    path: "{{ leapp_reports_dir }}"
+    path: "{{ leapp_reports_controller_dir }}"
     state: directory
     mode: "0755"
   delegate_to: localhost
