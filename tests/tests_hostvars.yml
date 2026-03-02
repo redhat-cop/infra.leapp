@@ -20,6 +20,8 @@
         patterns: "*.yml"
       register: setup_tasks
       delegate_to: localhost
+      # Do not run as root on the controller node
+      become: false
 
     - name: Сommon_upgrade_tasks | Do remediation setup tasks
       ansible.builtin.include_tasks: "{{ setup_task_file }}"
@@ -45,6 +47,8 @@
 
     - name: Test | Prepare controller workdir
       delegate_to: localhost
+      # Do not run as root on the controller node
+      become: false
       block:
         - name: Test | Create tempdir directory for workdir controller
           ansible.builtin.tempfile:
@@ -94,6 +98,8 @@
 
     - name: Test | Validate hostvars file
       delegate_to: localhost
+      # Do not run as root on the controller node
+      become: false
       block:
         - name: Test | Read hostvars file content
           ansible.builtin.slurp:
