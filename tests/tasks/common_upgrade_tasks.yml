@@ -14,6 +14,8 @@
     patterns: "*.yml"
   register: setup_tasks
   delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
 
 - name: common_upgrade_tasks | Do remediation setup tasks
   ansible.builtin.include_tasks: "{{ setup_task_file }}"
@@ -61,6 +63,8 @@
         path: "{{ item }}"
       register: remediate_hostvars_stat
       delegate_to: localhost
+      # Do not run as root on the controller node
+      become: false
       failed_when: not remediate_hostvars_stat.stat.exists
       loop:
         - "{{ playbook_dir }}/host_vars/{{ inventory_hostname }}.yml"
@@ -84,6 +88,8 @@
   when: leapp_test_remediations | d(false)
   register: verify_remediation_tasks
   delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
 
 - name: common_upgrade_tasks | Verify remediations
   ansible.builtin.include_tasks: "{{ verify_remediation_task_file }}"
@@ -108,6 +114,8 @@
     path: "{{ item }}"
   register: remediate_hostvars_stat
   delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
   failed_when: not remediate_hostvars_stat.stat.exists
   loop:
     - "{{ playbook_dir }}/host_vars/{{ inventory_hostname }}.yml"
@@ -130,6 +138,8 @@
     path: "{{ item }}"
   register: remediate_hostvars_stat
   delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
   failed_when: not remediate_hostvars_stat.stat.exists
   loop:
     - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_log_file_basename }}"
@@ -142,6 +152,8 @@
     patterns: "*.yml"
   register: verify_postupgrade_tasks
   delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
   when: leapp_test_upgrade | d(true)
 
 - name: common_upgrade_tasks | Run verification tasks after upgrade

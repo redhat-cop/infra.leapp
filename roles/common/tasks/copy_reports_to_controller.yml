@@ -25,6 +25,8 @@
         state: directory
         mode: "0755"
       delegate_to: localhost
+      # Do not run as root on the controller node
+      become: false
       run_once: true
 
     - name: copy_reports_to_controller | Copy report files to the controller

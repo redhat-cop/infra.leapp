@@ -23,6 +23,8 @@
 - name: create_remediation_hostvars | Write host_vars and playbook for remediation
   when: leapp_remediation_todo | default([]) | length > 0
   delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
   block:
     - name: create_remediation_hostvars | Ensure host_vars directory exists
       ansible.builtin.file:
@@ -35,7 +37,6 @@
       ansible.builtin.stat:
         path: "{{ leapp_workdir_controller }}/host_vars/{{ inventory_hostname }}.yml"
       register: host_vars_inventory_stat
-      delegate_to: localhost
 
     - name: create_remediation_hostvars | Read existing host_vars file
       ansible.builtin.slurp:

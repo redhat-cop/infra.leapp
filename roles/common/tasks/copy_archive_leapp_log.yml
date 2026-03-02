@@ -41,6 +41,8 @@
     state: directory
     mode: "0755"
   delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
   run_once: true
 
 - name: copy_archive_leapp_log | Copy ansible leapp log to the controller

@@ -1,0 +1,7 @@
+---
+bugfixes:
+    - Add `become false` to `delegate_to localhost` to avoid running these
+    - tasks as sudo and hence prompting for root password.
+    - These tasks do not require sudo permissions - they create subdirs and
+    - files in the work directory.
+...
