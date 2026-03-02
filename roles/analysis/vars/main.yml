@@ -6,6 +6,7 @@ __leapp_log_file_basename: "{{ __leapp_logs_name }}.log"
 __leapp_log_file: "{{ __leapp_reports_dir }}/{{ __leapp_log_file_basename }}"
 __leapp_report_json: "{{ __leapp_reports_dir }}/leapp-report.json"
 __leapp_report_txt: "{{ __leapp_reports_dir }}/leapp-report.txt"
+__leapp_preupgrade_log: "{{ __leapp_reports_dir }}/leapp-preupgrade.log"
 
 # Maps the title attribute of an inhibitor from a report to a remediation task file name
 __leapp_inhibitors_title_map:

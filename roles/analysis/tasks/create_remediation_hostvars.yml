@@ -54,6 +54,7 @@
         host_vars_content: |
           ---
           {{ final_host_vars | to_nice_yaml }}
+          ...
       ansible.builtin.copy:
         content: "{{ host_vars_content }}"
         dest: "{{ leapp_workdir_controller }}/host_vars/{{ inventory_hostname }}.yml"
@@ -70,6 +71,7 @@
               - name: Perform remediations on the system
                 ansible.builtin.include_role:
                   name: infra.leapp.remediate
+          ...
         dest: "{{ leapp_workdir_controller }}/remediate.yml"
         mode: "0644"
       run_once: true

@@ -3,6 +3,8 @@
 # Logs copied:
 # - /var/log/leapp/leapp-report.txt
 # - /var/log/leapp/leapp-report.json
+# - /var/log/leapp/leapp-preupgrade.log (analysis)
+# - /var/log/leapp/leapp-upgrade.log (upgrade)
 # - /var/log/leapp/ansible_leapp_<job_name>.log
 #
 # This task file requires the following variables to be set:
@@ -13,6 +15,7 @@
 # leapp_timestamp
 # leapp_report_txt
 # leapp_report_json
+# leapp_native_log
 
 - name: copy_reports_to_controller | Copy reports to the controller
   block:
@@ -32,6 +35,7 @@
       loop:
         - "{{ leapp_report_txt }}"
         - "{{ leapp_report_json }}"
+        - "{{ leapp_native_log }}"
 
     - name: copy_reports_to_controller | Copy log file to the controller
       ansible.builtin.include_role:

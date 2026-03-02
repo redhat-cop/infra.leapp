@@ -6,5 +6,6 @@ __leapp_log_file_basename: "{{ __leapp_logs_name }}.log"
 __leapp_log_file: "{{ __leapp_reports_dir }}/{{ __leapp_log_file_basename }}"
 __leapp_report_json: "{{ __leapp_reports_dir }}/leapp-report.json"
 __leapp_report_txt: "{{ __leapp_reports_dir }}/leapp-report.txt"
+__leapp_upgrade_log: "{{ __leapp_reports_dir }}/leapp-upgrade.log"
 
 ...

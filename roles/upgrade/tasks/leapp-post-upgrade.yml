@@ -194,6 +194,7 @@
     leapp_timestamp: "{{ __leapp_timestamp }}"
     leapp_report_txt: "{{ __leapp_report_txt }}"
     leapp_report_json: "{{ __leapp_report_json }}"
+    leapp_native_log: "{{ __leapp_upgrade_log }}"
   when: leapp_copy_reports
 
 ...
