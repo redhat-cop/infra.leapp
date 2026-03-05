@@ -26,12 +26,15 @@
   # Do not run as root on the controller node
   become: false
   block:
+    # This task must NOT have run_once true due to the following Ansible behavior.
+    # In the case when the first node in the inventory doesn't have leapp_remediation_todo defined, it is skipped.
+    # However, this node runs the run_once task even as skipped.
+    # So this run_once task is never run on a not-skipped node and hence the dir is never created.
     - name: create_remediation_hostvars | Ensure host_vars directory exists
       ansible.builtin.file:
         path: "{{ leapp_workdir_controller }}/host_vars"
         state: directory
         mode: "0755"
-      run_once: true
 
     - name: create_remediation_hostvars | Check if host_vars file exists
       ansible.builtin.stat:
@@ -75,6 +78,5 @@
           ...
         dest: "{{ leapp_workdir_controller }}/remediate.yml"
         mode: "0644"
-      run_once: true
 
 ...
