@@ -1,0 +1,7 @@
+---
+bugfixes:
+    - Sometimes pre-upgrade and upgrade may fail even when there are no inhibitors.
+    - For example due to packages conflicts, due to incorrectly configured target repositories.
+    - The roles should always copy logs to the controller to make it easier for the administrator to access the failures.
+
+...
