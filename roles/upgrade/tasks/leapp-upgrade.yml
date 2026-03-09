@@ -8,7 +8,11 @@
 - name: leapp-upgrade | Verify no inhibitor results found during preupgrade
   ansible.builtin.assert:
     that: not upgrade_inhibited
-    msg: Inhibitors found, please investigate and rerun analysis.
+    msg: |
+      Inhibitors found in the last pre-upgrade analysis report. Remediate the inhibitors first if you haven't
+      done so already and execute the analysis role again before proceeding with the upgrade. If you don't wish
+      to execute the analysis role again and instead let leapp upgrade to recheck for inhibitors, set the
+      leapp_check_analysis_results variable to false.
   when: leapp_check_analysis_results
 
 - name: leapp-upgrade | Register with Satellite activation key
