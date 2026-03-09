@@ -1,134 +1,137 @@
 ---
-- name: analysis-leapp | Register with Satellite activation key
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: register-satellite.yml
-  vars:
-    satellite_organization: "{{ leapp_satellite_organization }}"
-    satellite_activation_key: "{{ leapp_satellite_activation_key }}"
-  when: leapp_upgrade_type == 'satellite'
+- name: analysis-leapp | Perform preupgrade analysis and collect logs
+  block:
+    - name: analysis-leapp | Register with Satellite activation key
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: register-satellite.yml
+      vars:
+        satellite_organization: "{{ leapp_satellite_organization }}"
+        satellite_activation_key: "{{ leapp_satellite_activation_key }}"
+      when: leapp_upgrade_type == 'satellite'
 
-- name: analysis-leapp | Include custom_local_repos for local_repos_pre_leapp
-  vars:
-    __repos: "{{ leapp_local_repos_pre }}"
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: custom_local_repos
-  when: leapp_upgrade_type == "custom"
+    - name: analysis-leapp | Include custom_local_repos for local_repos_pre_leapp
+      vars:
+        __repos: "{{ leapp_local_repos_pre }}"
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: custom_local_repos
+      when: leapp_upgrade_type == "custom"
 
-- name: analysis-leapp | Install packages for preupgrade analysis on RHEL 7
-  ansible.builtin.package:
-    name: "{{ leapp_analysis_packages_el7 }}"
-    enablerepo: "{{ leapp_analysis_repos_el7 }}"
-    state: latest # noqa package-latest
-  when: ansible_facts["distribution_major_version"]|int == 7
+    - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 7
+      ansible.builtin.package:
+        name: "{{ leapp_analysis_packages_el7 }}"
+        enablerepo: "{{ leapp_analysis_repos_el7 }}"
+        state: latest # noqa package-latest
+      when: ansible_facts["distribution_major_version"]|int == 7
 
-- name: analysis-leapp | Install packages for preupgrade analysis on RHEL 8
-  ansible.builtin.package:
-    name: "{{ leapp_analysis_packages_el8 }}"
-    enablerepo: "{{ leapp_analysis_repos_el8 }}"
-    state: latest # noqa package-latest
-  when: ansible_facts["distribution_major_version"]|int == 8
+    - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 8
+      ansible.builtin.package:
+        name: "{{ leapp_analysis_packages_el8 }}"
+        enablerepo: "{{ leapp_analysis_repos_el8 }}"
+        state: latest # noqa package-latest
+      when: ansible_facts["distribution_major_version"]|int == 8
 
-- name: analysis-leapp | Install packages for preupgrade analysis on RHEL 9
-  ansible.builtin.package:
-    name: "{{ leapp_analysis_packages_el9 }}"
-    enablerepo: "{{ leapp_analysis_repos_el9 }}"
-    state: latest # noqa package-latest
-  when: ansible_facts["distribution_major_version"]|int == 9
+    - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 9
+      ansible.builtin.package:
+        name: "{{ leapp_analysis_packages_el9 }}"
+        enablerepo: "{{ leapp_analysis_repos_el9 }}"
+        state: latest # noqa package-latest
+      when: ansible_facts["distribution_major_version"]|int == 9
 
-- name: analysis-leapp | Ensure leapp log directory exists
-  ansible.builtin.file:
-    path: /var/log/leapp
-    state: directory
-    owner: root
-    group: root
-    mode: "0700"
+    - name: analysis-leapp | Ensure leapp log directory exists
+      ansible.builtin.file:
+        path: /var/log/leapp
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
 
-- name: analysis-leapp | Populate leapp_answers file
-  ansible.builtin.copy:
-    content: "{{ leapp_answerfile }}"
-    dest: /var/log/leapp/answerfile
-    owner: root
-    group: root
-    mode: "0644"
-  when: leapp_answerfile is defined
+    - name: analysis-leapp | Populate leapp_answers file
+      ansible.builtin.copy:
+        content: "{{ leapp_answerfile }}"
+        dest: /var/log/leapp/answerfile
+        owner: root
+        group: root
+        mode: "0644"
+      when: leapp_answerfile is defined
 
-- name: analysis-leapp | Create /etc/leapp/files/leapp_upgrade_repositories.repo
-  vars:
-    __repos: "{{ leapp_local_repos }}"
-    __leapp_repo_file: /etc/leapp/files/leapp_upgrade_repositories
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: custom_local_repos
-  when:
-    - leapp_upgrade_type == 'custom'
-    - leapp_local_repos | length > 0
+    - name: analysis-leapp | Create /etc/leapp/files/leapp_upgrade_repositories.repo
+      vars:
+        __repos: "{{ leapp_local_repos }}"
+        __leapp_repo_file: /etc/leapp/files/leapp_upgrade_repositories
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: custom_local_repos
+      when:
+        - leapp_upgrade_type == 'custom'
+        - leapp_local_repos | length > 0
 
-- name: analysis-leapp | Leapp preupgrade report
-  ansible.builtin.shell: >
-    set -o pipefail;
-    export PATH={{ leapp_os_path }};
-    ulimit -n 16384;
-    leapp preupgrade --report-schema=1.2.0
-    {{ leapp_preupg_opts }}
-    {{ __leapp_enable_repos_args }}
-    2>&1 | tee -a {{ __leapp_log_file }}
-  environment: "{{ leapp_env_vars }}"
-  changed_when: true
-  register: leapp
-  args:
-    executable: /bin/bash
-  async: "{{ leapp_async_timeout_maximum | int }}"
-  poll: "{{ leapp_async_poll_interval | int }}"
-  failed_when: "'report has been generated' not in leapp.stdout"
+    - name: analysis-leapp | Leapp preupgrade report
+      ansible.builtin.shell: >
+        set -o pipefail;
+        export PATH={{ leapp_os_path }};
+        ulimit -n 16384;
+        leapp preupgrade --report-schema=1.2.0
+        {{ leapp_preupg_opts }}
+        {{ __leapp_enable_repos_args }}
+        2>&1 | tee -a {{ __leapp_log_file }}
+      environment: "{{ leapp_env_vars }}"
+      changed_when: true
+      register: leapp
+      args:
+        executable: /bin/bash
+      async: "{{ leapp_async_timeout_maximum | int }}"
+      poll: "{{ leapp_async_poll_interval | int }}"
+      failed_when: "'report has been generated' not in leapp.stdout"
 
-- name: analysis-leapp | Include custom_local_repos for local_repos_post_analysis
-  vars:
-    __repos: "{{ leapp_local_repos_post_analysis }}"
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: custom_local_repos
-  when: leapp_upgrade_type == "custom"
+    - name: analysis-leapp | Include check-results-file.yml
+      ansible.builtin.include_tasks: check-results-file.yml
 
-# If the analysis required a different Satellite activation key, re-register with
-# the original activation key to restore the system to its pre-analysis state.
-- name: analysis-leapp | Restore original Satellite activation key
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: register-satellite.yml
-  vars:
-    satellite_organization: "{{ leapp_satellite_organization }}"
-    satellite_activation_key: "{{ leapp_satellite_activation_key_post_analysis }}"
-  when:
-    - leapp_upgrade_type == 'satellite'
-    - leapp_satellite_activation_key_post_analysis != leapp_satellite_activation_key
+    - name: analysis-leapp | Run parse_leapp_report to check for inhibitors
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: parse_leapp_report.yml
 
-- name: analysis-leapp | Include check-results-file.yml
-  ansible.builtin.include_tasks: check-results-file.yml
+    - name: analysis-leapp | Create remediation hostvars
+      ansible.builtin.include_tasks: create_remediation_hostvars.yml
+      when: leapp_create_remediation_hostvars
 
-- name: analysis-leapp | Run parse_leapp_report to check for inhibitors
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: parse_leapp_report.yml
+  always:
+    - name: analysis-leapp | Include custom_local_repos for local_repos_post_analysis
+      vars:
+        __repos: "{{ leapp_local_repos_post_analysis }}"
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: custom_local_repos
+      when: leapp_upgrade_type == "custom"
 
-- name: analysis-leapp | Copy reports to the controller
-  ansible.builtin.include_role:
-    name: infra.leapp.common
-    tasks_from: copy_reports_to_controller.yml
-  vars:
-    leapp_reports_controller_dir: "{{ __leapp_reports_controller_dir }}"
-    leapp_reports_dir: "{{ __leapp_reports_dir }}"
-    leapp_log_file_basename: "{{ __leapp_log_file_basename }}"
-    leapp_log_file: "{{ __leapp_log_file }}"
-    leapp_timestamp: "{{ __leapp_timestamp }}"
-    leapp_report_txt: "{{ __leapp_report_txt }}"
-    leapp_report_json: "{{ __leapp_report_json }}"
-    leapp_native_log: "{{ __leapp_preupgrade_log }}"
-  when: leapp_copy_reports
+    # If the analysis required a different Satellite activation key, re-register with
+    # the original activation key to restore the system to its pre-analysis state.
+    - name: analysis-leapp | Restore original Satellite activation key
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: register-satellite.yml
+      vars:
+        satellite_organization: "{{ leapp_satellite_organization }}"
+        satellite_activation_key: "{{ leapp_satellite_activation_key_post_analysis }}"
+      when:
+        - leapp_upgrade_type == 'satellite'
+        - leapp_satellite_activation_key_post_analysis != leapp_satellite_activation_key
 
-- name: analysis-leapp | Create remediation hostvars
-  ansible.builtin.include_tasks: create_remediation_hostvars.yml
-  when: leapp_create_remediation_hostvars
+    - name: analysis-leapp | Copy reports to the controller
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: copy_reports_to_controller.yml
+      vars:
+        leapp_reports_controller_dir: "{{ __leapp_reports_controller_dir }}"
+        leapp_reports_dir: "{{ __leapp_reports_dir }}"
+        leapp_log_file_basename: "{{ __leapp_log_file_basename }}"
+        leapp_log_file: "{{ __leapp_log_file }}"
+        leapp_timestamp: "{{ __leapp_timestamp }}"
+        leapp_report_txt: "{{ __leapp_report_txt }}"
+        leapp_report_json: "{{ __leapp_report_json }}"
+        leapp_native_log: "{{ __leapp_preupgrade_log }}"
+      when: leapp_copy_reports
 
 ...
