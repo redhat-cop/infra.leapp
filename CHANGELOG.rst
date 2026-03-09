@@ -4,6 +4,31 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.2
+======
+
+Minor Changes
+-------------
+
+- Copy leapp-preupgrade.log and leapp-upgrade.log from managed nodes to the controller node along with the reports to provide more information about the leapp execution.
+- Fixed problem with upgrade execution due to undefined internal variable.
+- The leapp_reports_controller_dir variable is now used correctly.
+
+Bugfixes
+--------
+
+- Add `become false` to `delegate_to localhost` to avoid running these
+- For example due to packages conflicts, due to incorrectly configured target repositories.
+- However, this node runs the run_once task even as skipped.
+- In the case when the first node in the inventory doesn't have leapp_remediation_todo defined, it is skipped.
+- So this run_once task is never run on a not-skipped node and hence the dir is never created.
+- Sometimes pre-upgrade and upgrade may fail even when there are no inhibitors.
+- Tasks inside a block that has extra conditions must NOT have run_once true due to the following Ansible behavior.
+- The roles should always copy logs to the controller to make it easier for the administrator to access the failures.
+- These tasks do not require sudo permissions - they create subdirs and
+- files in the work directory.
+- tasks as sudo and hence prompting for root password.
+
 v1.7.1
 ======
 
