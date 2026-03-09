@@ -17,31 +17,28 @@
 # leapp_report_json
 # leapp_native_log
 
-- name: copy_reports_to_controller | Copy reports to the controller
-  block:
-    - name: copy_reports_to_controller | Ensure reports directory on controller
-      ansible.builtin.file:
-        path: "{{ leapp_reports_controller_dir }}"
-        state: directory
-        mode: "0755"
-      delegate_to: localhost
-      # Do not run as root on the controller node
-      become: false
-      run_once: true
+- name: copy_reports_to_controller | Ensure reports directory on controller
+  ansible.builtin.file:
+    path: "{{ leapp_reports_controller_dir }}"
+    state: directory
+    mode: "0755"
+  delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
+  run_once: true
 
-    - name: copy_reports_to_controller | Copy report files to the controller
-      ansible.builtin.fetch:
-        src: "{{ item }}"
-        dest: "{{ leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ item | basename }}"
-        flat: true
-      loop:
-        - "{{ leapp_report_txt }}"
-        - "{{ leapp_report_json }}"
-        - "{{ leapp_native_log }}"
+- name: copy_reports_to_controller | Fetch report files if they exist
+  ansible.builtin.include_tasks: fetch_file_if_exists.yml
+  vars:
+    __leapp_report_file: "{{ item }}"
+  loop:
+    - "{{ leapp_report_txt }}"
+    - "{{ leapp_report_json }}"
+    - "{{ leapp_native_log }}"
 
-    - name: copy_reports_to_controller | Copy log file to the controller
-      ansible.builtin.include_role:
-        name: infra.leapp.common
-        tasks_from: copy_archive_leapp_log.yml
+- name: copy_reports_to_controller | Copy log file to the controller
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: copy_archive_leapp_log.yml
 
 ...

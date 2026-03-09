@@ -85,6 +85,19 @@
       poll: "{{ leapp_async_poll_interval | int }}"
       failed_when: "'report has been generated' not in leapp.stdout"
 
+    - name: analysis-leapp | Include check-results-file.yml
+      ansible.builtin.include_tasks: check-results-file.yml
+
+    - name: analysis-leapp | Run parse_leapp_report to check for inhibitors
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: parse_leapp_report.yml
+
+    - name: analysis-leapp | Create remediation hostvars
+      ansible.builtin.include_tasks: create_remediation_hostvars.yml
+      when: leapp_create_remediation_hostvars
+
+  always:
     - name: analysis-leapp | Include custom_local_repos for local_repos_post_analysis
       vars:
         __repos: "{{ leapp_local_repos_post_analysis }}"
@@ -106,19 +119,6 @@
         - leapp_upgrade_type == 'satellite'
         - leapp_satellite_activation_key_post_analysis != leapp_satellite_activation_key
 
-    - name: analysis-leapp | Include check-results-file.yml
-      ansible.builtin.include_tasks: check-results-file.yml
-
-    - name: analysis-leapp | Run parse_leapp_report to check for inhibitors
-      ansible.builtin.include_role:
-        name: infra.leapp.common
-        tasks_from: parse_leapp_report.yml
-
-    - name: analysis-leapp | Create remediation hostvars
-      ansible.builtin.include_tasks: create_remediation_hostvars.yml
-      when: leapp_create_remediation_hostvars
-
-  always:
     - name: analysis-leapp | Copy reports to the controller
       ansible.builtin.include_role:
         name: infra.leapp.common

@@ -1,0 +1,21 @@
+---
+# Copies __leapp_report_file to the controller.
+#
+# This task file requires the following variables to be set:
+# __leapp_report_file
+
+- name: fetch_file_if_exists | Check if file exists
+  ansible.builtin.stat:
+    path: "{{ __leapp_report_file }}"
+  register: __leapp_report_file_stat
+
+- name: fetch_file_if_exists | Copy report file to the controller
+  when: __leapp_report_file_stat.stat.exists
+  ansible.builtin.fetch:
+    src: "{{ __leapp_report_file }}"
+    dest: "{{
+      leapp_reports_controller_dir }}/{{
+      inventory_hostname }}/{{
+      __leapp_report_file | basename }}"
+    flat: true
+...
