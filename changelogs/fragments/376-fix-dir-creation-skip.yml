@@ -1,0 +1,8 @@
+---
+bugfixes:
+    - Tasks inside a block that has extra conditions must NOT have run_once true due to the following Ansible behavior.
+    - In the case when the first node in the inventory doesn't have leapp_remediation_todo defined, it is skipped.
+    - However, this node runs the run_once task even as skipped.
+    - So this run_once task is never run on a not-skipped node and hence the dir is never created.
+
+...
