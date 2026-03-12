@@ -30,9 +30,17 @@ default_leapp_analysis_repos_el6:
   - rhel-6-server-optional-rpms
 leapp_analysis_repos_el6: "{{ analysis_repos_el6 | default(default_leapp_analysis_repos_el6) }}"
 
+default_leapp_analysis_repos_el7_by_arch:
+  x86_64:
+    - rhel-7-server-extras-rpms
+  s390x:
+    - rhel-7-for-system-z-extras-rpms
+  ppc64le:
+    - rhel-7-for-power-le-extras-rpms
 # analysis_repos_el7 is deprecated, use leapp_analysis_repos_el7 instead
-default_leapp_analysis_repos_el7:
-  - rhel-7-server-extras-rpms
+default_leapp_analysis_repos_el7: >-
+  {{ default_leapp_analysis_repos_el7_by_arch[ansible_facts['architecture']]
+  | default(default_leapp_analysis_repos_el7_by_arch['x86_64']) }}
 leapp_analysis_repos_el7: "{{ analysis_repos_el7 | default(default_leapp_analysis_repos_el7) }}"
 
 # analysis_repos_el8 is deprecated, use leapp_analysis_repos_el8 instead
