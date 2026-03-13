@@ -1,5 +1,0 @@
----
-minor_changes:
-  - The leapp_reports_controller_dir variable is now used correctly.
-  - Fixed problem with upgrade execution due to undefined internal variable.
-...

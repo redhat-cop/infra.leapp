@@ -1,6 +1,0 @@
----
-minor_changes:
-  - Copy leapp-preupgrade.log and leapp-upgrade.log from managed nodes
-    to the controller node along with the reports to provide more
-    information about the leapp execution.
-...
