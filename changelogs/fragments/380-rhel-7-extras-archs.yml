@@ -1,5 +1,0 @@
----
-bugfixes:
-    - Different archs have different extras repository name, the role should enable corresponding to arch repositories
-
-...

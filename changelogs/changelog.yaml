@@ -420,3 +420,17 @@ releases:
     - 375-controller-become-false.yml
     - 376-fix-dir-creation-skip.yml
     release_date: '2026-03-09'
+  1.7.3:
+    changes:
+      bugfixes:
+      - Different archs have different extras repository name, the role should enable
+        corresponding to arch repositories
+      minor_changes:
+      - Make the upgrade role inhibitor check message clearer that the analysis role
+        has to be reexecuted until there are no inhibitors in the leapp report and
+        that checking of inhibitors in the analysis role report can be skipped by
+        using the leapp_check_analysis_results variable.
+    fragments:
+    - 379-make-inhibitor-check-msg-in-upgrade-role-clearer.yml
+    - 380-rhel-7-extras-archs.yml
+    release_date: '2026-03-16'
