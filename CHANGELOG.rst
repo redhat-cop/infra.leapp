@@ -4,6 +4,19 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.3
+======
+
+Minor Changes
+-------------
+
+- Make the upgrade role inhibitor check message clearer that the analysis role has to be reexecuted until there are no inhibitors in the leapp report and that checking of inhibitors in the analysis role report can be skipped by using the leapp_check_analysis_results variable.
+
+Bugfixes
+--------
+
+- Different archs have different extras repository name, the role should enable corresponding to arch repositories
+
 v1.7.2
 ======
 
