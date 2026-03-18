@@ -1,0 +1,6 @@
+---
+bugfixes:
+    - Remediation for RHEL 7 kernel modules does not work because modules remain after reboot in initramfs.
+    - Calling dracut to rebuild initramfs to fix the issue.
+
+...
