@@ -7,5 +7,19 @@ __leapp_log_file: "{{ __leapp_reports_dir }}/{{ __leapp_log_file_basename }}"
 __leapp_report_json: "{{ __leapp_reports_dir }}/leapp-report.json"
 __leapp_report_txt: "{{ __leapp_reports_dir }}/leapp-report.txt"
 __leapp_upgrade_log: "{{ __leapp_reports_dir }}/leapp-upgrade.log"
+__leapp_packages:
+  - leapp-upgrade
+__default_leapp_repos_el7_by_arch:
+  x86_64:
+    - rhel-7-server-extras-rpms
+  s390x:
+    - rhel-7-for-system-z-extras-rpms
+  ppc64le:
+    - rhel-7-for-power-le-extras-rpms
+__default_leapp_repos_el7: >-
+  {{ __default_leapp_repos_el7_by_arch[ansible_facts['architecture']]
+  | default(__default_leapp_repos_el7_by_arch['x86_64']) }}
+# upgrade_repos_el7 is deprecated, use __leapp_repos_el7 instead
+__leapp_repos_el7: "{{ upgrade_repos_el7 | default(__default_leapp_repos_el7) }}"
 
 ...

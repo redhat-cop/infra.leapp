@@ -1,54 +1,5 @@
 ---
 # defaults file for analysis
-# analysis_packages_el6 is deprecated, use leapp_analysis_packages_el6 instead
-default_leapp_analysis_packages_el6:
-  - preupgrade-assistant
-  - preupgrade-assistant-el6toel7
-  - redhat-upgrade-tool
-  - openscap
-  - openscap-engine-sce
-leapp_analysis_packages_el6: "{{ analysis_packages_el6 | default(default_leapp_analysis_packages_el6) }}"
-
-# analysis_packages_el7 is deprecated, use leapp_analysis_packages_el7 instead
-default_leapp_analysis_packages_el7:
-  - leapp-upgrade
-leapp_analysis_packages_el7: "{{ analysis_packages_el7 | default(default_leapp_analysis_packages_el7) }}"
-
-# analysis_packages_el8 is deprecated, use leapp_analysis_packages_el8 instead
-default_leapp_analysis_packages_el8:
-  - leapp-upgrade
-leapp_analysis_packages_el8: "{{ analysis_packages_el8 | default(default_leapp_analysis_packages_el8) }}"
-
-# analysis_packages_el9 is deprecated, use leapp_analysis_packages_el9 instead
-default_leapp_analysis_packages_el9:
-  - leapp-upgrade
-leapp_analysis_packages_el9: "{{ analysis_packages_el9 | default(default_leapp_analysis_packages_el9) }}"
-
-# analysis_repos_el6 is deprecated, use leapp_analysis_repos_el6 instead
-default_leapp_analysis_repos_el6:
-  - rhel-6-server-extras-rpms
-  - rhel-6-server-optional-rpms
-leapp_analysis_repos_el6: "{{ analysis_repos_el6 | default(default_leapp_analysis_repos_el6) }}"
-
-default_leapp_analysis_repos_el7_by_arch:
-  x86_64:
-    - rhel-7-server-extras-rpms
-  s390x:
-    - rhel-7-for-system-z-extras-rpms
-  ppc64le:
-    - rhel-7-for-power-le-extras-rpms
-# analysis_repos_el7 is deprecated, use leapp_analysis_repos_el7 instead
-default_leapp_analysis_repos_el7: >-
-  {{ default_leapp_analysis_repos_el7_by_arch[ansible_facts['architecture']]
-  | default(default_leapp_analysis_repos_el7_by_arch['x86_64']) }}
-leapp_analysis_repos_el7: "{{ analysis_repos_el7 | default(default_leapp_analysis_repos_el7) }}"
-
-# analysis_repos_el8 is deprecated, use leapp_analysis_repos_el8 instead
-leapp_analysis_repos_el8: "{{ analysis_repos_el8 | default([]) }}"
-
-# analysis_repos_el9 is deprecated, use leapp_analysis_repos_el9 instead
-leapp_analysis_repos_el9: "{{ analysis_repos_el9 | default([]) }}"
-
 # If defined, leapp_answerfile will be used as the contents of /var/log/leapp/answerfile.
 # leapp_answerfile: |
 #   [remove_pam_pkcs11_module_check]
@@ -208,4 +159,16 @@ leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection |
 
 # Directory to store leapp pre-upgrade reports and remediation hostvars
 leapp_workdir_controller: "{{ playbook_dir }}"
+
+# Whether to update all packages to latest version and reboot before running leapp analysis
+leapp_pre_upgrade: true
+
+# reboot_timeout is deprecated, use leapp_reboot_timeout instead
+# leapp_reboot_timeout: 7200
+leapp_reboot_timeout: "{{ reboot_timeout | default(7200) }}"
+
+# post_reboot_delay is deprecated, use leapp_post_reboot_delay instead
+# leapp_post_reboot_delay: 120
+leapp_post_reboot_delay: "{{ post_reboot_delay | default(120) }}"
+
 ...

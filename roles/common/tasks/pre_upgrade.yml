@@ -1,0 +1,46 @@
+# This task requires the __leapp_pre_upgrade variable to be set
+---
+- name: pre_upgrade | Register with Satellite activation key
+  ansible.builtin.include_tasks: register-satellite.yml
+  vars:
+    satellite_organization: "{{ leapp_satellite_organization }}"
+    satellite_activation_key: "{{ leapp_satellite_activation_key }}"
+  when: leapp_upgrade_type == 'satellite'
+
+- name: pre_upgrade | Include custom_local_repos for local_repos_pre_leapp
+  vars:
+    __repos: "{{ leapp_local_repos_pre }}"
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: custom_local_repos
+  when: leapp_upgrade_type == "custom"
+
+- name: pre_upgrade | Update all packages to latest version
+  when: __leapp_pre_upgrade | bool
+  block:
+    - name: pre_upgrade | Get package version lock entries
+      ansible.builtin.command: # noqa: command-instead-of-module
+        cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock list"
+      register: versionlock_list
+      changed_when: false
+      failed_when: false
+
+    - name: pre_upgrade | Remove all package version locks
+      ansible.builtin.command: # noqa: command-instead-of-module
+        cmd: "{{ ansible_facts['pkg_mgr'] }} versionlock clear"
+      changed_when: true
+      when:
+        - versionlock_list.rc == 0
+        - versionlock_list.stdout | d("") | trim | length > 0
+
+    - name: pre_upgrade | Install packages for upgrade from RHEL 7
+      ansible.builtin.package:
+        name: "{{ __leapp_packages }}"
+        enablerepo: >-
+          {{ __leapp_repos_el7
+          if ansible_facts["distribution_major_version"] | int == 7
+          else omit }}
+        state: latest # noqa package-latest
+
+    - name: pre_upgrade | Include update-and-reboot.yml
+      ansible.builtin.include_tasks: update-and-reboot.yml
