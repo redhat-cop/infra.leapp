@@ -15,13 +15,12 @@
       leapp_check_analysis_results variable to false.
   when: leapp_check_analysis_results
 
-- name: leapp-upgrade | Include pre_upgrade.yml
+- name: leapp-upgrade | Include pre_upgrade_update.yml
   ansible.builtin.include_role:
     name: infra.leapp.common
-    tasks_from: pre_upgrade.yml
+    tasks_from: pre_upgrade_update.yml
   vars:
-    # __leapp_pre_upgrade is required to be true to upgrade
-    __leapp_pre_upgrade: true
+    __leapp_pre_upgrade_update: "{{ leapp_pre_upgrade_update | bool }}"
 
 - name: leapp-upgrade | Create /etc/leapp/files/leapp_upgrade_repositories.repo
   vars:

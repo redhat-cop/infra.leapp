@@ -21,13 +21,9 @@ The role also generates a `remediate.yml` playbook that you can use to run remed
 | Name                      | Type   | Default value | Description |
 |---------------------------|--------|---------------|-------------|
 | leapp_upgrade_type        | String | "cdn"         | Set to "cdn" for hosts registered with Red Hat CDN, "rhui" for hosts using rhui repos, "satellite" for hosts registered to Satellite, and "custom" for custom repos. |
-| leapp_pre_upgrade         | bool   | true          | Prepare for the upgrade. When true, the role will do the following - clear the versionlock list, update all packages and optionally reboot if any packages were updated. |
+| leapp_pre_upgrade_update  | bool   | false         | Whether to make the role clear the versionlock list, update all packages and optionally reboot if any packages were updated. This can be destructive and cause downtime. |
 | leapp_reboot_timeout      | Int    | 7200          | Integer for maximum seconds to wait for reboot to complete. |
 | leapp_post_reboot_delay   | Int    | 120           | Integer to pass to the reboot post_reboot_delay option. |
-
-
-
-leapp_pre_upgrade: true
 
 ## Satellite variables
 

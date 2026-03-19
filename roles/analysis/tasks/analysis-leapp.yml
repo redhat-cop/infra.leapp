@@ -1,12 +1,12 @@
 ---
 - name: analysis-leapp | Perform preupgrade analysis and collect logs
   block:
-    - name: analysis-leapp | Include pre_upgrade.yml
+    - name: analysis-leapp | Include pre_upgrade_update.yml
       ansible.builtin.include_role:
         name: infra.leapp.common
-        tasks_from: pre_upgrade.yml
+        tasks_from: pre_upgrade_update.yml
       vars:
-        __leapp_pre_upgrade: "{{ leapp_pre_upgrade | bool }}"
+        __leapp_pre_upgrade_update: "{{ leapp_pre_upgrade_update | bool }}"
 
     - name: analysis-leapp | Ensure leapp log directory exists
       ansible.builtin.file:

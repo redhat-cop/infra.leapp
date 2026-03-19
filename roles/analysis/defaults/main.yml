@@ -161,7 +161,7 @@ leapp_system_roles_collection: "{{ infra_leapp_upgrade_system_roles_collection |
 leapp_workdir_controller: "{{ playbook_dir }}"
 
 # Whether to update all packages to latest version and reboot before running leapp analysis
-leapp_pre_upgrade: true
+leapp_pre_upgrade_update: false
 
 # reboot_timeout is deprecated, use leapp_reboot_timeout instead
 # leapp_reboot_timeout: 7200
