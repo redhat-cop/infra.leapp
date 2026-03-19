@@ -21,6 +21,7 @@
         mode: "0644"
         owner: root
         group: root
+      register: __leapp_modules_load
 
     - name: manage_one_kernel_module | Ensure modules are not loaded at boot
       ansible.builtin.template:
@@ -29,6 +30,12 @@
         mode: "0644"
         owner: root
         group: root
+      register: __leapp_modprobe
+
+    - name: manage_one_kernel_module | Rebuild initramfs when module config changed
+      ansible.builtin.command: dracut -f
+      when: __leapp_modules_load is changed or __leapp_modprobe is changed
+      changed_when: true
 
     - name: manage_one_kernel_module | Debug modprobe.d file
       ansible.builtin.command: cat {{ leapp_kernel_module_modprobe_file | quote }}
