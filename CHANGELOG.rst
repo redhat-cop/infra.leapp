@@ -4,6 +4,23 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.4
+======
+
+Major Changes
+-------------
+
+- However, in the case where the target system is not fully-updated - the analysis might pass, but the dnf update that the upgrade role does might bring some new inhibitors, hence the upgrade might fail.
+- So, the proper approach would be to allow the analysis role do the required pre-upgrade steps so that the analysis is run on the same system as the upgrade.
+- The analysis role historically runs only the pre-upgrade analysis that does not do any changes to the system.
+- The analysis role now runs the pre-upgrade steps before running the analysis. This is done by setting the leapp_pre_upgrade_update variable to true.
+
+Bugfixes
+--------
+
+- Calling dracut to rebuild initramfs to fix the issue.
+- Remediation for RHEL 7 kernel modules does not work because modules remain after reboot in initramfs.
+
 v1.7.3
 ======
 

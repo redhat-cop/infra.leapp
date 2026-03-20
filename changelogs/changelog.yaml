@@ -434,3 +434,23 @@ releases:
     - 379-make-inhibitor-check-msg-in-upgrade-role-clearer.yml
     - 380-rhel-7-extras-archs.yml
     release_date: '2026-03-16'
+  1.7.4:
+    changes:
+      bugfixes:
+      - Calling dracut to rebuild initramfs to fix the issue.
+      - Remediation for RHEL 7 kernel modules does not work because modules remain
+        after reboot in initramfs.
+      major_changes:
+      - However, in the case where the target system is not fully-updated - the analysis
+        might pass, but the dnf update that the upgrade role does might bring some
+        new inhibitors, hence the upgrade might fail.
+      - So, the proper approach would be to allow the analysis role do the required
+        pre-upgrade steps so that the analysis is run on the same system as the upgrade.
+      - The analysis role historically runs only the pre-upgrade analysis that does
+        not do any changes to the system.
+      - The analysis role now runs the pre-upgrade steps before running the analysis.
+        This is done by setting the leapp_pre_upgrade_update variable to true.
+    fragments:
+    - 382-rhel-7-kernel-modules-unload.yml
+    - 383-analysis-pre-upgrade.yml
+    release_date: '2026-03-20'
