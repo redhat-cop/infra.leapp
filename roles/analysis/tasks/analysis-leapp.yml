@@ -1,43 +1,12 @@
 ---
 - name: analysis-leapp | Perform preupgrade analysis and collect logs
   block:
-    - name: analysis-leapp | Register with Satellite activation key
+    - name: analysis-leapp | Include pre_upgrade_update.yml
       ansible.builtin.include_role:
         name: infra.leapp.common
-        tasks_from: register-satellite.yml
+        tasks_from: pre_upgrade_update.yml
       vars:
-        satellite_organization: "{{ leapp_satellite_organization }}"
-        satellite_activation_key: "{{ leapp_satellite_activation_key }}"
-      when: leapp_upgrade_type == 'satellite'
-
-    - name: analysis-leapp | Include custom_local_repos for local_repos_pre_leapp
-      vars:
-        __repos: "{{ leapp_local_repos_pre }}"
-      ansible.builtin.include_role:
-        name: infra.leapp.common
-        tasks_from: custom_local_repos
-      when: leapp_upgrade_type == "custom"
-
-    - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 7
-      ansible.builtin.package:
-        name: "{{ leapp_analysis_packages_el7 }}"
-        enablerepo: "{{ leapp_analysis_repos_el7 }}"
-        state: latest # noqa package-latest
-      when: ansible_facts["distribution_major_version"]|int == 7
-
-    - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 8
-      ansible.builtin.package:
-        name: "{{ leapp_analysis_packages_el8 }}"
-        enablerepo: "{{ leapp_analysis_repos_el8 }}"
-        state: latest # noqa package-latest
-      when: ansible_facts["distribution_major_version"]|int == 8
-
-    - name: analysis-leapp | Install packages for preupgrade analysis on RHEL 9
-      ansible.builtin.package:
-        name: "{{ leapp_analysis_packages_el9 }}"
-        enablerepo: "{{ leapp_analysis_repos_el9 }}"
-        state: latest # noqa package-latest
-      when: ansible_facts["distribution_major_version"]|int == 9
+        __leapp_pre_upgrade_update: "{{ leapp_pre_upgrade_update | bool }}"
 
     - name: analysis-leapp | Ensure leapp log directory exists
       ansible.builtin.file:

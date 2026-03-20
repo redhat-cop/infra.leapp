@@ -1,41 +1,5 @@
 ---
 # defaults file for upgrade
-# upgrade_packages_el7 is deprecated, use leapp_upgrade_packages_el7 instead
-# leapp_upgrade_packages_el7:
-#   - leapp-upgrade
-leapp_upgrade_packages_el7: "{{ upgrade_packages_el7 | default(['leapp-upgrade']) }}"
-
-# upgrade_packages_el8 is deprecated, use leapp_upgrade_packages_el8 instead
-# leapp_upgrade_packages_el8:
-#   - leapp-upgrade
-leapp_upgrade_packages_el8: "{{ upgrade_packages_el8 | default(['leapp-upgrade']) }}"
-
-# upgrade_packages_el9 is deprecated, use leapp_upgrade_packages_el9 instead
-# leapp_upgrade_packages_el9:
-#   - leapp-upgrade
-leapp_upgrade_packages_el9: "{{ upgrade_packages_el9 | default(['leapp-upgrade']) }}"
-
-default_leapp_upgrade_repos_el7_by_arch:
-  x86_64:
-    - rhel-7-server-extras-rpms
-  s390x:
-    - rhel-7-for-system-z-extras-rpms
-  ppc64le:
-    - rhel-7-for-power-le-extras-rpms
-# upgrade_repos_el7 is deprecated, use leapp_upgrade_repos_el7 instead
-default_leapp_upgrade_repos_el7: >-
-  {{ default_leapp_upgrade_repos_el7_by_arch[ansible_facts['architecture']]
-  | default(default_leapp_upgrade_repos_el7_by_arch['x86_64']) }}
-leapp_upgrade_repos_el7: "{{ upgrade_repos_el7 | default(default_leapp_upgrade_repos_el7) }}"
-
-# upgrade_repos_el8 is deprecated, use leapp_upgrade_repos_el8 instead
-# leapp_upgrade_repos_el8: []
-leapp_upgrade_repos_el8: "{{ upgrade_repos_el8 | default([]) }}"
-
-# upgrade_repos_el9 is deprecated, use leapp_upgrade_repos_el9 instead
-# leapp_upgrade_repos_el9: []
-leapp_upgrade_repos_el9: "{{ upgrade_repos_el9 | default([]) }}"
-
 leapp_upgrade_type: cdn
 # leapp_upgrade_type: satellite
 # leapp_upgrade_type: rhui

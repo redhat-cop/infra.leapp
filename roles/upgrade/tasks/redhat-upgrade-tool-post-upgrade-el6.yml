@@ -33,5 +33,8 @@
     - leapp_update_grub_to_grub_2
 
 - name: redhat-upgrade-tool-post-upgrade-el6 | Include update-and-reboot.yml
-  ansible.builtin.include_tasks: update-and-reboot.yml
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: update-and-reboot.yml
+
 ...

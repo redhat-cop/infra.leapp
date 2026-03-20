@@ -168,7 +168,9 @@
   changed_when: true
 
 - name: leapp-post-upgrade | Include update-and-reboot.yml
-  ansible.builtin.include_tasks: update-and-reboot.yml
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: update-and-reboot.yml
   when:
     - leapp_post_upgrade_update | bool
     - leapp_upgrade_type != "custom" or leapp_local_repos_post_upgrade | length > 0
