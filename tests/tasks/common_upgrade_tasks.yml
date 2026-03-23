@@ -40,9 +40,10 @@
     - not (leapp_test_remediations | d(false))
 
 - name: common_upgrade_tasks | Run first analysis
-  ansible.builtin.include_role:
-    name: infra.leapp.analysis
-    public: true
+  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+  vars:
+    __leapp_test_rolename: infra.leapp.analysis
+    __sr_public: true
 
 - name: common_upgrade_tasks | Flush handlers
   ansible.builtin.meta: flush_handlers
@@ -77,9 +78,10 @@
     # ansible.builtin.import_playbook here. import_playbook # can only be used
     # at the playbook level, not in task files.
     - name: common_upgrade_tasks | Include remediate role
-      ansible.builtin.include_role:
-        name: infra.leapp.remediate
-        public: true
+      ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+      vars:
+        __leapp_test_rolename: infra.leapp.remediate
+        __sr_public: true
 
 - name: common_upgrade_tasks | Gather verify remediation tasks
   ansible.builtin.find:
@@ -102,9 +104,10 @@
   ansible.builtin.meta: flush_handlers
 
 - name: common_upgrade_tasks | Run analysis after remediation
-  ansible.builtin.include_role:
-    name: infra.leapp.analysis
-    public: true
+  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+  vars:
+    __leapp_test_rolename: infra.leapp.analysis
+    __sr_public: true
 
 - name: common_upgrade_tasks | Flush handlers
   ansible.builtin.meta: flush_handlers
@@ -126,9 +129,10 @@
 
 # set leapp_test_upgrade to false in order to test only analysis and remediation
 - name: common_upgrade_tasks | Run upgrade role
-  ansible.builtin.include_role:
-    name: infra.leapp.upgrade
-    public: true
+  ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
+  vars:
+    __leapp_test_rolename: infra.leapp.upgrade
+    __sr_public: true
   when: leapp_test_upgrade | d(true)
   tags:
     - tests::upgrade

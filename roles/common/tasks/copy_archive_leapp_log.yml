@@ -8,6 +8,9 @@
 # leapp_log_file_basename
 # leapp_log_file
 # leapp_timestamp
+- name: copy_archive_leapp_log | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: copy_archive_leapp_log | Check for log file
   ansible.builtin.stat:
     path: "{{ leapp_log_file }}"

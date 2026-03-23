@@ -17,6 +17,9 @@
 # leapp_report_json
 # leapp_native_log
 
+- name: copy_reports_to_controller | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: copy_reports_to_controller | Ensure reports directory on controller
   ansible.builtin.file:
     path: "{{ leapp_reports_controller_dir }}"

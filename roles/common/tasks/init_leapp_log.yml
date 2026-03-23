@@ -6,6 +6,9 @@
 # leapp_reports_dir: "{{ __leapp_reports_dir }}"
 # leapp_log_file: "{{ __leapp_log_file }}"
 
+- name: init_leapp_log | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: init_leapp_log | Ensure that log directory exists
   ansible.builtin.file:
     path: "{{ leapp_reports_dir }}"
