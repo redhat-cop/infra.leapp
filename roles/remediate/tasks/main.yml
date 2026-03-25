@@ -1,5 +1,13 @@
 ---
 # tasks file for remediations
+- name: Ensure ansible_facts used by role
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: set_facts.yml
+  vars:
+    __leapp_role_required_facts: "{{ __leapp_remediate_required_facts }}"
+    __leapp_role_required_facts_subsets: "{{ __leapp_remediate_required_facts_subsets }}"
+
 - name: Run remediations
   vars:
     leapp_report_location_6to7: /root/preupgrade/result.txt

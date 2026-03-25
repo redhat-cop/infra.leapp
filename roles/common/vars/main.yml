@@ -1,5 +1,14 @@
 ---
 # vars file for common
+__leapp_common_required_facts:
+  - architecture
+  - date_time
+  - distribution
+  - distribution_version
+  - distribution_major_version
+  - pkg_mgr
+__leapp_common_required_facts_subsets: "{{ ['!all', '!min'] +
+  __leapp_common_required_facts }}"
 __leapp_preupg_return_codes:
   0:
     msg: "preupg works properly and modules exit with the following results: PASS, FIXED, INFORMATIONAL, NEEDS_INSPECTION, NOT_APPLICABLE."

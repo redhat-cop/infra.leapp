@@ -1,4 +1,7 @@
 ---
+- name: cleanup_logs | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: cleanup_logs | Cleanup | Remove log files
   ansible.builtin.shell: |
     set -euxo pipefail

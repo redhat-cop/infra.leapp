@@ -1,4 +1,12 @@
 ---
+- name: Ensure ansible_facts used by role
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: set_facts.yml
+  vars:
+    __leapp_role_required_facts: "{{ __leapp_analysis_required_facts }}"
+    __leapp_role_required_facts_subsets: "{{ __leapp_analysis_required_facts_subsets }}"
+
 # If we store timestamp variable in vars, it  is processed dynamically at
 # runtime, hence timestamp changes on each variable invocation. We want the
 # timestamp to be stable so that logs are stored in the same directory.

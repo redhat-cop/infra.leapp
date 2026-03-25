@@ -2,6 +2,9 @@
 # - leapp_kernel_modules - REQUIRED - list of kernel modules to manage
 # - leapp_kernel_modules_state - REQUIRED - state of the kernel modules - present or absent
 ---
+- name: manage_kernel_modules | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: manage_kernel_modules | Load or unload kernel modules
   ansible.builtin.include_tasks: manage_one_kernel_module.yml
   loop: "{{ leapp_kernel_modules }}"

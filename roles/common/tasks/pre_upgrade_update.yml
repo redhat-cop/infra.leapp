@@ -1,5 +1,8 @@
 # This task requires the __leapp_pre_upgrade_update variable to be set
 ---
+- name: pre_upgrade_update | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: pre_upgrade_update | Register with Satellite activation key
   ansible.builtin.include_tasks: register-satellite.yml
   vars:

@@ -1,6 +1,9 @@
 # Inputs:
 # - leapp_result_filename - REQUIRED - path to the Leapp pre-upgrade report file. It is set in common role vars.
 ---
+- name: parse_leapp_report | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: parse_leapp_report | Parse Leapp Report
   vars:
     leapp_result_directory: "{{ leapp_result_filename | dirname }}"

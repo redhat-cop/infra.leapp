@@ -1,4 +1,11 @@
 ---
-# vars file for upgrade
+# vars file for remediate
+__leapp_remediate_required_facts:
+  - date_time
+  - distribution
+  - distribution_major_version
+  - mounts
+__leapp_remediate_required_facts_subsets: "{{ ['!all', '!min'] +
+  __leapp_remediate_required_facts }}"
 
 ...

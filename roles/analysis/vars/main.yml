@@ -1,4 +1,11 @@
 ---
+__leapp_analysis_required_facts:
+  - architecture
+  - distribution
+  - distribution_major_version
+__leapp_analysis_required_facts_subsets: "{{ ['!all', '!min'] +
+  __leapp_analysis_required_facts }}"
+
 __leapp_logs_name: ansible_leapp_analysis
 __leapp_reports_controller_dir: "{{ leapp_workdir_controller }}/{{ __leapp_logs_name }}_logs_{{ __leapp_timestamp }}"
 __leapp_reports_dir: /var/log/leapp

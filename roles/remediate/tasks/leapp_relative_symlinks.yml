@@ -51,6 +51,9 @@
         #       which throws an inline-env-var error here because it cannot tell if the context
         #       contains an envvar=value specification.  Note that the current version of ansible-lint
         #       26.* does not throw this error.
+        # Note: ansible-lint does not like it that both argv and cmd are used together - they are mutually exclusive.
+        # However, this is not a problem because only one of them will ever be used.
+        # noqa: args[module]
         - name: leapp_relative_symlinks | Set links in root directory to be relative
           ansible.builtin.command: # noqa: inline-env-var
             argv: "{{ leapp_inhibitor_remediation.context if not leapp_inhibitor_remediation.context is string else omit }}"

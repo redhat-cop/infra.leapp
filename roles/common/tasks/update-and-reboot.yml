@@ -1,4 +1,7 @@
 ---
+- name: update-and-reboot | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: update-and-reboot | Ensure all updates are applied
   ansible.builtin.package:
     name: "*"

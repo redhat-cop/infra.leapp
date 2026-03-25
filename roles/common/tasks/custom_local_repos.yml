@@ -1,4 +1,7 @@
 ---
+- name: custom_local_repos | Ensure ansible_facts used by role
+  ansible.builtin.include_tasks: set_facts.yml
+
 - name: custom_local_repos | Remove old /etc/leapp/files/leapp_upgrade_repositories.repo
   ansible.builtin.file:
     path: /etc/leapp/files/leapp_upgrade_repositories.repo

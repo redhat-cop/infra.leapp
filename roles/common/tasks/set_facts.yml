@@ -1,0 +1,18 @@
+# Ensure that the role has the facts it uses
+# Inputs:
+# - __leapp_role_required_facts - OPTIONAL - list of facts required by the role,
+#   defaults to __leapp_common_required_facts
+# - __leapp_role_required_facts_subsets - OPTIONAL - list of fact subsets required by the role,
+#   defaults to ['!all', '!min'] + __leapp_role_required_facts
+# Outputs:
+# - ansible_facts is updated with the required facts
+---
+- name: set_facts | Ensure ansible_facts used by role
+  ansible.builtin.setup:
+    gather_subset: "{{ __required_facts_subsets }}"
+  when: __required_facts | difference(ansible_facts.keys() | list) | length > 0
+  vars:
+    __required_facts: "{{ __leapp_role_required_facts |
+      d(__leapp_common_required_facts) }}"
+    __required_facts_subsets: "{{ __leapp_role_required_facts_subsets |
+      d(['!all', '!min'] + __required_facts) }}"
