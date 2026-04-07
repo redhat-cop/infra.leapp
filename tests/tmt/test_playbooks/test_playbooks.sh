@@ -85,6 +85,7 @@ SR_ANSIBLE_GATHERING="${SR_ANSIBLE_GATHERING:-implicit}"
 SR_REQUIRED_VARS=("SR_ANSIBLE_VER")
 # SR_ANSIBLE_VERBOSITY
 #   Default is "-vv" - user can locally edit tft.yml in role to increase this for debugging
+# shellcheck disable=SC2153
 [ -n "$LSR_ANSIBLE_VERBOSITY" ] && export SR_ANSIBLE_VERBOSITY="$LSR_ANSIBLE_VERBOSITY"
 SR_ANSIBLE_VERBOSITY="${SR_ANSIBLE_VERBOSITY:--vv}"
 # SR_REPORT_ERRORS_URL

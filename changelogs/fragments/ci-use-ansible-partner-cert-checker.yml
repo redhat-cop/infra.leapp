@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Use the ansible-collections/partner-certification-checker collection for CI.
+
+...
