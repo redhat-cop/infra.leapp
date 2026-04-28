@@ -4,11 +4,36 @@
   vars:
     job_name: test_analysis
   tasks:
+    - name: See if /dev/log exists for the fingerprint check
+      ansible.builtin.stat:
+        path: /dev/log
+      register: __register_dev_log
+
+    - name: Set the start time for the journal search
+      ansible.builtin.set_fact:
+        __journal_start_time: "{{ ansible_facts['date_time']['date'] ~ ' ' ~ ansible_facts['date_time']['time'] }}"
+      when: __register_dev_log.stat.exists
+
     - name: Test | Run analysis
       block:
         - name: Test | Run role analysis
           ansible.builtin.include_role:
             name: infra.leapp.analysis
+
+        # look for the exact module invocation, not some other message that might contain the string
+        - name: Check system journal contains role fingerprints
+          ansible.builtin.shell:
+            executable: /bin/bash
+            cmd: >-
+              set -eo pipefail;
+              journalctl --since "{{ __journal_start_time }}" --no-pager |
+              grep -v " Invoked with" | grep "sr_fingerprint.*begin infra.leapp:analysis" ||
+              { echo ERROR: BEGIN fingerprint not found; exit 1; };
+              journalctl --since "{{ __journal_start_time }}" --no-pager |
+              grep -v " Invoked with" | grep "sr_fingerprint.*success infra.leapp:analysis" ||
+              { echo ERROR: SUCCESS fingerprint not found; exit 1; }
+          changed_when: false
+          when: __register_dev_log.stat.exists
       always:
         - name: Test | Include cleanup logs
           ansible.builtin.include_role:

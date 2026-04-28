@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Log role fingerprints in syslog.
+
+...
