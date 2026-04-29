@@ -1,0 +1,7 @@
+---
+- name: leapp_update_all_packages | Include pre_upgrade_update.yml
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: pre_upgrade_update.yml
+  vars:
+    __leapp_pre_upgrade_update: true
