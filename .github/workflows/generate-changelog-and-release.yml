@@ -1,0 +1,137 @@
+---
+# Actions → "Generate changelog and open release PR" → Run workflow.
+#
+# Runs antsibull-changelog release (fragments → CHANGELOG.rst), bumps galaxy.yml,
+# builds the collection and runs ansible-lint (same idea as .github/workflows/ansible-lint.yml),
+# then opens a pull request against the default branch. Lint failures do not open a PR.
+# The CI workflow still runs ansible-lint on the PR for branch checks.
+#
+# The PR is labeled with `release-on-merge`. When that PR is merged into the
+# default branch, `release.yml` creates the git tag and GitHub release, then
+# publishes to Ansible Galaxy.
+#
+# Create the `release-on-merge` label once under Issues → Labels if it does not exist.
+# Workflow permissions: Settings → Actions → General → Read and write.
+name: Generate changelog and open release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (semver, no v prefix), e.g. 1.7.5'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: generate-changelog-pr-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must be semver X.Y.Z (no v prefix), got: ${VERSION}"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync default branch and tags
+        env:
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git pull --ff-only origin "${BRANCH}"
+          git fetch origin --tags
+
+      - name: Refuse if release tag already exists on remote
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${VERSION}" >/dev/null 2>&1; then
+            echo "Tag ${VERSION} already exists on origin; delete the tag or pick a new version."
+            exit 1
+          fi
+
+      - name: Read current collection version from galaxy.yml
+        id: versions
+        run: |
+          old=$(grep -E '^version:' galaxy.yml | awk '{print $2}')
+          echo "old=${old}" >> "${GITHUB_OUTPUT}"
+          echo "Current galaxy.yml version: ${old}"
+
+      - name: Refuse if already at target version
+        env:
+          OLD: ${{ steps.versions.outputs.old }}
+          NEW: ${{ inputs.version }}
+        run: |
+          if [[ "${OLD}" == "${NEW}" ]]; then
+            echo "galaxy.yml is already at version ${NEW}; nothing to bump."
+            exit 1
+          fi
+
+      - name: Set collection version in galaxy.yml
+        env:
+          NEW: ${{ inputs.version }}
+        run: |
+          sed -i "s/^version:.*$/version: ${NEW}/" galaxy.yml
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install antsibull-changelog and Ansible
+        run: pip install antsibull-changelog ansible-core
+
+      - name: Generate changelog (fragments → CHANGELOG.rst)
+        env:
+          VERSION: ${{ inputs.version }}
+        run: antsibull-changelog release --verbose --version "${VERSION}"
+
+      - name: Build collection (ansible-lint gate)
+        run: ansible-galaxy collection build -vvv
+
+      - name: Install collection for lint
+        run: ansible-galaxy collection install "./infra-leapp-${{ inputs.version }}.tar.gz"
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
+        with:
+          args: "--offline"
+
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Update changelog ${{ inputs.version }}'
+          committer: 'GitHub <noreply@github.com>'
+          author: '${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>'
+          base: ${{ github.event.repository.default_branch }}
+          branch: release/changelog-${{ inputs.version }}-${{ github.run_id }}
+          delete-branch: true
+          title: 'ci: Changelog ${{ inputs.version }}'
+          body: |
+            Automated changelog and version bump for **${{ inputs.version }}**.
+
+            - Set **`galaxy.yml`** `version` to **${{ inputs.version }}** (was ${{ steps.versions.outputs.old }}).
+            - `antsibull-changelog release` updates `CHANGELOG.rst`, `changelogs/changelog.yaml`, and fragment cleanup for **${{ inputs.version }}**.
+
+            **Next step:** review and merge. This PR is labeled **`release-on-merge`** so that merge triggers `release.yml` (GitHub tag + release, then Galaxy publish).
+
+            It is also labeled **`changelog`** and **`automated pr`** for consistency with [past release PRs](https://github.com/redhat-cop/infra.leapp/pull/384). CI treats this as a release-only diff (`CHANGELOG.rst`, `changelogs/changelog.yaml`, `galaxy.yml`, and removed fragments), so no extra fragment is required.
+          labels: |
+            release-on-merge
+            changelog
+            automated pr

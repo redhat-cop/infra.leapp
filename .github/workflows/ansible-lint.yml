@@ -6,12 +6,12 @@ jobs:
     name: Ansible Lint # Naming the build is important to use it as a status check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build collection
         run: ansible-galaxy collection build -vvv
         shell: bash
-        working-directory: ${{ vars.GITHUB_PATH }}
+        working-directory: ${{ github.workspace }}
 
       - name: Get version
         run: echo "NUM=$(cat galaxy.yml | grep version | cut -d ':' -f 2 | awk '{print $1}')" >> $GITHUB_OUTPUT
@@ -20,7 +20,7 @@ jobs:
       - name: Install collection
         run: ansible-galaxy collection install ./infra-leapp-${{ steps.vers.outputs.NUM }}.tar.gz # -p /home/runner/collections
         shell: bash
-        working-directory: ${{ vars.GITHUB_PATH }}
+        working-directory: ${{ github.workspace }}
 
       # - name: Install collection dependencies
       #   run: ansible-galaxy collection install -r requirements.yml
