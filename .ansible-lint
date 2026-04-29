@@ -31,8 +31,8 @@ exclude_paths:
 loop_var_prefix: ^(__|{role}_)
 
 # Enforce variable names to follow pattern below, in addition to Ansible own
-# requirements, like avoiding python identifiers. To disable add `var-naming`
-# to skip_list.
+# requirements, like avoiding python identifiers. To skip only the role-prefix
+# check, add `var-naming[no-role-prefix]` to skip_list.
 var_naming_pattern: ^[a-z_][a-z0-9_]*$
 
 use_default_rules: true
@@ -49,7 +49,7 @@ use_default_rules: true
 # When putting ignores inside the ignore file, they are marked as ignored, but
 # still visible, making it easier to address later.
 skip_list:
-  - var-naming
+  - var-naming[no-role-prefix]
 
 # Ansible-lint does not automatically load rules that have the 'opt-in' tag.
 # You must enable opt-in rules by listing each rule 'id' below.
