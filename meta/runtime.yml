@@ -1,3 +1,6 @@
 ---
-requires_ansible: ">=2.15.0" # Use '>= 2.11.0' instead, if upgrading RHEL 6
-...
+# Minimum aligns with Red Hat Ansible Automation Platform (AAP 2.4+ / Core 2.16).
+# See https://forum.ansible.com/t/red-hat-ansible-automation-platform-is-ending-support-for-ansible-core-2-15-and-python-3-11/45574
+requires_ansible: ">=2.16.0"
+# RHEL 6 is end-of-life; managing RHEL 6 hosts requires ansible-core <= 2.12, which is
+# incompatible with this minimum. Use an older collection release if you still require that.

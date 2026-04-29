@@ -25,8 +25,8 @@ issues: https://github.com/redhat-cop/infra.leapp/issues
 build_ignore:
   # https://docs.ansible.com/ansible/devel/dev_guide/developing_collections_distributing.html#ignoring-files-and-folders
   - .gitignore
+  - .ansible-lint
   - changelogs/.plugin-cache.yaml
   - .github/
 dependencies:
   "fedora.linux_system_roles": "*" # ">=1.21.0"
-...
