@@ -64,9 +64,12 @@ ansible-galaxy collection install infra.leapp
 You can also list it in a `requirements.yml` and install with `ansible-galaxy collection install -r requirements.yml`:
 
 ```yaml
+---
 collections:
   - name: infra.leapp
-  - name: fedora.linux_system_roles
+    version: "*"
+  - name: fedora.linux_system_roles # or redhat.rhel_system_roles see roles README for more details
+    version: "*"
 ```
 
 Use `redhat.rhel_system_roles` where documented in role READMEs if that fits your environment instead of `fedora.linux_system_roles`.
@@ -85,26 +88,6 @@ ansible-galaxy collection install infra.leapp:==1.0.0
 
 See [Using Ansible collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html) for more details.
 
-**After installation:** Configure inventory, credentials, and subscription/repo access for managed nodes as required by the roles you run. Authentication follows your standard Ansible patterns (for example `become`, SSH keys, vault secrets). If you install collections alongside the `ansible` PyPI package, collection versions are not upgraded when you upgrade that package alone—re-run `ansible-galaxy collection install` with `--upgrade` when you want newer collection releases.
-
-## Use cases
-
-1. **Enterprise-wide analysis before upgrades** — Run the `analysis` role across groups of hosts to collect Leapp (or Preupgrade Assistant) reports, feed results into change management, and only promote systems that pass checks to an upgrade wave.
-
-2. **Phased in-place upgrades** — Use the `upgrade` role in rolling batches (maintenance windows, load-balanced sets, or cluster nodes) so you can pause, verify applications, and continue with the same automation across RHEL 7→8, 8→9, or 9→10.
-
-3. **Satellite or disconnected RHEL** — Point role variables at Satellite content views or internal mirrors so upgrades use approved baselines without direct internet access from managed nodes.
-
-4. **Public cloud RHEL** — Automate upgrades on cloud instances (for example EC2 with RHUI or BYOS) by aligning repository and subscription variables with your billing and entitlement model.
-
-5. **Remediation workflows** — Combine `remediate` with analysis output to address inhibitors or configuration drift before re-running analysis or upgrade playbooks.
-
-## Testing
-
-Continuous integration runs on pushes to the repository (workflows linked in the badges at the top of this file), including Ansible/YAML lint checks. Playbook-oriented testing is also driven via [tmt](https://tmt.readthedocs.io/) plans under `plans/`, exercising roles against managed RHEL images where that CI is configured.
-
-**Known constraints:** Match controller Ansible and Python to your targets and to `meta/runtime.yml` (see **Requirements**). Third-party and non-RHEL software may need separate automation (see **Out of scope**). Always validate in your own test tiers before production.
-
 ## Contributing
 
 We are a fledgling community and welcome any new contributors. Get started by opening an issue or pull request. Refer to `CONTRIBUTING.md` for more information.
@@ -119,14 +102,6 @@ This collection is **Red Hat Ansible Certified Content**, distributed on **Red H
 
 - **Release notes / changelog:** `CHANGELOG.rst` and `changelogs/changelog.yaml`.
 - **Roadmap:** No separate public roadmap document; follow the changelog and repository activity for upcoming changes.
-
-## Related information
-
-- [Using Ansible collections](https://docs.ansible.com/ansible/devel/user_guide/collections_using.html)
-- [RHEL In-place upgrade Support Policy](https://access.redhat.com/articles/7102732)
-- [Supported in-place upgrade paths for Red Hat Enterprise Linux](https://access.redhat.com/articles/4263361)
-- [Ansible Core compatibility with RHEL 7 and RHEL 6 managed nodes](https://access.redhat.com/articles/6977724)
-- Broader context on RHEL in-place upgrade automation at scale: [blog post](https://red.ht/bobblog)
 
 ## License Information
 
