@@ -9,9 +9,10 @@
 
     leapp_inhibitor_keys:
       - f08a07da902958defa4f5c2699fae9ec2eb67c5b
-      - 7ae2961239eec9905e2580fa6309a589b1dca953
+      # TODO: Following keys can be removed with the next leapp release (Nov 2026)
+      - 7ae2961239eec9905e2580fa6309a589b1dca953  
       - 48e04852631245aa4afee9adcdc7c2375b8cffb8
-    leapp_inhibitor_title: Leapp detected loaded kernel drivers which have been removed in RHEL \d+. Upgrade cannot proceed.
+    leapp_inhibitor_title: Leapp detected loaded kernel drivers that have been removed in the target OS. Upgrade cannot proceed.
     leapp_report_entries: "{{ leapp_report_data.entries | default([]) }}"
     leapp_inhibitor_entries_by_key: "{{ leapp_report_entries
       | selectattr('key', 'defined')
