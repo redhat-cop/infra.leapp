@@ -7,6 +7,12 @@
     __leapp_role_required_facts: "{{ __leapp_upgrade_required_facts }}"
     __leapp_role_required_facts_subsets: "{{ __leapp_upgrade_required_facts_subsets }}"
 
+- name: Record role begin fingerprint
+  infra.leapp.sr_fingerprint:
+    sr_message: >-
+      begin infra.leapp:upgrade ansible_version={{ ansible_version.full }}
+      {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}
+
 # If we store timestamp variable in vars, it  is processed dynamically at
 # runtime, hence timestamp changes on each variable invocation. We want the
 # timestamp to be stable so that logs are stored in the same directory.
@@ -70,4 +76,10 @@
     quiet: true
   changed_when: true
   notify: Ansible leapp in-place OS upgrade is done
+
+- name: Record role success fingerprint
+  infra.leapp.sr_fingerprint:
+    sr_message: >-
+      success infra.leapp:upgrade ansible_version={{ ansible_version.full }}
+      {{ ansible_facts['distribution'] }}-{{ ansible_facts['distribution_version'] }}
 ...
