@@ -70,7 +70,7 @@ jobs:
             --title "infra.leapp ${VERSION}" \
             --notes-file CHANGELOG.rst \
             --verify-tag \
-            --attach "${{ steps.build.outputs.tar_file }}"
+            "${{ steps.build.outputs.tar_file }}"
 
       - name: Publish to Ansible Galaxy
         run: ansible-galaxy collection publish --api-key=${{ secrets.GALAXY_INFRA_KEY }} ${{ steps.build.outputs.tar_file }}
