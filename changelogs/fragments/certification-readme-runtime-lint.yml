@@ -1,0 +1,7 @@
+---
+minor_changes:
+  - README - align structure and links for Red Hat Ansible Certified Content on Automation Hub (requirements, installation, support, and role paths).
+  - meta/runtime.yml - set ``requires_ansible`` to ``>=2.16.0`` with notes on managed-node compatibility.
+  - CI - run extra documentation linting on Python 3.12.
+  - ansible-lint - skip only ``var-naming[no-role-prefix]`` instead of the entire ``var-naming`` rule.
+  - Tests - rename play var ``diff`` to ``__diff`` in ``remediate_removed_kernel_drivers`` verify task.
