@@ -3,7 +3,7 @@
 
 namespace: infra
 name: leapp
-version: 1.7.4
+version: 1.7.5
 readme: README.md
 authors:
   - Bob Mader (github.com/swapdisk)

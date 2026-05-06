@@ -4,6 +4,25 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.5
+======
+
+Minor Changes
+-------------
+
+- Add a manual ``Generate changelog and open release PR`` workflow that runs ``antsibull-changelog release``, bumps ``galaxy.yml``, builds the collection, runs ``ansible-lint``, and opens a PR labeled ``release-on-merge`` with ``changelog`` and ``automated pr``.
+- Align GitHub Actions pins (e.g. ``actions/checkout@v6``, ``actions/setup-python@v6``) and use ``github.workspace`` instead of a disallowed ``GITHUB_``-prefixed repository variable for collection build paths.
+- CI - run extra documentation linting on Python 3.12.
+- Document maintainer release flow in ``RELEASE.md`` and link it from ``CONTRIBUTING.md``.
+- Log role fingerprints in syslog.
+- README - align structure and links for Red Hat Ansible Certified Content on Automation Hub (requirements, installation, support, and role paths).
+- Refactor roles to ensure they gather their required facts
+- Rework the ``Release`` workflow to run on merge of that PR, create the tag and GitHub release from the merge commit (so the tarball matches the updated ``CHANGELOG.rst``), then publish to Ansible Galaxy.
+- Tests - rename play var ``diff`` to ``__diff`` in ``remediate_removed_kernel_drivers`` verify task.
+- Use the ansible-collections/partner-certification-checker collection for CI.
+- ansible-lint - skip only ``var-naming[no-role-prefix]`` instead of the entire ``var-naming`` rule.
+- meta/runtime.yml - set ``requires_ansible`` to ``>=2.16.0`` with notes on managed-node compatibility.
+
 v1.7.4
 ======
 

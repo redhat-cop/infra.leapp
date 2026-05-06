@@ -1,8 +1,0 @@
----
-minor_changes:
-  - Add a manual ``Generate changelog and open release PR`` workflow that runs ``antsibull-changelog release``, bumps ``galaxy.yml``, builds the collection, runs ``ansible-lint``, and opens a PR labeled ``release-on-merge`` with ``changelog`` and ``automated pr``.
-  - Rework the ``Release`` workflow to run on merge of that PR, create the tag and GitHub release from the merge commit (so the tarball matches the updated ``CHANGELOG.rst``), then publish to Ansible Galaxy.
-  - Document maintainer release flow in ``RELEASE.md`` and link it from ``CONTRIBUTING.md``.
-  - Align GitHub Actions pins (e.g. ``actions/checkout@v6``, ``actions/setup-python@v6``) and use ``github.workspace`` instead of a disallowed ``GITHUB_``-prefixed repository variable for collection build paths.
-
-...
