@@ -31,12 +31,12 @@
       ansible.builtin.slurp:
         src: "{{ leapp_log_file }}"
       register: leapp_log_file_slurp
-      no_log: true
+      no_log: "{{ ansible_verbosity < 3 }}"
 
     - name: copy_archive_leapp_log | Decode file {{ leapp_log_file }}
       ansible.builtin.set_fact:
         leapp_log_file_content: "{{ (leapp_log_file_slurp.content | b64decode).split('\n') }}"
-      no_log: true
+      no_log: "{{ ansible_verbosity < 3 }}"
 
     - name: copy_archive_leapp_log | Ensure reports directory on controller
       ansible.builtin.file:

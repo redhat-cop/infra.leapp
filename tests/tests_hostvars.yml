@@ -88,7 +88,7 @@
           ansible.builtin.slurp:
             src: "{{ leapp_hostvars_file }}"
           register: hostvars_file_content
-          no_log: true
+          no_log: "{{ ansible_verbosity < 3 }}"
 
     - name: Test | Run role analysis
       ansible.builtin.include_tasks: tasks/run_role_with_clear_facts.yml
@@ -105,7 +105,7 @@
           ansible.builtin.slurp:
             src: "{{ leapp_hostvars_file }}"
           register: hostvars_file_new_content
-          no_log: true
+          no_log: "{{ ansible_verbosity < 3 }}"
 
         - name: Test | Assert that hostvars file contains remediation_todo
           ansible.builtin.assert:

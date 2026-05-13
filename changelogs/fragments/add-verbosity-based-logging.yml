@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Add verbosity-based logging to reduce verbose output from slurp and set_fact tasks. Output is now suppressed by default but can be shown when running with -vvv or higher verbosity.
+
+...
