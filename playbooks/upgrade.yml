@@ -1,15 +1,22 @@
 ---
-- name: Upgrade
+- name: RHEL upgrade
   hosts: all
-  strategy: free
   become: true
-  force_handlers: true
+  # strategy: free
+  # gather_facts: true
+  # force_handlers: true
+
   vars:
+    # Upgrade type: cdn (default), satellite, rhui, or custom
     leapp_upgrade_type: satellite
-    leapp_satellite_organization: My Satellite Organization
-    leapp_satellite_activation_key: MY_ACTIVATION_KEY
-    leapp_satellite_activation_key_post_upgrade: MY_ACTIVATION_KEY_POST_UPGRADE
-    leapp_upgrade_opts: --target 8.10
+
+    # Variables specific to satellite upgrade type
+    leapp_satellite_organization: <satellite_org>
+    leapp_satellite_activation_key: <activation_key>
+    leapp_satellite_activation_key_post_analysis: <activation_key_post_analysis>
+
+    # Additional variables that inflience the upgrade execution (see roles/upgrade/README.md)
+    leapp_preupg_opts: --target 9.6
     leapp_update_grub_to_grub_2: true
     leapp_selinux_mode: permissive
   tasks:

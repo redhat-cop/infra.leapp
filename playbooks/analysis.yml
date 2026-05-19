@@ -1,26 +1,27 @@
 ---
-- name: Analysis
+- name: RHEL pre-upgrade analysis
   hosts: all
-  strategy: free
-  gather_facts: true
   become: true
-  force_handlers: true
+  # strategy: free
+  # gather_facts: true
+  # force_handlers: true
 
   vars:
+    # Upgrade type: cdn (default), satellite, rhui, or custom
     leapp_upgrade_type: satellite
-    leapp_satellite_organization: My Satellite Organization
-    leapp_satellite_activation_key_post_analysis: MY_ACTIVATION_KEY_POST_ANALYSIS
-    leapp_satellite_activation_key: MY_ACTIVATION_KEY
-    # By default the analysis role will use:
-    # analysis_repos_el7: rhel-7-server-extras-rpms
-    # Optionally override the default analysis_repos_el7 to use the upstream copr leapp repository:
-    # analysis_repos_el7: copr:copr.fedorainfracloud.org:group_oamg:leapp
-    leapp_preupg_opts: --target 8.10
+
+    # Variables specific to satellite upgrade type
+    leapp_satellite_organization: <satellite_org>
+    leapp_satellite_activation_key: <activation_key>
+    leapp_satellite_activation_key_post_analysis: <activation_key_post_analysis>
+
+    # Additional variables that inflience the analysis execution (see roles/analysis/README.md)
+    leapp_preupg_opts: --target 9.6
     leapp_answerfile: |
       [remove_pam_pkcs11_module_check]
       confirm = True
   tasks:
-    - name: Generate preupgrade analysis report
+    - name: Generate pre-upgrade analysis report
       ansible.builtin.import_role:
         name: infra.leapp.analysis
 ...
