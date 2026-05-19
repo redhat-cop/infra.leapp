@@ -14,7 +14,7 @@
       changed_when: false
 
     - name: leapp_multiple_kernels | Set default kernel to latest
-      ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
+      ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] | quote }}
       when: installed_kernels.stdout_lines[0] != current_kernel.stdout
       register: set_default_kernel
       changed_when: set_default_kernel is success

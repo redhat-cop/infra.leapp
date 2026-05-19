@@ -24,7 +24,7 @@
       when: installed_kernels.stdout_lines[0] != default_kernel_version.stdout
       block:
         - name: leapp_newest_kernel_not_in_use | Set default kernel to latest
-          ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
+          ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] | quote }}
           register: set_default_kernel
           changed_when: set_default_kernel is success
 
