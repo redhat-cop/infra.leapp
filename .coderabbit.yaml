@@ -1,0 +1,228 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit configuration for infra.leapp
+
+chat:
+  art: false
+
+reviews:
+  # Disable fun features
+  poem: false
+  in_progress_fortune: false
+
+  # Disable auto-features
+  auto_apply_labels: false
+  auto_assign_reviewers: false
+  request_changes_workflow: false
+
+  # Disable additional review features
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  suggested_labels: false
+  high_level_summary_in_walkthrough: false
+
+  # Disable finishing touches
+  finishing_touches:
+    unit_tests:
+      enabled: false
+
+  path_instructions:
+    # ========================================
+    # Ansible Role Tasks - Core role logic
+    # ========================================
+    - path: "roles/*/tasks/**/*.yml"
+      instructions: |
+        **no_log patterns:**
+        - For sensitive data (credentials, secrets, passwords, keys):
+          ```yaml
+          - name: Task with sensitive data
+            ansible.builtin.command: sensitive command
+            no_log: "{{ leapp_secure_logging }}"
+          ```
+          Ensure `leapp_secure_logging: true` is defined in the role's defaults/main.yml
+
+        - For facts modules (package_facts, service_facts):
+          ```yaml
+          - name: Gather package facts
+            ansible.builtin.package_facts:
+            no_log: "{{ ansible_verbosity < 3 }}"
+          ```
+          This hides verbose facts output unless running with -vvv or higher verbosity
+
+        - NEVER use hardcoded `no_log: true` - always parametrize
+
+        **Third-party collections:**
+        - Avoid using third-party collections (community.general, community.crypto, etc.)
+        - Use ansible.builtin modules or command module instead
+        - In the case when the use of module is absolutely necessary - vendor it inside this collection
+          under plugins/modules/ or library/
+
+        **Idempotency:**
+        - Tasks must be idempotent - safe to run multiple times without unintended changes
+        - Use proper state parameters (present/absent, started/stopped, etc.)
+        - Command/shell tasks should use creates/removes or changed_when to avoid false changes
+        - Example:
+          ```yaml
+          - name: Initialize leapp
+            ansible.builtin.command: /usr/bin/leapp preupgrade
+            args:
+              creates: /var/log/leapp/leapp-report.json
+          ```
+
+        **Check mode support:**
+        - Critical tasks should support check mode (--check flag)
+        - Use check_mode: false only when absolutely necessary (e.g., fact gathering)
+        - Test that role works with --check --diff
+
+        **Test coverage requirement:**
+        - When adding new tasks to tasks/main.yml or creating new task files, verify that corresponding test coverage exists in tests/
+        - New functionality MUST include test files (tests/tests_*.yml) that exercise the new code paths
+        - Tests should verify both success scenarios and failure/edge cases
+        - If this PR adds new tasks but does not include new or updated tests, flag it and request test coverage
+
+    # ========================================
+    # Ansible Role Handlers
+    # ========================================
+    - path: "roles/*/handlers/**/*.yml"
+      instructions: |
+        - Handlers with sensitive data must use `no_log: "{{ leapp_secure_logging }}"`
+        - Handler names should be descriptive and prefixed with role name for clarity
+
+    # ========================================
+    # Collection-Level Test Playbooks
+    # ========================================
+    - path: "tests/tests_*.yml"
+      instructions: |
+        **Test quality requirements:**
+        - Tests should verify both success and failure scenarios
+        - Use assert module to verify expected state after role execution
+        - Include cleanup tasks to ensure tests are rerunnable
+        - Tests should be idempotent - running twice should not cause failures
+        - Example verification:
+          ```yaml
+          - name: Verify leapp report exists
+            ansible.builtin.assert:
+              that:
+                - leapp_report.stat.exists
+              fail_msg: "Leapp report file does not exist"
+          ```
+
+    # ========================================
+    # Role Templates
+    # ========================================
+    - path: "roles/*/templates/**/*.j2"
+      instructions: |
+        **Required headers (in this order):**
+        1. ansible_managed header: `{{ ansible_managed | comment }}`
+        2. Collection/role fingerprint: `{{ "ansible_role:leapp.<role_name>" | comment(prefix="", postfix="") }}`
+
+    # ========================================
+    # Role Variable Definitions - defaults/
+    # ========================================
+    - path: "roles/*/defaults/**/*.yml"
+      instructions: |
+        - All variables MUST be prefixed with `leapp_`
+        - All variables MUST be stored in the file defaults/main.yml, Ansible
+          doesn't include variables from other files.
+        - These are user-facing API variables
+        - For every new variable introduced in this file, verify that it is
+          documented in the role's README.md with a description and a usage example.
+          If it is missing from the role's README.md, flag it and request that it be added.
+
+    # ========================================
+    # Role Variable Definitions - vars/
+    # ========================================
+    - path: "roles/*/vars/**/*.yml"
+      instructions: |
+        - Internal variables MUST be prefixed with `__leapp_`
+        - User-facing variables belong in defaults/main.yml, not here
+
+    # ========================================
+    # Collection Library (Vendored Modules)
+    # ========================================
+    - path: "library/**/*.py"
+      instructions: |
+        - These are vendored or custom modules for the collection
+        - Follow the same guidelines as plugins/modules/
+        - Document why the module is vendored if it's from an external source
+
+    # ========================================
+    # Collection Playbooks
+    # ========================================
+    - path: "playbooks/**/*.yml"
+      instructions: |
+        - Collection playbooks should demonstrate role usage
+        - Include clear documentation and examples
+        - Should be idempotent and follow best practices
+
+    # ========================================
+    # Role Documentation
+    # ========================================
+    - path: "roles/*/README.md"
+      instructions: |
+        - Document all new user-facing variables from the role's defaults/main.yml
+        - Include usage examples for new functionality
+        - Clearly explain role purpose and dependencies
+        - Document any role-specific requirements or limitations
+
+    # ========================================
+    # Collection-Level Documentation
+    # ========================================
+    - path: "README.md"
+      instructions: |
+        - Document collection-level features and usage
+        - Provide overview of all roles in the collection
+        - Include examples of how to use roles together
+        - Document any collection-level requirements or dependencies
+
+    # ========================================
+    # Changelog Fragments
+    # ========================================
+    - path: "changelogs/fragments/**/*.yml"
+      instructions: |
+        **Changelog fragment requirements:**
+        - Every PR that makes user-facing changes MUST include a changelog fragment file
+        - Fragment files must be placed in the `changelogs/fragments/` directory
+        - If the PR does not include a changelog fragment and makes user-facing changes, flag it and request that one be added
+
+        **File format (YAML):**
+        Fragment files must use one or more of these categories:
+        - `major_changes:` - Breaking changes or major new features
+        - `minor_changes:` - New features or enhancements (non-breaking)
+        - `breaking_changes:` - Changes that break backward compatibility
+        - `deprecated_features:` - Features marked as deprecated
+        - `removed_features:` - Features that have been removed
+        - `security_fixes:` - Security-related fixes
+        - `bugfixes:` - Bug fixes
+        - `known_issues:` - Known issues or limitations
+
+        **Format example:**
+        ```yaml
+        ---
+        minor_changes:
+          - Add new leapp_backup_enabled variable to control backup creation
+        ```
+
+        **Multiple entries example:**
+        ```yaml
+        ---
+        bugfixes:
+          - Fix OSTree package installation on RHEL 9
+          - Correct firewall configuration during upgrade
+        ```
+
+        **Breaking change example:**
+        ```yaml
+        ---
+        breaking_changes:
+          - Remove deprecated leapp_old_variable - use leapp_new_variable instead
+        minor_changes:
+          - Add leapp_new_variable to replace the deprecated variable
+        ```
+
+        **Guidelines:**
+        - Each entry should be a clear, user-facing description of the change
+        - Write from the user's perspective, not implementation details
+        - Use imperative mood (e.g., "Add support for..." not "Added support for...")
+        - One fragment file per PR (can contain multiple entries under different categories)
+        - Choose the most appropriate category for each change
+        - Breaking changes should be highlighted in both the fragment and PR description

@@ -1,0 +1,6 @@
+---
+minor_changes:
+  - Add .coderabbit.yaml configuration file with infra.leapp code conventions for automated PR reviews.
+  - Document code conventions and AI agent usage in CONTRIBUTING.md, explaining how to reference .coderabbit.yaml when using AI coding assistants.
+
+...
