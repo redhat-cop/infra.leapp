@@ -1,10 +1,14 @@
 ---
 - name: Remediate
   hosts: all
-  strategy: free
   become: true
-  force_handlers: true
+  # strategy: free
+  # gather_facts: true
+  # force_handlers: true
+
   vars:
+    # Executes following remediations for all systems, use host_vars files
+    # to specify remediations per managed node (see roles/remediate/README.md).
     leapp_remediation_todo:
       - leapp_firewalld_allowzonedrifting
       - leapp_missing_pkg
