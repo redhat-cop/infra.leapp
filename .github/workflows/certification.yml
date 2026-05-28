@@ -35,7 +35,7 @@ concurrency:
 # for each affected version of ansible-core (for example, `tests/sanity/ignore-2.18.txt`) and add corresponding entries.
 jobs:
   call:
-    uses: ansible-collections/partner-certification-checker/.github/workflows/certification-reusable.yml@2f6d9300ebe9190da3120a740c3a4d5ca2f0f02e # v1.0.0
+    uses: ansible-collections/partner-certification-checker/.github/workflows/certification-reusable.yml@v2.0.0
     # If the minimal Ansible Core version your collection supports Ansible
     # is greater than 2.16.0, specify it below.
     # You might also have to specify Python version supported by that version,
