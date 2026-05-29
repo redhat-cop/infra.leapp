@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - Use Ansible certification checker version v2.0.0
+
+...
