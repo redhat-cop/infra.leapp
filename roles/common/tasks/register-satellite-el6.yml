@@ -7,6 +7,7 @@
 
 # Note: RHEL 6 does not support the rhc role - using subscription-manager directly.
 - name: register-satellite-el6 | Register with Satellite activation key
+  no_log: true
   ansible.builtin.shell: >
     export PATH={{ leapp_os_path }};
     subscription-manager register
