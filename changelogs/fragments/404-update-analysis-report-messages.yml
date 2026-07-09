@@ -1,0 +1,4 @@
+---
+trivial:
+  - Update analysis report messages to mention errors alongside inhibitors, as both are being checked.
+...
