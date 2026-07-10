@@ -1,5 +1,0 @@
----
-minor_changes:
-  - Refactor roles to ensure they gather their required facts
-
-...
