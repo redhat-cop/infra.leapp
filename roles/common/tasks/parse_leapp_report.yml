@@ -46,7 +46,7 @@
       ansible.builtin.set_fact:
         leapp_inhibitors: []
 
-    - name: parse_leapp_report | Check for inhibitors
+    - name: parse_leapp_report | Check for inhibitors and errors
       ansible.builtin.set_fact:
         cacheable: "{{ leapp_result_fact_cacheable }}"
         upgrade_inhibited: true

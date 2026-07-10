@@ -27,7 +27,7 @@
   ansible.builtin.debug:
     msg: >-
       The preupgrade analysis report generation is now complete.
-      {{ 'WARNING: Inhibitors' if upgrade_inhibited else 'SUCCESS: No inhibitors' }} found.
+      {{ 'WARNING: Inhibitors or errors' if upgrade_inhibited else 'SUCCESS: No inhibitors or errors' }} found.
       Review the tasks above or the result file at {{ __leapp_report_txt }}.
 
 ...

@@ -1,17 +1,17 @@
 ---
-- name: leapp-upgrade | Run parse_leapp_report to check for inhibitors
+- name: leapp-upgrade | Run parse_leapp_report to check for inhibitors and errors
   ansible.builtin.include_role:
     name: infra.leapp.common
     tasks_from: parse_leapp_report.yml
   when: leapp_check_analysis_results
 
-- name: leapp-upgrade | Verify no inhibitor results found during preupgrade
+- name: leapp-upgrade | Verify no inhibitor or error results found during preupgrade
   ansible.builtin.assert:
     that: not upgrade_inhibited
     msg: |
-      Inhibitors found in the last pre-upgrade analysis report. Remediate the inhibitors first if you haven't
-      done so already and execute the analysis role again before proceeding with the upgrade. If you don't wish
-      to execute the analysis role again and instead let leapp upgrade to recheck for inhibitors, set the
+      Inhibitors or errors found in the last pre-upgrade analysis report. Remediate the inhibitors or errors first
+      if you haven't done so already and execute the analysis role again before proceeding with the upgrade. If you
+      don't wish to execute the analysis role again and instead let leapp upgrade to recheck for inhibitors, set the
       leapp_check_analysis_results variable to false.
   when: leapp_check_analysis_results
 
@@ -65,7 +65,7 @@
       poll: "{{ leapp_async_poll_interval | int }}"
       changed_when: true
   rescue:
-    - name: leapp-upgrade | Run parse_leapp_report to check for inhibitors
+    - name: leapp-upgrade | Run parse_leapp_report to check for inhibitors and errors
       ansible.builtin.include_role:
         name: infra.leapp.common
         tasks_from: parse_leapp_report.yml
