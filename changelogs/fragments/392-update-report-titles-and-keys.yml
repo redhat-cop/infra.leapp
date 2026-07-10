@@ -1,5 +1,0 @@
----
-minor_changes:
-    - Update report titles and keys to align with upstream leapp-repository changes, while preserving backward compatibility.
-
-...
