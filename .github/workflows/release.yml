@@ -68,7 +68,7 @@ jobs:
           git push origin "refs/tags/${VERSION}"
           gh release create "${VERSION}" \
             --title "infra.leapp ${VERSION}" \
-            --notes-file CHANGELOG.rst \
+            --generate-notes \
             --verify-tag \
             "${{ steps.build.outputs.tar_file }}"
 
