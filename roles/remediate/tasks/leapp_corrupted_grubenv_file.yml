@@ -68,7 +68,7 @@
           with_items: "{{ files_grub }}"
 
         - name: leapp_corrupted_grubenv_file | Regenerate grub config
-          ansible.builtin.command: grub2-mkconfig -o {{ grub_cfg_path.stdout }}
+          ansible.builtin.command: grub2-mkconfig -o {{ grub_cfg_path.stdout | quote }}
           register: grub_mkconfig
           changed_when: grub_mkconfig is success
 

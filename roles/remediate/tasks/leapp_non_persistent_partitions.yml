@@ -31,7 +31,7 @@
           changed_when: false
 
         - name: leapp_non_persistent_partitions | Get UUID for the device
-          ansible.builtin.command: blkid -s UUID -o value {{ mount_device_output.stdout }}
+          ansible.builtin.command: blkid -s UUID -o value {{ mount_device_output.stdout | quote }}
           register: uuid_output
           changed_when: false
 

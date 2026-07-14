@@ -116,7 +116,7 @@
     - name: leapp-upgrade | Run grub2-install
       ansible.builtin.shell: >
         export PATH={{ leapp_os_path }};
-        grub2-install {{ leapp_grub_boot_device }}
+        grub2-install {{ leapp_grub_boot_device | quote }}
       changed_when: true
 
     - name: leapp-upgrade | Reboot to pickup grub update
