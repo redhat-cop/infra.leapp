@@ -1,0 +1,5 @@
+---
+minor_changes:
+    - Introduce ``leapp_secure_logging`` variable to parametrize ``no_log`` on
+      tasks handling sensitive data. Defaults to ``true``; set to ``false`` for
+      debugging.
