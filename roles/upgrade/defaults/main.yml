@@ -225,4 +225,6 @@ leapp_workdir_controller: "{{ playbook_dir }}"
 # Reports are stored in a timestamped directory: playbook_dir/leapp_reports_YYYY-MM-DD_HH-MM-SS
 leapp_copy_reports: true
 
+leapp_secure_logging: true
+
 ...
