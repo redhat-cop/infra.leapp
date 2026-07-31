@@ -2,7 +2,7 @@
 - name: leapp_old_postgresql_data | Backup and then remove /var/lib/pgsql/data for remediation
   vars:
     postgresql_data_path: /var/lib/pgsql/data
-    postgresql_backup_path: /var/backups
+    postgresql_backup_path: /var/backups/leapp
   block:
     - name: leapp_old_postgresql_data | Check if /var/lib/pgsql/data exists
       ansible.builtin.stat:
@@ -24,11 +24,13 @@
             name: tar
             state: present
 
-        - name: leapp_old_postgresql_data | Ensure /var/backups exists
+        - name: leapp_old_postgresql_data | Ensure /var/backups/leapp exists
           ansible.builtin.file:
             path: "{{ postgresql_backup_path }}"
             state: directory
-            mode: "0755"
+            mode: "0700"
+            owner: root
+            group: root
 
         - name: leapp_old_postgresql_data | Create tar.gz archive of postgresql data
           ansible.builtin.command: # noqa: command-instead-of-module
@@ -38,7 +40,9 @@
         - name: leapp_old_postgresql_data | Set permissions on backup archive
           ansible.builtin.file:
             path: "{{ postgresql_backup_path }}/{{ backup_file_name }}"
-            mode: "0755"
+            mode: "0600"
+            owner: root
+            group: root
 
         - name: leapp_old_postgresql_data | Remove original postgresql data
           ansible.builtin.file:

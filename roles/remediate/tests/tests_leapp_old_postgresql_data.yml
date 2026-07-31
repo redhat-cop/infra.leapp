@@ -15,9 +15,14 @@
           /var/lib/pgsql/data already exists; refusing to remove real data
           during tests.
 
+    - name: Test | Check if /var/backups/leapp exists before test
+      ansible.builtin.stat:
+        path: /var/backups/leapp
+      register: pgsql_backup_dir_pre
+
     - name: Test | Capture existing backups
       ansible.builtin.find:
-        paths: /var/backups
+        paths: /var/backups/leapp
         patterns: "pgsql_data_backup_*.tar.gz"
         file_type: file
       register: pgsql_backups_pre
@@ -52,7 +57,7 @@
 
     - name: Test | Capture backups after remediation
       ansible.builtin.find:
-        paths: /var/backups
+        paths: /var/backups/leapp
         patterns: "pgsql_data_backup_*.tar.gz"
         file_type: file
       register: pgsql_backups_post
@@ -85,8 +90,40 @@
           - pgsql_backup_contents.stdout_lines | select("search", "var/lib/pgsql/data/README.test") | list | length > 0
         fail_msg: Backup does not contain /var/lib/pgsql/data.
 
-    - name: Cleanup | Remove backup archive
+    - name: Test | Stat of backup directory
+      ansible.builtin.stat:
+        path: /var/backups/leapp
+      register: pgsql_backup_dir_stat
+
+    - name: Test | Assert backup directory permissions
+      ansible.builtin.assert:
+        that:
+          - pgsql_backup_dir_stat.stat.mode == "0700"
+          - pgsql_backup_dir_stat.stat.uid == 0
+          - pgsql_backup_dir_stat.stat.gid == 0
+        fail_msg: /var/backups/leapp must be owned by root with mode 0700.
+
+    - name: Test | Stat of backup archive
+      ansible.builtin.stat:
+        path: "{{ pgsql_new_backup }}"
+      register: pgsql_backup_file_stat
+
+    - name: Test | Assert backup archive permissions
+      ansible.builtin.assert:
+        that:
+          - pgsql_backup_file_stat.stat.mode == "0600"
+          - pgsql_backup_file_stat.stat.uid == 0
+          - pgsql_backup_file_stat.stat.gid == 0
+        fail_msg: Backup archive must be owned by root with mode 0600.
+
+    - name: Cleanup | Remove test backup archive
       ansible.builtin.file:
         path: "{{ pgsql_new_backup }}"
         state: absent
       when: pgsql_new_backup | length > 0
+
+    - name: Cleanup | Remove backup directory if it did not exist before test
+      ansible.builtin.file:
+        path: /var/backups/leapp
+        state: absent
+      when: not pgsql_backup_dir_pre.stat.exists
