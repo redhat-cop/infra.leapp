@@ -47,7 +47,8 @@
           ansible.builtin.copy:
             src: "{{ item }}"
             dest: "{{ item }}.backup"
-            mode: "0644"
+            remote_src: true
+            mode: preserve
           with_items: "{{ files_grub }}"
 
         - name: leapp_corrupted_grubenv_file | Find grub.cfg file
@@ -59,7 +60,8 @@
           ansible.builtin.copy:
             src: "{{ grub_cfg_path.stdout }}"
             dest: "{{ grub_cfg_path.stdout }}.backup"
-            mode: "0644"
+            remote_src: true
+            mode: preserve
 
         - name: leapp_corrupted_grubenv_file | Delete file(s)
           ansible.builtin.file:
