@@ -1,0 +1,6 @@
+---
+bugfixes:
+    - Tighten permissions on PostgreSQL data backups created during
+      remediation to prevent other users from reading sensitive database
+      contents (CVE-2026-68563).
+...
