@@ -1,6 +1,0 @@
----
-bugfixes:
-    - Fix corrupted grubenv remediation to perform backup and restore
-      operations entirely on the managed node instead of the Ansible controller
-      (CVE-2026-68562).
-...
