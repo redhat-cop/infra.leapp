@@ -1,4 +1,0 @@
----
-bugfixes:
-    - Add ``| quote`` filter to variables interpolated in shell tasks to prevent shell injection.
-    - Add ``no_log`` to subscription-manager register task to prevent activation key leakage in logs.

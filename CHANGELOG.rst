@@ -4,6 +4,24 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.6
+======
+
+Minor Changes
+-------------
+
+- Add .coderabbit.yaml configuration file with infra.leapp code conventions for automated PR reviews.
+- Document code conventions and AI agent usage in CONTRIBUTING.md, explaining how to reference .coderabbit.yaml when using AI coding assistants.
+- Introduce ``leapp_secure_logging`` variable to parametrize ``no_log`` on tasks handling sensitive data. Defaults to ``true``; set to ``false`` for debugging.
+
+Bugfixes
+--------
+
+- Add ``no_log`` to subscription-manager register task to prevent activation key leakage in logs.
+- Add ``| quote`` filter to variables interpolated in shell tasks to prevent shell injection.
+- Fix corrupted grubenv remediation to perform backup and restore operations entirely on the managed node instead of the Ansible controller (CVE-2026-68562).
+- Tighten permissions on PostgreSQL data backups created during remediation to prevent other users from reading sensitive database contents (CVE-2026-68563).
+
 v1.7.5
 ======
 
