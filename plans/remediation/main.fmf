@@ -1,0 +1,31 @@
+summary: Run remediation tests
+tag+:
+  - remediation_tests
+
+adjust+:
+  - when: managed_node == rhel7
+    discover+:
+      - name: Run remediation tests
+        how: fmf
+        where: control_node
+        filter: "tag:remediation & tag:7to8"
+  - when: managed_node == rhel8
+    discover+:
+      - name: Run remediation tests
+        how: fmf
+        where: control_node
+        filter: "tag:remediation & tag:8to9"
+  - when: managed_node == rhel9
+    discover+:
+      - name: Run remediation tests
+        how: fmf
+        where: control_node
+        filter: "tag:remediation & tag:9to10"
+  - when: >-
+      managed_node != rhel7
+      and managed_node != rhel8
+      and managed_node != rhel9
+    prepare+:
+      - name: Unsupported managed_node for remediation tests
+        how: shell
+        script: 'echo "ERROR: No remediation tests defined for managed_node=${managed_node:-undefined}" && exit 1'

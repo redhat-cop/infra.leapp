@@ -1,0 +1,10 @@
+# verify the remote using root remediation (disabled)
+# after remediation with leapp_remediate_ssh_password_auth: false,
+# the remediation should NOT have set PermitRootLogin to prohibit-password
+---
+- name: verify | leapp_remote_using_root_disabled | Verify PermitRootLogin was NOT hardened
+  ansible.builtin.command: grep -E '^PermitRootLogin prohibit-password' /etc/ssh/sshd_config
+  changed_when: false
+  register: grep_sshd_config
+  failed_when: grep_sshd_config.rc == 0
+...

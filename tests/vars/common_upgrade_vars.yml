@@ -12,6 +12,9 @@ leapp_env_vars:
   LEAPP_UNSUPPORTED: 1
   LEAPP_DEVEL_RPMS_ALL_SIGNED: 1
 
+# Clear versionlocks and update all packages before running leapp
+leapp_pre_upgrade_update: true
+
 # Remove these test packages before each test
 leapp_remove_test_packages:
   - leapp-upgrade

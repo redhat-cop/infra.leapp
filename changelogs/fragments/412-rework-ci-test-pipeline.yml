@@ -1,0 +1,7 @@
+---
+trivial:
+  - "CI - rework test pipeline with modular tmt plans and tag-based filtering"
+  - "CI - replace per-version test playbooks with a single parameterized test driven by tmt context"
+  - "CI - add dedicated remediation test framework with setup, verify, and cleanup stages"
+  - "CI - consolidate CI workflow into testing-farm.yml with test matrix from test-matrix.json"
+  - "CI - trigger tests with ``/citest <scope>`` in PR comments where scope is ``integration``, ``remediation``, ``role``, or omitted to run all"

@@ -1,0 +1,9 @@
+summary: Run role tests
+tag+:
+  - role_tests
+
+discover+:
+  - name: Run role tests
+    how: fmf
+    where: control_node
+    filter: tag:role_test

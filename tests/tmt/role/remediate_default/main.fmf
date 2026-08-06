@@ -1,0 +1,9 @@
+summary: Test remediate role defaults
+duration: 1h
+tag:
+  - role_test
+  - remediate
+environment:
+  TEST_NAME: "Role test: remediate default"
+  PLAYBOOK: "roles/remediate/tests/tests_default.yml"
+  LOGFILE_PREFIX: "role-remediate_default"

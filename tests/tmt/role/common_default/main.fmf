@@ -1,0 +1,9 @@
+summary: Test common role defaults
+duration: 1h
+tag:
+  - role_test
+  - common
+environment:
+  TEST_NAME: "Role test: common default"
+  PLAYBOOK: "roles/common/tests/tests_default.yml"
+  LOGFILE_PREFIX: "role-common_default"

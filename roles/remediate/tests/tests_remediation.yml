@@ -1,0 +1,38 @@
+---
+- name: "Test Remediation: {{ remediation_name }}"
+  hosts: all
+  vars_files:
+    - ../../../tests/vars/common_upgrade_vars.yml
+    - ../../../tests/vars/repo_urls.yml
+  vars:
+    remediation_name: "{{ lookup('env', 'REMEDIATION_NAME') }}"
+    expected_inhibitor: "{{ lookup('env', 'INHIBITOR_NAME') | default(remediation_name, true) }}"
+    skip_resolution_check: "{{ lookup('env', 'SKIP_RESOLUTION_CHECK') | default(false) | bool }}"
+    leapp_upgrade_type: custom
+    leapp_upgrade_opts: "--no-rhsm"
+  tasks:
+    - name: Validate remediation_name is set
+      ansible.builtin.assert:
+        that: remediation_name | length > 0
+        fail_msg: "REMEDIATION_NAME environment variable must be set"
+
+    - name: Determine upgrade path from current RHEL version
+      ansible.builtin.set_fact:
+        rhel_base_ver: "{{ ansible_facts['distribution_major_version'] | int }}"
+        rhel_target_ver: "{{ ansible_facts['distribution_major_version'] | int + 1 }}"
+
+    - name: Build leapp_local_repos for target RHEL version
+      ansible.builtin.set_fact:
+        leapp_local_repos:
+          - name: "rhel-{{ rhel_target_ver }}-for-x86_64-baseos-rpms"
+            description: BaseOS for x86_64
+            baseurl: "{{ repo_urls['rhel' ~ rhel_target_ver].baseos.url }}"
+            state: present
+          - name: "rhel-{{ rhel_target_ver }}-for-x86_64-appstream-rpms"
+            description: AppStream for x86_64
+            baseurl: "{{ repo_urls['rhel' ~ rhel_target_ver].appstream.url }}"
+            state: present
+
+    - name: Include remediation test cycle
+      ansible.builtin.include_tasks: tasks/remediation_test.yml
+...

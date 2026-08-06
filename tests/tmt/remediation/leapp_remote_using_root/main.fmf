@@ -1,0 +1,13 @@
+summary: Test remote using root remediation
+duration: 2h
+tag:
+  - remediation
+  - leapp_remote_using_root
+  - 7to8
+  - 8to9
+environment:
+  TEST_NAME: "Remediation: leapp_remote_using_root"
+  PLAYBOOK: "roles/remediate/tests/tests_remediation.yml"
+  LOGFILE_PREFIX: "remediation-leapp_remote_using_root"
+  REMEDIATION_NAME: "leapp_remote_using_root"
+  INHIBITOR_NAME: "leapp_remote_using_root"

@@ -1,0 +1,18 @@
+---
+- name: cleanup | leapp_old_postgresql_data | Remove test backup archive
+  ansible.builtin.file:
+    path: "{{ pgsql_new_backup }}"
+    state: absent
+  when: pgsql_new_backup | default('') | length > 0
+
+- name: cleanup | leapp_old_postgresql_data | Remove backup directory if it did not exist before test
+  ansible.builtin.file:
+    path: /var/backups/leapp
+    state: absent
+  when: not (pgsql_backup_dir_pre.stat.exists | default(false))
+
+- name: cleanup | leapp_old_postgresql_data | Remove postgresql data directory if still present
+  ansible.builtin.file:
+    path: /var/lib/pgsql/data
+    state: absent
+...

@@ -1,0 +1,14 @@
+summary: Test loaded removed kernel drivers remediation
+duration: 2h
+tag:
+  - remediation
+  - leapp_loaded_removed_kernel_drivers
+  - 7to8
+  - 8to9
+  - 9to10
+environment:
+  TEST_NAME: "Remediation: leapp_loaded_removed_kernel_drivers"
+  PLAYBOOK: "roles/remediate/tests/tests_remediation.yml"
+  LOGFILE_PREFIX: "remediation-leapp_loaded_removed_kernel_drivers"
+  REMEDIATION_NAME: "leapp_loaded_removed_kernel_drivers"
+  INHIBITOR_NAME: "leapp_loaded_removed_kernel_drivers"

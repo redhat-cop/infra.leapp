@@ -5,7 +5,7 @@
     leapp_upgrade_opts: "--no-rhsm"
     # Define leapp_local_repos_post_upgrade by adding file key to leapp_local_repos
     leapp_local_repos_post_upgrade: "{{ leapp_local_repos | map('combine', {'file': '/etc/yum.repos.d/rhel' ~ rhel_target_ver ~ '.repo'}) | list }}"
-    # This repo is created in prepare phase in plans/test_playbooks.fmf
+    # This repo is created in prepare phase in plans/main.fmf
     leapp_repo_files_to_remove_at_upgrade:
       - rhel{{ rhel_base_ver }}.repo
   block:
@@ -19,7 +19,7 @@
         {{ rhel_base_ver }}
       when: >-
           ansible_facts["distribution"] not in ['CentOS', 'RedHat']
-          or ansible_facts["distribution_major_version"] | int != rhel_base_ver
+          or ansible_facts["distribution_major_version"] | int != rhel_base_ver | int
           or leapp_upgrade_completed is defined
           or leapp_log_stat.stat.exists
       ansible.builtin.meta: end_play
@@ -31,7 +31,7 @@
       ansible.builtin.assert:
         that:
           - ansible_facts["distribution"] in ['CentOS', 'RedHat']
-          - ansible_facts["distribution_major_version"] | int == rhel_target_ver
+          - ansible_facts["distribution_major_version"] | int == rhel_target_ver | int
         fail_msg: >-
           System was not upgraded to RHEL {{ rhel_target_ver }}.
           Current OS: {{ ansible_facts['distribution'] }}

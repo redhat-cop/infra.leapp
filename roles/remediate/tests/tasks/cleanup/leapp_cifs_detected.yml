@@ -1,0 +1,19 @@
+---
+- name: cleanup | leapp_cifs_detected | Check if backup exists
+  ansible.builtin.stat:
+    path: /etc/fstab.leapp_test_backup
+  register: fstab_backup
+
+- name: cleanup | leapp_cifs_detected | Restore /etc/fstab
+  ansible.builtin.copy:
+    src: /etc/fstab.leapp_test_backup
+    dest: /etc/fstab
+    remote_src: true
+    mode: preserve
+  when: fstab_backup.stat.exists
+
+- name: cleanup | leapp_cifs_detected | Remove backup
+  ansible.builtin.file:
+    path: /etc/fstab.leapp_test_backup
+    state: absent
+...

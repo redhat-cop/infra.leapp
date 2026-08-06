@@ -1,0 +1,9 @@
+summary: Test analysis role defaults
+duration: 1h
+tag:
+  - role_test
+  - analysis
+environment:
+  TEST_NAME: "Role test: analysis default"
+  PLAYBOOK: "roles/analysis/tests/tests_default.yml"
+  LOGFILE_PREFIX: "role-analysis_default"

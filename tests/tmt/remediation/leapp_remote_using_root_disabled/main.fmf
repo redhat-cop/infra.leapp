@@ -1,0 +1,15 @@
+summary: Test remote_using_root with auth disabled
+duration: 2h
+tag:
+  - remediation
+  - leapp_remote_using_root
+  - 7to8
+  - 8to9
+environment:
+  TEST_NAME: "Remediation: leapp_remote_using_root (disabled variant)"
+  PLAYBOOK: "roles/remediate/tests/tests_remediation.yml"
+  LOGFILE_PREFIX: "remediation-leapp_remote_using_root_disabled"
+  REMEDIATION_NAME: "leapp_remote_using_root_disabled"
+  INHIBITOR_NAME: "leapp_remote_using_root"
+  # Remediation is intentionally disabled — inhibitor persists after second analysis
+  SKIP_RESOLUTION_CHECK: "true"

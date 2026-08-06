@@ -1,0 +1,31 @@
+---
+- name: Test Custom Repository Upgrade
+  hosts: all
+  vars_files:
+    - vars/common_upgrade_vars.yml
+    - vars/repo_urls.yml
+  tasks:
+    - name: Determine upgrade path from current RHEL version
+      ansible.builtin.set_fact:
+        rhel_base_ver: "{{ ansible_facts['distribution_major_version'] | int }}"
+        rhel_target_ver: "{{ ansible_facts['distribution_major_version'] | int + 1 }}"
+
+    - name: Skip if no repo URLs for target RHEL version
+      when: ('rhel' ~ rhel_target_ver) not in repo_urls
+      ansible.builtin.meta: end_play
+
+    - name: Build leapp_local_repos for target RHEL version
+      ansible.builtin.set_fact:
+        leapp_local_repos:
+          - name: "rhel-{{ rhel_target_ver }}-for-x86_64-baseos-rpms"
+            description: BaseOS for x86_64
+            baseurl: "{{ repo_urls['rhel' ~ rhel_target_ver].baseos.url }}"
+            state: present
+          - name: "rhel-{{ rhel_target_ver }}-for-x86_64-appstream-rpms"
+            description: AppStream for x86_64
+            baseurl: "{{ repo_urls['rhel' ~ rhel_target_ver].appstream.url }}"
+            state: present
+
+    - name: Include tests_upgrade_custom tasks
+      ansible.builtin.include_tasks: tasks/tests_upgrade_custom.yml
+...
