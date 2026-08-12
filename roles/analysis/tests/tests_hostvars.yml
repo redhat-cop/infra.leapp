@@ -6,7 +6,8 @@
     - ../../../tests/vars/repo_urls.yml
   vars:
     leapp_upgrade_type: custom
-    leapp_upgrade_opts: "--no-rhsm"
+    leapp_preupg_opts: "--no-rhsm --debug"
+    leapp_upgrade_opts: "--no-rhsm --debug"
   tasks:
     - name: Setup | Remove leapp packages
       ansible.builtin.package:

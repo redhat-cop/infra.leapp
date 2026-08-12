@@ -2,7 +2,8 @@
 - name: tests_upgrade_custom | Run upgrade to {{ rhel_target_version }}
   vars:
     leapp_upgrade_type: custom
-    leapp_upgrade_opts: "--no-rhsm"
+    leapp_preupg_opts: "--no-rhsm --debug"
+    leapp_upgrade_opts: "--no-rhsm --debug"
     # Define leapp_local_repos_post_upgrade by adding file key to leapp_local_repos
     leapp_local_repos_post_upgrade: "{{ leapp_local_repos | map('combine', {'file': '/etc/yum.repos.d/rhel' ~ rhel_target_ver ~ '.repo'}) | list }}"
     # This repo is created in prepare phase in plans/main.fmf

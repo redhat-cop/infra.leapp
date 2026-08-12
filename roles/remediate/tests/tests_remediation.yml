@@ -9,7 +9,8 @@
     expected_inhibitor: "{{ lookup('env', 'INHIBITOR_NAME') | default(remediation_name, true) }}"
     skip_resolution_check: "{{ lookup('env', 'SKIP_RESOLUTION_CHECK') | default(false) | bool }}"
     leapp_upgrade_type: custom
-    leapp_upgrade_opts: "--no-rhsm"
+    leapp_preupg_opts: "--no-rhsm --debug"
+    leapp_upgrade_opts: "--no-rhsm --debug"
   tasks:
     - name: Validate remediation_name is set
       ansible.builtin.assert:

@@ -178,12 +178,16 @@ jobs:
           ARTIFACTS_DIR_NAME="tf_${{ github.event.repository.name }}-${{ github.event.issue.number }}_${scope_label}-managed_${{ matrix.managed_node }}-control_${{ matrix.control_node }}-${{ matrix.ansible_version }}_$DATETIME/artifacts"
           ARTIFACTS_DIR_NAME="tf_${{ github.event.repository.name }}-${{ github.event.issue.number }}_\
           ${scope_label}-${{ matrix.managed_node }}-${{ matrix.ansible_version }}_$DATETIME/artifacts"
-          ARTIFACTS_TARGET_DIR=/srv/pub/alt/${{ vars.SR_LSR_USER }}/logs
-          ARTIFACTS_DIR=$ARTIFACTS_TARGET_DIR/$ARTIFACTS_DIR_NAME
-          ARTIFACTS_URL=https://dl.fedoraproject.org/pub/alt/${{ vars.SR_LSR_USER }}/logs/$ARTIFACTS_DIR_NAME
           echo "DATETIME=$DATETIME" >> $GITHUB_OUTPUT
-          echo "ARTIFACTS_DIR=$ARTIFACTS_DIR" >> $GITHUB_OUTPUT
-          echo "ARTIFACTS_URL=$ARTIFACTS_URL" >> $GITHUB_OUTPUT
+          if [ -n "$SR_LSR_USER" ]; then
+            ARTIFACTS_TARGET_DIR=/srv/pub/alt/${SR_LSR_USER}/logs
+            ARTIFACTS_DIR=$ARTIFACTS_TARGET_DIR/$ARTIFACTS_DIR_NAME
+            ARTIFACTS_URL=https://dl.fedoraproject.org/pub/alt/${SR_LSR_USER}/logs/$ARTIFACTS_DIR_NAME
+            echo "ARTIFACTS_DIR=$ARTIFACTS_DIR" >> $GITHUB_OUTPUT
+            echo "ARTIFACTS_URL=$ARTIFACTS_URL" >> $GITHUB_OUTPUT
+          fi
+        env:
+          SR_LSR_USER: ${{ vars.SR_LSR_USER }}
 
       - name: Check if platform is supported
         id: platform_check
@@ -231,6 +235,7 @@ jobs:
           TF_API_KEY_RH: ${{ secrets.TF_API_KEY_RH }}
 
       - name: Run test in testing farm
+        id: testing_farm
         uses: sclorg/testing-farm-as-github-action@230555baceb860aa468d216f1822974836b965d1 # v4.3.1
         if: steps.platform_check.outputs.is_supported == 'true'
         with:
@@ -280,4 +285,4 @@ jobs:
           status: ${{ job.status }}
           context: "${{ needs.parse_command.outputs.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|${{ matrix.managed_node }}|ansible-${{ matrix.ansible_version }}"
           description: Test finished
-          targetUrl: ${{ steps.set_vars.outputs.ARTIFACTS_URL }}
+          targetUrl: ${{ steps.set_vars.outputs.ARTIFACTS_URL || steps.testing_farm.outputs.test_log_url }}

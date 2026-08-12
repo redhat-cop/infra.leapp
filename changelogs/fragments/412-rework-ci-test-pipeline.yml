@@ -5,3 +5,4 @@ trivial:
   - "CI - add dedicated remediation test framework with setup, verify, and cleanup stages"
   - "CI - consolidate CI workflow into testing-farm.yml with test matrix from test-matrix.json"
   - "CI - trigger tests with ``/citest <scope>`` in PR comments where scope is ``integration``, ``remediation``, ``role``, or omitted to run all"
+  - "CI - collect leapp logs as Testing Farm artifacts for easier debugging"

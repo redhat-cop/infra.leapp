@@ -16,6 +16,12 @@ rlJournalStart
         lsrRunPlaybook "$playbook" "" "$SR_SKIP_TAGS" "$managed_node" "$LOGFILE" "$SR_ANSIBLE_VERBOSITY"
     rlPhaseEnd
     rlPhaseStartCleanup
+        playbook_dir=$(dirname "$playbook")
+        for log_dir in "$playbook_dir"/ansible_leapp_*_logs_*; do
+            [ -d "$log_dir" ] || continue
+            rlRun "cp -r '$log_dir' '$TMT_TEST_DATA/'" 0 \
+                "Copy $(basename "$log_dir") to TMT artifacts"
+        done
         lsrSubmitManagedNodesLogs
         lsrReserveSystems "$SR_RESERVE_SYSTEMS"
     rlPhaseEnd

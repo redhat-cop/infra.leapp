@@ -3,6 +3,7 @@
   hosts: all
   vars:
     job_name: test_analysis
+    leapp_preupg_opts: "--debug"
   tasks:
     - name: See if /dev/log exists for the fingerprint check
       ansible.builtin.stat:
