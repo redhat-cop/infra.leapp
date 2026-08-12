@@ -80,6 +80,13 @@ adjust:
         how: minute
         image: RHEL-9.8.0
 
+  # ---- Local reporting ----
+  - when: initiator is not defined
+    report:
+      - how: display
+      - how: html
+        open: false
+
   # ---- Local VMs (virtual) ----
   # Example: tmt -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
   - when: >-
