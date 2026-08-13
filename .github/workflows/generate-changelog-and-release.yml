@@ -45,7 +45,7 @@ jobs:
 
       # Avoid persisting checkout credentials: create-pull-request configures its own
       # auth; both together cause Git to send duplicate Authorization headers (HTTP 400).
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
@@ -91,7 +91,7 @@ jobs:
         run: |
           sed -i "s/^version:.*$/version: ${NEW}/" galaxy.yml
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.12'
 
@@ -110,12 +110,12 @@ jobs:
         run: ansible-galaxy collection install "./infra-leapp-${{ inputs.version }}.tar.gz"
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@main
+        uses: ansible/ansible-lint@2bac76bbc98f420b20299cbbc4a52a8ce6cbc295 # main
         with:
           args: "--offline"
 
       - name: Open pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'Update changelog ${{ inputs.version }}'
