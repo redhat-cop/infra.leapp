@@ -39,11 +39,20 @@ jobs:
           # Examples:
           #   /citest integration         — run all upgrade types
           #   /citest integration custom  — run only custom upgrade type
+          command_name=$(echo "$command" | awk '{print $1}')
           scope=$(echo "$command" | awk '{print $2}')
           subtype=$(echo "$command" | awk '{print $3}')
 
+          if [ "$command_name" != "/citest" ]; then
+            echo "Unsupported command: $command_name"
+            exit 1
+          fi
+
           # Supported scopes: integration, remediation, role
-          if [ "$scope" != "integration" ] && [ "$scope" != "remediation" ] && [ "$scope" != "role" ]; then
+          # Empty scope means run all test scopes
+          if [ -z "$scope" ]; then
+            scope="all"
+          elif [ "$scope" != "integration" ] && [ "$scope" != "remediation" ] && [ "$scope" != "role" ]; then
             echo "Unsupported test scope: $scope"
             exit 1
           fi
@@ -52,7 +61,9 @@ jobs:
           echo "upgrade_type=$subtype" >> $GITHUB_OUTPUT
 
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
 
       - name: Build matrix from test-matrix.json
         id: matrix
@@ -60,7 +71,18 @@ jobs:
           SCOPE: ${{ steps.parse.outputs.test_scope }}
           UPGRADE_TYPE: ${{ steps.parse.outputs.upgrade_type }}
         run: |
-          matrix=$(jq -c ".${SCOPE}" .github/test-matrix.json)
+          if [ "$SCOPE" = "all" ]; then
+            # Merge all scopes, tagging each entry with its test_scope
+            matrix=$(jq -c '
+              [.integration[] + {test_scope: "integration"}]
+              + [.remediation[] + {test_scope: "remediation"}]
+              + [.role[] + {test_scope: "role"}]
+            ' .github/test-matrix.json)
+          else
+            matrix=$(jq -c --arg scope "$SCOPE" \
+              '.[$scope] | map(. + {test_scope: $scope})' \
+              .github/test-matrix.json)
+          fi
 
           # If a specific upgrade type was requested, filter the matrix
           if [ -n "$UPGRADE_TYPE" ]; then
@@ -87,7 +109,7 @@ jobs:
     # The concurrency key prevents multiple workflows from running at the same time
     concurrency:
       # Group name contains reponame-pr_num to allow simultaneous runs in different PRs
-      group: testing-farm-${{ github.event.repository.name }}-${{ github.event.issue.number }}
+      group: testing-farm-${{ github.event.repository.name }}-${{ github.event.issue.number }}-${{ needs.parse_command.outputs.test_scope }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     outputs:
@@ -155,10 +177,13 @@ jobs:
         run: echo "supported_platforms=${{ steps.supported_platforms.outputs.supported_platforms }}"
 
   testing-farm:
-    name: "${{ needs.parse_command.outputs.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|${{ matrix.managed_node }}|ansible-${{ matrix.ansible_version }}"
+    name: "${{ matrix.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|managed:${{ matrix.managed_node }}|control:${{ matrix.control_node }}|ansible-${{ matrix.ansible_version }}"
     needs:
       - parse_command
       - prepare_vars
+    concurrency:
+      group: testing-farm-${{ github.event.repository.name }}-${{ github.event.issue.number }}-${{ matrix.test_scope }}-${{ matrix.managed_node }}-${{ matrix.ansible_version }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.parse_command.outputs.matrix) }}
@@ -168,7 +193,7 @@ jobs:
         id: set_vars
         run: |
           printf -v DATETIME '%(%Y%m%d-%H%M%S)T' -1
-          scope="${{ needs.parse_command.outputs.test_scope }}"
+          scope="${{ matrix.test_scope }}"
           upgrade_type="${{ matrix.upgrade_type }}"
           if [ -n "$upgrade_type" ]; then
             scope_label="${scope}-${upgrade_type}"
@@ -176,8 +201,6 @@ jobs:
             scope_label="${scope}"
           fi
           ARTIFACTS_DIR_NAME="tf_${{ github.event.repository.name }}-${{ github.event.issue.number }}_${scope_label}-managed_${{ matrix.managed_node }}-control_${{ matrix.control_node }}-${{ matrix.ansible_version }}_$DATETIME/artifacts"
-          ARTIFACTS_DIR_NAME="tf_${{ github.event.repository.name }}-${{ github.event.issue.number }}_\
-          ${scope_label}-${{ matrix.managed_node }}-${{ matrix.ansible_version }}_$DATETIME/artifacts"
           echo "DATETIME=$DATETIME" >> $GITHUB_OUTPUT
           if [ -n "$SR_LSR_USER" ]; then
             ARTIFACTS_TARGET_DIR=/srv/pub/alt/${SR_LSR_USER}/logs
@@ -210,7 +233,7 @@ jobs:
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: pending
-          context: "${{ needs.parse_command.outputs.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|${{ matrix.managed_node }}|ansible-${{ matrix.ansible_version }}"
+          context: "${{ matrix.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|managed:${{ matrix.managed_node }}|control:${{ matrix.control_node }}|ansible-${{ matrix.ansible_version }}"
           description: Test started
           targetUrl: ""
 
@@ -220,7 +243,7 @@ jobs:
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: success
-          context: "${{ needs.parse_command.outputs.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|${{ matrix.managed_node }}|ansible-${{ matrix.ansible_version }}"
+          context: "${{ matrix.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|managed:${{ matrix.managed_node }}|control:${{ matrix.control_node }}|ansible-${{ matrix.ansible_version }}"
           description: Platform is not supported. Skipping.
           targetUrl: ""
 
@@ -240,7 +263,7 @@ jobs:
         if: steps.platform_check.outputs.is_supported == 'true'
         with:
           git_ref: main
-          tmt_plan_filter: "tag:${{ needs.parse_command.outputs.test_scope }}_tests"
+          tmt_plan_filter: "tag:${{ matrix.test_scope }}_tests"
           pipeline_settings: '{ "type": "tmt-multihost" }'
           environment_settings: '{ "provisioning": { "tags": { "BusinessUnit": "ansible_collection_leapp" } } }'
           # Keeping SR_ARTIFACTS_URL at the bottom makes the link in logs clickable
@@ -283,6 +306,6 @@ jobs:
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: ${{ job.status }}
-          context: "${{ needs.parse_command.outputs.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|${{ matrix.managed_node }}|ansible-${{ matrix.ansible_version }}"
+          context: "${{ matrix.test_scope }}${{ matrix.upgrade_type && format('|{0}', matrix.upgrade_type) || '' }}|managed:${{ matrix.managed_node }}|control:${{ matrix.control_node }}|ansible-${{ matrix.ansible_version }}"
           description: Test finished
           targetUrl: ${{ steps.set_vars.outputs.ARTIFACTS_URL || steps.testing_farm.outputs.test_log_url }}

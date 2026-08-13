@@ -20,7 +20,8 @@ You can run tests locally with `tmt try` or remotely in Testing Farm. In CI, tes
 
 Comment on a PR to trigger tests:
 
-```
+```text
+/citest                       — run all scopes (integration + remediation + role)
 /citest integration           — run all integration upgrade types
 /citest integration custom    — run only custom upgrade type
 /citest remediation           — run remediation tests
