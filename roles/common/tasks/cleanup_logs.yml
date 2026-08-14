@@ -1,6 +1,7 @@
 ---
 - name: cleanup_logs | Ensure ansible_facts used by role
   ansible.builtin.include_tasks: set_facts.yml
+  tags: tests::cleanup
 
 - name: cleanup_logs | Cleanup | Remove log files
   ansible.builtin.shell: |
@@ -9,3 +10,4 @@
     rm -f /var/log/leapp/*.json
     rm -f /var/log/leapp/*.txt
   changed_when: true
+  tags: tests::cleanup

@@ -40,5 +40,6 @@
           ansible.builtin.include_role:
             name: infra.leapp.common
             tasks_from: cleanup_logs.yml
+          tags: tests::cleanup
 
 ...

@@ -121,6 +121,7 @@
             path: /etc/fstab
             line: "//127.0.0.1/test_hostvars /mnt/cifs cifs username=test,password=test 0 0"
             state: absent
+          tags: tests::cleanup
 
         - name: Cleanup | Remove controller workdir
           delegate_to: localhost
@@ -129,4 +130,5 @@
             path: "{{ workdir_controller_tempfile.path }}"
             state: absent
           when: workdir_controller_tempfile is defined
+          tags: tests::cleanup
 ...

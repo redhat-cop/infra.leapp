@@ -117,13 +117,16 @@
       delegate_to: localhost
       become: false
       register: cleanup_file_stat
+      tags: tests::cleanup
 
     - name: remediation_test | Clean up test artifacts for {{ remediation_name }}
       ansible.builtin.include_tasks: "cleanup/{{ remediation_name }}.yml"
       when: cleanup_file_stat.stat.exists
+      tags: tests::cleanup
 
     - name: remediation_test | Clean up leapp packages
       ansible.builtin.package:
         name: "{{ leapp_remove_test_packages }}"
         state: absent
+      tags: tests::cleanup
 ...

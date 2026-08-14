@@ -7,4 +7,5 @@
     leapp_kernel_modules: "{{ leapp_test_kernel_modules | default([]) }}"
     leapp_kernel_modules_state: absent
   when: leapp_test_kernel_modules | default([]) | length > 0
+  tags: tests::cleanup
 ...
