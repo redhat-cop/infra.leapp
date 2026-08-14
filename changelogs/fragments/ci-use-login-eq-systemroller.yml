@@ -1,0 +1,3 @@
+---
+trivial:
+  - "CI - use exact match for systemroller login instead of contains"
