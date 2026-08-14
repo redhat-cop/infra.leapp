@@ -5,6 +5,9 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
@@ -17,23 +20,23 @@ on:
 
 jobs:
   changelog:
-    uses: ansible/ansible-content-actions/.github/workflows/changelog.yaml@main
+    uses: ansible/ansible-content-actions/.github/workflows/changelog.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
     if: github.event_name == 'pull_request'
   ansible-lint:
-    # uses: ansible/ansible-content-actions/.github/workflows/ansible_lint.yaml@main
-    uses: redhat-cop/infra.leapp/.github/workflows/ansible-lint.yml@main
+    # uses: ansible/ansible-content-actions/.github/workflows/ansible_lint.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
+    uses: redhat-cop/infra.leapp/.github/workflows/ansible-lint.yml@ac6d732c4a6c7b9c6480f864e0c9876053589cfd # main
     # with:
     #   working_directory: /home/runner/collections
   sanity:
-    uses: ansible/ansible-content-actions/.github/workflows/sanity.yaml@main
+    uses: ansible/ansible-content-actions/.github/workflows/sanity.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
     with:
       extra_matrix_entries: '[{"name": "sanity-py3.12-2.16"}]'
   build-import:
-    uses: ansible/ansible-content-actions/.github/workflows/build_import.yaml@main
+    uses: ansible/ansible-content-actions/.github/workflows/build_import.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
   # unit-galaxy:
-  #   uses: ansible/ansible-content-actions/.github/workflows/unit.yaml@main
+  #   uses: ansible/ansible-content-actions/.github/workflows/unit.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
   # integration:
-  #   uses: ansible/ansible-content-actions/.github/workflows/integration.yaml@main
+  #   uses: ansible/ansible-content-actions/.github/workflows/integration.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
   all_green:
     if: ${{ always() }}
     needs:
