@@ -1,0 +1,22 @@
+---
+- name: cleanup | leapp_remote_using_root_disabled | Check if backup exists
+  ansible.builtin.stat:
+    path: /etc/ssh/sshd_config.leapp_test_backup
+  register: sshd_config_backup
+  tags: tests::cleanup
+
+- name: cleanup | leapp_remote_using_root_disabled | Restore /etc/ssh/sshd_config
+  ansible.builtin.copy:
+    src: /etc/ssh/sshd_config.leapp_test_backup
+    dest: /etc/ssh/sshd_config
+    remote_src: true
+    mode: preserve
+  when: sshd_config_backup.stat.exists
+  tags: tests::cleanup
+
+- name: cleanup | leapp_remote_using_root_disabled | Remove backup
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.leapp_test_backup
+    state: absent
+  tags: tests::cleanup
+...

@@ -1,0 +1,38 @@
+---
+- name: setup | leapp_old_postgresql_data | Ensure /var/lib/pgsql/data is absent
+  ansible.builtin.stat:
+    path: /var/lib/pgsql/data
+  register: pgsql_data_stat_pre
+
+- name: setup | leapp_old_postgresql_data | Check if real data exist
+  ansible.builtin.assert:
+    that:
+      - not pgsql_data_stat_pre.stat.exists
+    fail_msg: >-
+      /var/lib/pgsql/data already exists; refusing to remove real data
+      during tests.
+
+- name: setup | leapp_old_postgresql_data | Record pre-existing backup dir state
+  ansible.builtin.stat:
+    path: /var/backups/leapp
+  register: pgsql_backup_dir_pre
+
+- name: setup | leapp_old_postgresql_data | Capture existing backups
+  ansible.builtin.find:
+    paths: /var/backups/leapp
+    patterns: "pgsql_data_backup_*.tar.gz"
+    file_type: file
+  register: pgsql_backups_pre
+
+- name: setup | leapp_old_postgresql_data | Create mock postgresql data directory
+  ansible.builtin.file:
+    path: /var/lib/pgsql/data
+    state: directory
+    mode: "0755"
+
+- name: setup | leapp_old_postgresql_data | Add marker file
+  ansible.builtin.copy:
+    dest: /var/lib/pgsql/data/README.test
+    content: test-data
+    mode: "0644"
+...

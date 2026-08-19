@@ -1,0 +1,10 @@
+# set up the test system to trigger the remote root login inhibitor
+# leapp_remediate_ssh_password_auth: false — the role should NOT fix it
+---
+- name: setup | leapp_remote_using_root_disabled | Include remote_using_root setup
+  ansible.builtin.include_tasks: leapp_remote_using_root.yml
+
+- name: setup | leapp_remote_using_root_disabled | Disable SSH remediation
+  ansible.builtin.set_fact:
+    leapp_remediate_ssh_password_auth: false
+...

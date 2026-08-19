@@ -1,0 +1,50 @@
+# set up the test system to trigger the remote root login inhibitor
+# leapp_remediate_ssh_password_auth: true (default) — the role should fix it
+#
+# This inhibitor protects against silent loss of root password due to changes in
+# PermitRootLogin option across RHEL versions. In RHEL 7, the PermitRootLogin
+# is not in the sshd_config which is equivalent to being set to 'yes'. In RHEL 8,
+# this default changes to 'prohibit-password' and thus the config ships
+# with 'PermitRootLogin yes' to preserve backward compatibility. This is followed
+# by the change in RHEL 9 where the PermitRootLogin is not included in the config
+# which defaults to the 'prohibit-password'.
+#
+# Therefore, we need different setup for each version of RHEL:
+#     - RHEL 7: Inhibited if the default config is modified and no PermitRootLogin entry exists.
+#     - RHEL 8: Inhibited if the configuration is not modified.
+#     - RHEL 9: Does not inhibit since there is no change between RHEL 9 and 10.
+---
+- name: setup | leapp_remote_using_root | Backup /etc/ssh/sshd_config
+  ansible.builtin.copy:
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config.leapp_test_backup
+    remote_src: true
+    mode: preserve
+
+- name: setup | leapp_remote_using_root | Download openssh-server RPM
+  ansible.builtin.command:
+    cmd: >-
+      {% if rhel_base_ver | int >= 8 %}dnf download{% else %}yumdownloader{% endif %}
+      --destdir /tmp openssh-server
+  changed_when: false
+
+- name: setup | leapp_remote_using_root | Extract stock sshd_config from RPM
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail;
+      rpm2cpio /tmp/openssh-server-*.rpm |
+      cpio -iv --to-stdout ./etc/ssh/sshd_config > /etc/ssh/sshd_config
+  changed_when: false
+
+- name: setup | leapp_remote_using_root | Remove downloaded RPM
+  ansible.builtin.shell:
+    cmd: rm -f /tmp/openssh-server-*.rpm
+  changed_when: false
+
+- name: setup | leapp_remote_using_root | Modify the sshd_config to trigger inhibitor on RHEL 7
+  when: rhel_base_ver | int == 7
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+...

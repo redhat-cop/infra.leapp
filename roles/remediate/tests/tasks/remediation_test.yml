@@ -1,0 +1,132 @@
+---
+- name: remediation_test | Run setup, test, and cleanup
+  block:
+    - name: remediation_test | Run setup for {{ remediation_name }}
+      ansible.builtin.include_tasks: "setup/{{ remediation_name }}.yml"
+
+- name: remediation_test | Run test and cleanup
+  block:
+    - name: remediation_test | Run first analysis
+      ansible.builtin.include_tasks: ../../../../tests/tasks/run_role_with_clear_facts.yml
+      vars:
+        __leapp_test_rolename: infra.leapp.analysis
+        __sr_public: true
+
+    - name: remediation_test | Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: remediation_test | Show inhibitors found
+      ansible.builtin.debug:
+        var: leapp_inhibitors | default([])
+
+    - name: remediation_test | Show remediation todo
+      ansible.builtin.debug:
+        var: leapp_remediation_todo
+
+    - name: remediation_test | Assert expected inhibitor was found
+      ansible.builtin.assert:
+        that:
+          - expected_inhibitor in (leapp_remediation_todo | default([]))
+        fail_msg: >-
+          Expected '{{ expected_inhibitor }}' not in leapp_remediation_todo.
+          Setup failed to trigger the inhibitor.
+
+    - name: remediation_test | Filter remediation_todo to current test only
+      ansible.builtin.set_fact:
+        leapp_remediation_todo: >-
+          {{ leapp_remediation_todo | default([])
+             | select('match', expected_inhibitor ~ '$')
+             | list }}
+
+    - name: remediation_test | Show filtered remediation todo
+      ansible.builtin.debug:
+        var: leapp_remediation_todo
+
+    - name: remediation_test | Run remediation
+      when: leapp_remediation_todo | default([]) | length > 0
+      block:
+        - name: remediation_test | Validate analysis outputs exist
+          ansible.builtin.stat:
+            path: "{{ item }}"
+          register: remediation_outputs_stat
+          delegate_to: localhost
+          become: false
+          failed_when: not remediation_outputs_stat.stat.exists
+          loop:
+            - "{{ playbook_dir }}/host_vars/{{ inventory_hostname }}.yml"
+            - "{{ playbook_dir }}/remediate.yml"
+            - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_log_file_basename }}"
+            - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_report_txt | basename }}"
+            - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_report_json | basename }}"
+
+        - name: remediation_test | Run remediate role
+          ansible.builtin.include_tasks: ../../../../tests/tasks/run_role_with_clear_facts.yml
+          vars:
+            __leapp_test_rolename: infra.leapp.remediate
+            __sr_public: true
+
+    - name: remediation_test | Check if verify file exists
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/tasks/verify/{{ remediation_name }}.yml"
+      delegate_to: localhost
+      become: false
+      register: verify_file_stat
+
+    - name: remediation_test | Verify remediation for {{ remediation_name }}
+      ansible.builtin.include_tasks: "verify/{{ remediation_name }}.yml"
+      when: verify_file_stat.stat.exists
+
+    - name: remediation_test | Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: remediation_test | Run second analysis
+      ansible.builtin.include_tasks: ../../../../tests/tasks/run_role_with_clear_facts.yml
+      vars:
+        __leapp_test_rolename: infra.leapp.analysis
+        __sr_public: true
+
+    - name: remediation_test | Validate post-remediation analysis outputs
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: post_remediation_outputs_stat
+      delegate_to: localhost
+      become: false
+      failed_when: not post_remediation_outputs_stat.stat.exists
+      loop:
+        - "{{ playbook_dir }}/host_vars/{{ inventory_hostname }}.yml"
+        - "{{ playbook_dir }}/remediate.yml"
+        - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_log_file_basename }}"
+        - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_report_txt | basename }}"
+        - "{{ __leapp_reports_controller_dir }}/{{ inventory_hostname }}/{{ __leapp_report_json | basename }}"
+
+    # Skip when testing that a remediation is disabled
+    # (e.g. leapp_remediate_ssh_password_auth: false) —
+    # the inhibitor is expected to persist after the second analysis.
+    - name: remediation_test | Assert inhibitor resolved after remediation
+      ansible.builtin.assert:
+        that:
+          - expected_inhibitor not in (leapp_remediation_todo | default([]))
+        fail_msg: >-
+          '{{ expected_inhibitor }}' still present after remediation.
+      when: not (skip_resolution_check | default(false) | bool)
+
+  always:
+    - name: remediation_test | Check if cleanup file exists
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/tasks/cleanup/{{ remediation_name }}.yml"
+      delegate_to: localhost
+      become: false
+      register: cleanup_file_stat
+      tags: tests::cleanup
+
+    - name: remediation_test | Clean up test artifacts for {{ remediation_name }}
+      ansible.builtin.include_tasks: "cleanup/{{ remediation_name }}.yml"
+      when: cleanup_file_stat.stat.exists
+      tags: tests::cleanup
+
+    - name: remediation_test | Clean up leapp packages
+      ansible.builtin.package:
+        name: "{{ leapp_remove_test_packages }}"
+        state: absent
+      tags: tests::cleanup
+...

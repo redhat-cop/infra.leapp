@@ -1,0 +1,11 @@
+---
+- name: cleanup | leapp_loaded_removed_kernel_drivers | Unload test kernel modules
+  ansible.builtin.include_role:
+    name: infra.leapp.common
+    tasks_from: manage_kernel_modules.yml
+  vars:
+    leapp_kernel_modules: "{{ leapp_test_kernel_modules | default([]) }}"
+    leapp_kernel_modules_state: absent
+  when: leapp_test_kernel_modules | default([]) | length > 0
+  tags: tests::cleanup
+...

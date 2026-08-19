@@ -4,6 +4,7 @@
   vars:
     job_name: test_upgrade
     leapp_check_analysis_results: false
+    leapp_upgrade_opts: "--debug"
   tasks:
     - name: Test | Run upgrade
       block:
@@ -28,5 +29,6 @@
           ansible.builtin.include_role:
             name: infra.leapp.common
             tasks_from: cleanup_logs.yml
+          tags: tests::cleanup
 
 ...

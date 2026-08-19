@@ -1,0 +1,56 @@
+{
+  "integration": [
+    {
+      "managed_node": "rhel7",
+      "control_node": "rhel9",
+      "upgrade_type": "custom",
+      "ansible_version": "2.14"
+    },
+    {
+      "managed_node": "rhel8",
+      "control_node": "rhel9",
+      "upgrade_type": "custom",
+      "ansible_version": "2.16"
+    },
+    {
+      "managed_node": "rhel9",
+      "control_node": "rhel9",
+      "upgrade_type": "custom",
+      "ansible_version": "2.17"
+    }
+  ],
+  "remediation": [
+    {
+      "managed_node": "rhel7",
+      "control_node": "rhel9",
+      "ansible_version": "2.14"
+    },
+    {
+      "managed_node": "rhel8",
+      "control_node": "rhel9",
+      "ansible_version": "2.16"
+    },
+    {
+      "managed_node": "rhel9",
+      "control_node": "rhel9",
+      "ansible_version": "2.17"
+    }
+  ],
+  "role": [
+    {
+      "managed_node": "rhel7",
+      "control_node": "rhel9",
+      "ansible_version": "2.14"
+    },
+    {
+      "managed_node": "rhel8",
+      "control_node": "rhel9",
+      "ansible_version": "2.16"
+    },
+    {
+      "managed_node": "rhel9",
+      "control_node": "rhel9",
+      "ansible_version": "2.17"
+    }
+  ]
+}

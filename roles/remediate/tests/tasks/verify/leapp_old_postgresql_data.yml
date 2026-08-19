@@ -1,0 +1,73 @@
+---
+- name: verify | leapp_old_postgresql_data | Get information about /var/lib/pgsql/data directory
+  ansible.builtin.stat:
+    path: /var/lib/pgsql/data
+  register: pgsql_data_stat_post
+
+- name: verify | leapp_old_postgresql_data | Assert data directory removed
+  ansible.builtin.assert:
+    that:
+      - not pgsql_data_stat_post.stat.exists
+    fail_msg: /var/lib/pgsql/data still exists after remediation.
+
+- name: verify | leapp_old_postgresql_data | Capture backups after remediation
+  ansible.builtin.find:
+    paths: /var/backups/leapp
+    patterns: "pgsql_data_backup_*.tar.gz"
+    file_type: file
+  register: pgsql_backups_post
+
+- name: verify | leapp_old_postgresql_data | Select newly created backup
+  ansible.builtin.set_fact:
+    pgsql_new_backup: >-
+      {{
+        (pgsql_backups_post.files | map(attribute='path') | list)
+        | difference(pgsql_backups_pre.files | map(attribute='path') | list)
+        | first | default('')
+      }}
+
+- name: verify | leapp_old_postgresql_data | Assert backup created
+  ansible.builtin.assert:
+    that:
+      - pgsql_new_backup | length > 0
+    fail_msg: No new pgsql_data_backup_*.tar.gz created in /var/backups/leapp.
+
+- name: verify | leapp_old_postgresql_data | Verify backup contains expected data
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: tar -tzf {{ pgsql_new_backup }}
+  register: pgsql_backup_contents
+  changed_when: false
+
+- name: verify | leapp_old_postgresql_data | Assert backup content
+  ansible.builtin.assert:
+    that:
+      - pgsql_backup_contents.stdout_lines | select("search", "var/lib/pgsql/data") | list | length > 0
+      - pgsql_backup_contents.stdout_lines | select("search", "var/lib/pgsql/data/README.test") | list | length > 0
+    fail_msg: Backup does not contain /var/lib/pgsql/data.
+
+- name: verify | leapp_old_postgresql_data | Get information about backup directory
+  ansible.builtin.stat:
+    path: /var/backups/leapp
+  register: pgsql_backup_dir_stat
+
+- name: verify | leapp_old_postgresql_data | Assert backup directory permissions
+  ansible.builtin.assert:
+    that:
+      - pgsql_backup_dir_stat.stat.mode == "0700"
+      - pgsql_backup_dir_stat.stat.uid == 0
+      - pgsql_backup_dir_stat.stat.gid == 0
+    fail_msg: /var/backups/leapp must be owned by root with mode 0700.
+
+- name: verify | leapp_old_postgresql_data | Stat backup archive
+  ansible.builtin.stat:
+    path: "{{ pgsql_new_backup }}"
+  register: pgsql_backup_file_stat
+
+- name: verify | leapp_old_postgresql_data | Assert backup archive permissions
+  ansible.builtin.assert:
+    that:
+      - pgsql_backup_file_stat.stat.mode == "0600"
+      - pgsql_backup_file_stat.stat.uid == 0
+      - pgsql_backup_file_stat.stat.gid == 0
+    fail_msg: Backup archive must be owned by root with mode 0600.
+...

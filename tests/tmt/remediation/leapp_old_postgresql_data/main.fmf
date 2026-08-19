@@ -1,0 +1,16 @@
+# Disabled: the inhibitor "Old PostgreSQL data found in /var/lib/pgsql/data"
+# is only produced by the satellite_upgrade_check actor (el7toel8, requires
+# Foreman). Re-enable once remediation tests can run without a preceding
+# analysis, or once the satellite upgrade type is supported in test environments.
+summary: Test old PostgreSQL data remediation
+duration: 2h
+tag:
+  - remediation
+  - leapp_old_postgresql_data
+  # - 7to8
+environment:
+  TEST_NAME: "Remediation: leapp_old_postgresql_data"
+  PLAYBOOK: "roles/remediate/tests/tests_remediation.yml"
+  LOGFILE_PREFIX: "remediation-leapp_old_postgresql_data"
+  REMEDIATION_NAME: "leapp_old_postgresql_data"
+  INHIBITOR_NAME: "leapp_old_postgresql_data"

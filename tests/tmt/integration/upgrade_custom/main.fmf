@@ -1,0 +1,9 @@
+summary: Test custom repository upgrade
+duration: 4h
+tag:
+  - integration
+  - upgrade_custom
+environment:
+  TEST_NAME: "Custom repository upgrade"
+  PLAYBOOK: "tests/tests_upgrade_custom.yml"
+  LOGFILE_PREFIX: "integration-upgrade_custom"

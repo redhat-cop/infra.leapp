@@ -1,0 +1,9 @@
+summary: Test analysis role hostvars handling
+duration: 1h
+tag:
+  - role_test
+  - analysis
+environment:
+  TEST_NAME: "Role test: analysis hostvars"
+  PLAYBOOK: "roles/analysis/tests/tests_hostvars.yml"
+  LOGFILE_PREFIX: "role-analysis_hostvars"

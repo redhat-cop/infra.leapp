@@ -1,36 +1,49 @@
-# Introduction CI Testing Plans
+# CI Testing Plans
 
-Leapp CI runs [tmt](https://tmt.readthedocs.io/en/stable/index.html) test plans in [Testing farm](https://docs.testing-farm.io/Testing%20Farm/0.1/index.html) with the [tft.yml](https://github.com/redhat-cop/infra.leapp/blob/main/.github/workflows/tft.yml) GitHub workflow.
+Leapp CI runs [tmt](https://tmt.readthedocs.io/en/stable/index.html) test plans in [Testing Farm](https://docs.testing-farm.io/Testing%20Farm/0.1/index.html) with the [testing-farm.yml](https://github.com/redhat-cop/infra.leapp/blob/main/.github/workflows/testing-farm.yml) GitHub workflow.
 
-The `plans/test_playbooks.fmf` plan is a test plan that runs test playbooks in parallel on multiple managed nodes.
+## Plan Structure
 
-The `plans/test_playbooks_parallel.fmf` plan does the following steps:
+Plans use FMF inheritance. The base plan `plans/main.fmf` contains shared configuration (provisioning, environment, prepare steps, setup discover). Child plans inherit from it and add scope-specific discover filters:
 
-1. Provisions systems to be used as a control node and as managed nodes.
-2. Does the required preparation on systems.
-3. Run test playbooks matching the pattern `tests_*.yml` from each role's tests directory, and from the root of the collection from [test.sh](https://github.com/redhat-cop/infra.leapp/blob/main/tests/tmt/test_playbooks/test_playbooks.sh).
+- `plans/integration/main.fmf` — discovers tests tagged `integration`. Uses TMT context `upgrade_type` to filter by upgrade subtype (e.g., `custom`). Without the context, all integration tests are discovered.
+- `plans/remediation/main.fmf` — discovers tests tagged `remediation`, filtered by managed node version (`7to8`, `8to9`, `9to10`)
+- `plans/role/main.fmf` — discovers tests tagged `role_test`
 
-The [tft.yml](https://github.com/redhat-cop/infra.leapp/blob/main/.github/workflows/tft.yml) workflow runs the above plan and uploads the results to our Fedora storage for public access.
-
-This workflow uses Testing Farm's Github Action [Schedule tests on Testing Farm](https://github.com/marketplace/actions/schedule-tests-on-testing-farm).
+Each child plan gets three discover steps: `prep_managed_node` + `setup_control_node` (inherited from base) + scope-specific tests (added by child).
 
 ## Running Tests
 
-You can run tests locally with the `tmt try` cli or remotely in Testing Farm.
+You can run tests locally with `tmt try` or remotely in Testing Farm. In CI, tests are triggered by commenting `/citest` on a pull request.
+
+### CI (`/citest`)
+
+Comment on a PR to trigger tests:
+
+```text
+/citest                       — run all scopes (integration + remediation + role)
+/citest integration           — run all integration upgrade types
+/citest integration custom    — run only custom upgrade type
+/citest remediation           — run remediation tests
+/citest role                  — run role tests
+```
+
+The workflow parses the scope and optional subtype from the comment, builds a matrix from `.github/test-matrix.json` (which contains `managed_node`, `upgrade_type`, and `ansible_version`), and submits requests to Testing Farm. Both `managed_node` and `upgrade_type` are passed as TMT context dimensions so plans can filter tests and select version-specific configuration.
 
 ### Running Tests Locally
 
 1. Install `tmt` as described in [Installation](https://tmt.readthedocs.io/en/stable/stories/install.html).
-2. Change to the role repository directory.
-3. Optionally, modify `plans/test_playbooks_parallel.fmf` to modify variables to suit your requirements.
-4. In the plan `plans/test_playbooks_parallel.fmf`, uncomment environment-file and provide a URL to leapp_coll_env_file stored in Red Hat GitLab.
-5. Run a command to run on local VMs or on 1minutetip VMs:
+2. Change to the collection repository directory.
+3. In `plans/main.fmf`, provide the URL to `leapp_coll_env_file` stored in Red Hat GitLab in the `environment-file` entry.
+4. Run a command to run on local VMs or on 1minutetip VMs:
 
     ```bash
-    # Provision local VMs
-    $ tmt -c COMPOSE_MANAGED_NODE=<platform> try -p /plans/test_playbooks
+    # Provision local VMs — all integration tests
+    $ tmt -c managed_node=<platform> try -p /plans/integration
+    # Only custom upgrade type
+    $ tmt -c managed_node=<platform> -c upgrade_type=custom try -p /plans/integration
     # Provision VMs in 1minutetip
-    $ tmt -c 1minutetip=true -c COMPOSE_MANAGED_NODE=<platform> try -p /plans/test_playbooks
+    $ tmt -c 1minutetip=true -c managed_node=<platform> try -p /plans/integration
     ```
 
     `<platform>` can be `rhel7`, `rhel8`, or `rhel9`.
@@ -38,7 +51,7 @@ You can run tests locally with the `tmt try` cli or remotely in Testing Farm.
 ### Running in Testing Farm
 
 1. Install `testing-farm` as described in [Installation](https://gitlab.com/testing-farm/cli/-/blob/main/README.adoc#user-content-installation).
-2. Change to the role repository directory.
+2. Change to the collection repository directory.
 3. If you want to run tests with edits in your branch, you need to commit and push changes first to some branch.
 4. Save the environment file to `leapp_coll_env_file`. TF doesn't allow providing URL for environment-files.
 5. Enter `testing-farm request`.
@@ -54,12 +67,10 @@ You can run tests locally with the `tmt try` cli or remotely in Testing Farm.
         -e SR_GITHUB_ORG=redhat-cop \
         -e SR_PR_NUM=303 \
         -e SR_TEST_LOCAL_CHANGES=false \
-        -e COMPOSE_CONTROLLER=RHEL-9-Nightly \
-        -e COMPOSE_MANAGED_NODE=RHEL-8.10.0-Nightly \
-        -e 'SR_EXCLUDED_TESTS=""' \
-        -e 'SR_ONLY_TESTS=""' \
-        -e SR_RESERVE_SYSTEMS=false \
         -c initiator=testing-farm \
+        -c managed_node=rhel8 \
+        -c control_node=rhel9 \
+        -c upgrade_type=custom \
         --tag user=spetrosi \
         --tag purpose=test-leapp \
         --no-wait
