@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Call 'zipl' after boot loader changes on s390x architecture."

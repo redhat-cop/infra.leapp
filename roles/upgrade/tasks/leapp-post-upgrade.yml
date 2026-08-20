@@ -148,6 +148,11 @@
 - name: leapp-post-upgrade | Recreate the rescue kernel
   ansible.builtin.include_tasks: recreate-rescue-kernel.yml
 
+- name: leapp-post-upgrade | Run zipl to update s390x boot record
+  ansible.builtin.command: zipl
+  when: ansible_facts['architecture'] == 's390x'
+  changed_when: true
+
 - name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_role:
     name: infra.leapp.common
