@@ -1,0 +1,9 @@
+summary: Test upgrade role rescue kernel recreation logic
+duration: 10m
+tag:
+  - role_test
+  - upgrade
+environment:
+  TEST_NAME: "Role test: upgrade rescue kernel"
+  PLAYBOOK: "roles/upgrade/tests/tests_rescue_kernel.yml"
+  LOGFILE_PREFIX: "role-upgrade_rescue_kernel"

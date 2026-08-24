@@ -1,0 +1,196 @@
+---
+# Tests roles/upgrade/tasks/recreate-rescue-kernel.yml.
+#
+# It exercises the real task file against a temporary boot directory (via the
+# __leapp_rescue_boot_path seam) so no real /boot files are touched, and
+# replaces the recreation command with `echo` (via the
+# __leapp_rescue_install_script seam) so the scenarios run for real without
+# building a kernel. Echo prints the arguments it received, which lets the
+# tests assert the command runs with the expected script arguments.
+- name: Test recreate-rescue-kernel
+  hosts: all
+  become: true
+  vars:
+    __test_rescue_files:
+      - vmlinuz-6.0.0-1.el9-rescue
+      - initramfs-6.0.0-1.el9-rescue.img
+    # Non-rescue boot files that must never be matched or removed.
+    __test_non_rescue_files:
+      - vmlinuz-6.0.0-1.el9
+      - initramfs-6.0.0-1.el9.img
+    # Harmless stand-in for 51-dracut-rescue.install: echoes its arguments.
+    __test_install_stub: echo
+  tasks:
+    - name: Test | Create temporary boot directory
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: rescue-boot
+      register: __test_boot_dir
+
+    - name: Test | Run rescue kernel scenarios
+      block:
+
+        - name: Test | Scenario 1 - rescue files present are removed and recreated
+          block:
+            - name: Test | Scenario 1 | Create fake rescue kernel files
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}/{{ item }}"
+                state: touch
+                mode: "0644"
+              loop: "{{ __test_rescue_files }}"
+
+            - name: Test | Scenario 1 | Run recreate-rescue-kernel
+              ansible.builtin.include_role:
+                name: infra.leapp.upgrade
+                tasks_from: recreate-rescue-kernel.yml
+              vars:
+                __leapp_rescue_boot_path: "{{ __test_boot_dir.path }}"
+                __leapp_rescue_install_script: "{{ __test_install_stub }}"
+
+            - name: Test | Scenario 1 | Find rescue files after run
+              ansible.builtin.find:
+                paths:
+                  - "{{ __test_boot_dir.path }}"
+                patterns:
+                  - vmlinuz-*rescue*
+                  - initramfs-*rescue*
+              register: __test_scenario1_files
+
+            - name: Test | Scenario 1 | Assert files found, install triggered, recreation ran with correct args
+              vars:
+                __stdout: "{{ __rescue_kernel_reinstall.stdout }}"
+              ansible.builtin.assert:
+                that:
+                  - __rescue_kernel_files.files | length == __test_rescue_files | length
+                  - not (__rescue_config_package_install.skipped | default(false))
+                  - __test_scenario1_files.files | length == 0
+                  - not (__rescue_kernel_reinstall.skipped | default(false))
+                  - "'add ' in __stdout"
+                  - __test_boot_dir.path in __stdout
+                  - "'/vmlinuz-' in __stdout"
+                fail_msg: >-
+                  With rescue files present, dracut-config-rescue must be
+                  installed, the old rescue files removed, and the recreation
+                  command must run with the expected arguments.
+
+        - name: Test | Scenario 2 - no rescue files, install and recreation are skipped
+          block:
+            - name: Test | Scenario 2 | Empty the boot directory
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}"
+                state: "{{ item }}"
+                mode: "0755"
+              loop:
+                - absent
+                - directory
+
+            - name: Test | Scenario 2 | Run recreate-rescue-kernel
+              ansible.builtin.include_role:
+                name: infra.leapp.upgrade
+                tasks_from: recreate-rescue-kernel.yml
+              vars:
+                __leapp_rescue_boot_path: "{{ __test_boot_dir.path }}"
+                __leapp_rescue_install_script: "{{ __test_install_stub }}"
+
+            - name: Test | Scenario 2 | Assert install and recreation are skipped
+              ansible.builtin.assert:
+                that:
+                  - __rescue_kernel_files.files | length == 0
+                  - __rescue_config_package_install.skipped | default(false)
+                  - __rescue_kernel_reinstall.skipped | default(false)
+                fail_msg: >-
+                  With no rescue files, the package install and the recreation
+                  command must be skipped.
+
+        # A bogus package name forces a real install failure; the rescue section
+        # catches it and verifies removal did not run (fail-fast ordering).
+        - name: Test | Scenario 3 - package install fails, files are not removed
+          block:
+            - name: Test | Scenario 3 | Recreate fake rescue kernel files
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}/{{ item }}"
+                state: touch
+                mode: "0644"
+              loop: "{{ __test_rescue_files }}"
+
+            - name: Test | Scenario 3 | Run recreate-rescue-kernel with a bogus package
+              ansible.builtin.include_role:
+                name: infra.leapp.upgrade
+                tasks_from: recreate-rescue-kernel.yml
+              vars:
+                __leapp_rescue_boot_path: "{{ __test_boot_dir.path }}"
+                __leapp_rescue_config_package: infra-leapp-test-nonexistent-package
+
+            - name: Test | Scenario 3 | Fail if the bogus install unexpectedly succeeded
+              ansible.builtin.fail:
+                msg: Expected the bogus package install to fail, but it did not.
+          rescue:
+            - name: Test | Scenario 3 | Assert the package install caused the failure
+              ansible.builtin.assert:
+                that:
+                  - "'Ensure dracut-config-rescue is installed' in ansible_failed_task.name"
+                fail_msg: >-
+                  Expected the dracut-config-rescue install to fail, but the
+                  failure came from a different task:
+                  {{ ansible_failed_task.name }}.
+
+            - name: Test | Scenario 3 | Find rescue files after failed install
+              ansible.builtin.find:
+                paths:
+                  - "{{ __test_boot_dir.path }}"
+                patterns:
+                  - vmlinuz-*rescue*
+                  - initramfs-*rescue*
+              register: __test_scenario3_files
+
+            - name: Test | Scenario 3 | Assert rescue files were not removed
+              ansible.builtin.assert:
+                that:
+                  - __test_scenario3_files.files | length == __test_rescue_files | length
+                fail_msg: >-
+                  Rescue kernel files must not be removed when the
+                  dracut-config-rescue install fails.
+
+        - name: Test | Scenario 4 - only rescue files are removed, non-rescue files survive
+          block:
+            - name: Test | Scenario 4 | Create rescue and non-rescue boot files
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}/{{ item }}"
+                state: touch
+                mode: "0644"
+              loop: "{{ __test_rescue_files + __test_non_rescue_files }}"
+
+            - name: Test | Scenario 4 | Run recreate-rescue-kernel
+              ansible.builtin.include_role:
+                name: infra.leapp.upgrade
+                tasks_from: recreate-rescue-kernel.yml
+              vars:
+                __leapp_rescue_boot_path: "{{ __test_boot_dir.path }}"
+                __leapp_rescue_install_script: "{{ __test_install_stub }}"
+
+            - name: Test | Scenario 4 | Stat non-rescue files after run
+              ansible.builtin.stat:
+                path: "{{ __test_boot_dir.path }}/{{ item }}"
+              loop: "{{ __test_non_rescue_files }}"
+              register: __test_non_rescue_stat
+
+            - name: Test | Scenario 4 | Assert only rescue files matched and non-rescue survive
+              ansible.builtin.assert:
+                that:
+                  - __rescue_kernel_files.files | length == __test_rescue_files | length
+                  - __rescue_kernel_files.files
+                    | map(attribute='path') | map('basename')
+                    | select('search', 'rescue') | list | length
+                    == __test_rescue_files | length
+                  - __test_non_rescue_stat.results | map(attribute='stat.exists') | min
+                fail_msg: >-
+                  The find step must match only rescue kernel files; non-rescue
+                  boot files (regular kernel or initramfs) must never be
+                  matched and must remain on disk.
+
+      always:
+        - name: Test | Cleanup temporary boot directory
+          ansible.builtin.file:
+            path: "{{ __test_boot_dir.path }}"
+            state: absent
+          tags: tests::cleanup

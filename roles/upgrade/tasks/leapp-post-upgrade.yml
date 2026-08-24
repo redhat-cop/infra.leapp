@@ -145,33 +145,8 @@
     tasks_from: custom_local_repos
   when: leapp_upgrade_type == "custom"
 
-- name: leapp-post-upgrade | Find old rescue kernel files
-  ansible.builtin.find:
-    paths:
-      - /boot
-    patterns:
-      - vmlinuz-*rescue*
-      - initramfs-*rescue*
-  register: __rescue_kernel_files
-
-- name: leapp-post-upgrade | Ensure dracut-config-rescue is installed before recreating the rescue kernel
-  ansible.builtin.package:
-    name: dracut-config-rescue
-    state: present
-  when: __rescue_kernel_files.files | length > 0
-
-- name: leapp-post-upgrade | Remove old rescue kernel files
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    state: absent
-  loop: "{{ __rescue_kernel_files.files }}"
-
-- name: leapp-post-upgrade | Reinstall the rescue kernel files when old ones were found
-  ansible.builtin.shell: >
-    export PATH={{ leapp_os_path }};
-    /usr/lib/kernel/install.d/51-dracut-rescue.install add "$(uname -r)" /boot "/boot/vmlinuz-$(uname -r)"
-  when: __rescue_kernel_files.files | length > 0
-  changed_when: true
+- name: leapp-post-upgrade | Recreate the rescue kernel
+  ansible.builtin.include_tasks: recreate-rescue-kernel.yml
 
 - name: leapp-post-upgrade | Include update-and-reboot.yml
   ansible.builtin.include_role:
