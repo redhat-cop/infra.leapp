@@ -1,21 +1,32 @@
 ---
 - name: leapp_multiple_kernels | Boot to latest kernel and remove old kernels
   block:
-    - name: leapp_multiple_kernels | Get list of installed kernels packages sorted by the newest version
-      ansible.builtin.shell: |
-        set -o pipefail
-        rpm -q kernel --queryformat '%{version}-%{release}.%{arch}\n' | sort -Vr
-      register: installed_kernels
-      changed_when: false
 
+    - name: leapp_multiple_kernels | Gather package facts
+      ansible.builtin.package_facts:
+        manager: rpm
+
+    - name: leapp_multiple_kernels | Sort kernels by RPM version (newest first)
+      ansible.builtin.set_fact:
+        sorted_kernels: "{{ ansible_facts.packages['kernel'] | infra.leapp.rpm_sort | reverse | list }}"
+
+    - name: leapp_multiple_kernels | Debug sorted kernels
+      ansible.builtin.debug:
+        var: sorted_kernels
+
+    - name: leapp_multiple_kernels | Set fact for latest kernel version
+      ansible.builtin.set_fact:
+        latest_kernel_version: "{{ sorted_kernels[0].version }}-{{ sorted_kernels[0].release }}.{{ sorted_kernels[0].arch }}"
+
+    # example output: 4.18.0-553.157.1.el8_10.x86_64
     - name: leapp_multiple_kernels | Check current kernel version
       ansible.builtin.command: uname -r
       register: current_kernel
       changed_when: false
 
     - name: leapp_multiple_kernels | Set default kernel to latest
-      ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ installed_kernels.stdout_lines[0] }}
-      when: installed_kernels.stdout_lines[0] != current_kernel.stdout
+      ansible.builtin.command: grubby --set-default /boot/vmlinuz-{{ latest_kernel_version }}
+      when: latest_kernel_version != current_kernel.stdout
       register: set_default_kernel
       changed_when: set_default_kernel is success
 
@@ -23,7 +34,7 @@
       ansible.builtin.command: zipl
       when:
         - ansible_facts['architecture'] == 's390x'
-        - installed_kernels.stdout_lines[0] != current_kernel.stdout
+        - latest_kernel_version != current_kernel.stdout
       changed_when: true
 
     - name: leapp_multiple_kernels | Update-and-reboot | Reboot when updates applied
@@ -31,18 +42,18 @@
         reboot_timeout: "{{ leapp_reboot_timeout }}"
         post_reboot_delay: "{{ leapp_post_reboot_delay }}"
       timeout: "{{ leapp_reboot_timeout }}"
-      when: installed_kernels.stdout_lines[0] != current_kernel.stdout
+      when: latest_kernel_version != current_kernel.stdout
 
     # TODO: This is slow.  Instead, use filters/map to construct the list
     # of package names to remove and pass the list as name:
     - name: leapp_multiple_kernels | Remove old kernels
       ansible.builtin.package:
-        name: kernel-core-{{ item }}
+        name: kernel-core-{{ item.version }}-{{ item.release }}.{{ item.arch }}
         state: absent
-      loop: "{{ installed_kernels.stdout_lines[1:] }}"
+      loop: "{{ sorted_kernels[1:] }}"
 
     - name: leapp_multiple_kernels | Print the list of installed kernels
       ansible.builtin.debug:
-        var: installed_kernels.stdout_lines
+        var: sorted_kernels
 
 ...
