@@ -54,6 +54,11 @@
           changed_when: leapp_disable_cgroupsv1 is success
           notify: Reboot the system
 
+        - name: leapp_cgroups-v1_enabled | Run zipl to update s390x boot record
+          ansible.builtin.command: zipl
+          when: ansible_facts['architecture'] == 's390x'
+          changed_when: true
+
         - name: leapp_cgroups-v1_enabled | Show the remediation command result
           ansible.builtin.debug:
             msg: leapp_disable_cgroupsv1.stdout_lines

@@ -111,7 +111,9 @@
   delay: "{{ leapp_resume_delay }}"
 
 - name: leapp-upgrade | Block to handle grub_boot_device option
-  when: leapp_grub_boot_device is not none
+  when:
+    - leapp_grub_boot_device is not none
+    - ansible_facts['architecture'] != 's390x'
   block:
     - name: leapp-upgrade | Run grub2-install
       ansible.builtin.shell: >
