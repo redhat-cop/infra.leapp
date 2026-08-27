@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Install the required ``dracut-config-rescue`` package to ensure the rescue kernel is recreated correctly after the upgrade."

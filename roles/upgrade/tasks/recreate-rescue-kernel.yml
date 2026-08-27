@@ -1,0 +1,53 @@
+---
+# Recreate the rescue kernel after an upgrade.
+#
+# Input variables:
+#   leapp_os_path (required)
+#     PATH used when running the 51-dracut-rescue.install reinstall script.
+#     Provided by the role defaults (defaults to "$PATH").
+#
+#   __leapp_rescue_boot_path (optional, default: '/boot')
+#     Directory searched for old rescue kernel files and used as the target
+#     directory for the reinstall script. Internal seam overridden by tests to
+#     target a temporary directory instead of /boot.
+#
+#   __leapp_rescue_config_package (optional, default: 'dracut-config-rescue')
+#     Package installed to enable rescue image creation. Internal seam overridden
+#     by tests to force an install failure.
+#
+#   __leapp_rescue_install_script (optional,
+#     default: '/usr/lib/kernel/install.d/51-dracut-rescue.install')
+#     Script invoked to recreate the rescue kernel. Internal seam overridden by
+#     tests with a harmless stub (echo) so the recreation can run without
+#     building a real kernel.
+
+- name: recreate-rescue-kernel | Find old rescue kernel files
+  ansible.builtin.find:
+    paths: "{{ [__leapp_rescue_boot_path | default('/boot')] }}"
+    patterns:
+      - vmlinuz-*rescue*
+      - initramfs-*rescue*
+  register: __rescue_kernel_files
+
+- name: recreate-rescue-kernel | Ensure dracut-config-rescue is installed before recreating the rescue kernel
+  ansible.builtin.package:
+    name: "{{ __leapp_rescue_config_package | default('dracut-config-rescue') }}"
+    state: present
+  when: __rescue_kernel_files.files | length > 0
+  register: __rescue_config_package_install
+
+- name: recreate-rescue-kernel | Remove old rescue kernel files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ __rescue_kernel_files.files }}"
+
+- name: recreate-rescue-kernel | Reinstall the rescue kernel files when old ones were found
+  ansible.builtin.shell: >
+    export PATH={{ leapp_os_path }};
+    {{ __leapp_rescue_install_script | default('/usr/lib/kernel/install.d/51-dracut-rescue.install') }} add "$(uname -r)"
+    {{ __leapp_rescue_boot_path | default('/boot') }}
+    "{{ __leapp_rescue_boot_path | default('/boot') }}/vmlinuz-$(uname -r)"
+  when: __rescue_kernel_files.files | length > 0
+  changed_when: true
+  register: __rescue_kernel_reinstall
