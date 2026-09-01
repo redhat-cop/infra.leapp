@@ -110,7 +110,7 @@ jobs:
         run: ansible-galaxy collection install "./infra-leapp-${{ inputs.version }}.tar.gz"
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@2bac76bbc98f420b20299cbbc4a52a8ce6cbc295 # main
+        uses: ansible/ansible-lint@b500667df7dcc286b40748b1c820a336bff339b6 # main
         with:
           args: "--offline"
 
