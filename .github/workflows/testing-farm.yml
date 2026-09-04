@@ -1,9 +1,9 @@
 ---
 name: Testing Farm — On-demand tests
 on:
-  # Tests that run on issue_comment are run from the main branch.
-  # Changes to this workflow and to tmt plans and tests need to be merged to
-  # main first to appear in CI runs.
+  # Tests that run on issue_comment are run from the PR branch.
+  # Changes to the workflow file itself need to be merged to main first to
+  # appear in CI runs, but tmt plans and tests run from the PR branch.
   issue_comment:
     types:
       - created
@@ -262,7 +262,7 @@ jobs:
         uses: sclorg/testing-farm-as-github-action@230555baceb860aa468d216f1822974836b965d1 # v4.3.1
         if: steps.platform_check.outputs.is_supported == 'true'
         with:
-          git_ref: main
+          git_ref: ${{ needs.prepare_vars.outputs.head_sha }}
           tmt_plan_filter: "tag:${{ matrix.test_scope }}_tests"
           pipeline_settings: '{ "type": "tmt-multihost" }'
           environment_settings: '{ "provisioning": { "tags": { "BusinessUnit": "ansible_collection_leapp" } } }'
@@ -272,7 +272,7 @@ jobs:
             SR_GITHUB_ORG=${{ github.repository_owner }};\
             SR_PR_NUM=${{ github.event.issue.number }};\
             SR_ARTIFACTS_DIR=${{ steps.set_vars.outputs.ARTIFACTS_DIR }};\
-            SR_TEST_LOCAL_CHANGES=false;\
+            SR_TEST_LOCAL_CHANGES=true;\
             SR_LSR_USER=${{ vars.SR_LSR_USER }};\
             RHEL_7_9_SERVER_REPO_URL=${{ secrets.RHEL_7_9_SERVER_REPO_URL }};\
             RHEL_7_9_EXTRAS_REPO_URL=${{ secrets.RHEL_7_9_EXTRAS_REPO_URL }};\
