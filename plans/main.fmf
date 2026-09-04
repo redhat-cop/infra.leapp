@@ -18,7 +18,7 @@ adjust:
   - when: managed_node == rhel9
     environment+:
       SR_ANSIBLE_VER: "2.17"
-      COMPOSE_MANAGED_NODE: "RHEL-9.8.0-Nightly"
+      COMPOSE_MANAGED_NODE: "RHEL-9.9.0-Nightly"
 
   # Per-version mappings for control node.
   - when: control_node == rhel9
@@ -78,7 +78,7 @@ adjust:
       - name: managed-node01
         role: managed_node
         how: minute
-        image: RHEL-9.8.0
+        image: RHEL-9.9.0
 
   # ---- Local reporting ----
   - when: initiator is not defined
@@ -127,7 +127,7 @@ adjust:
         role: managed_node
         how: virtual
         connection: system
-        image: ${RHEL_9_8_image}
+        image: ${RHEL_9_9_image}
 
 environment:
     SR_ANSIBLE_VER: ""
