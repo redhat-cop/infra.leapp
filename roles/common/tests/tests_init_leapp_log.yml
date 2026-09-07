@@ -1,0 +1,186 @@
+---
+# Tests roles/common/tasks/init_leapp_log.yml.
+#
+# It exercises the real task file against a temporary log directory (via the
+# leapp_reports_dir / leapp_log_file seams) so the production path
+# /var/log/leapp is never touched. The facts.d directory is redirected the same
+# way (via the __leapp_facts_dir seam) so the host's real /etc/ansible/facts.d
+# is untouched.
+- name: Test init_leapp_log
+  hosts: all
+  vars:
+    job_name: test_init_leapp_log
+  tasks:
+    # Each scenario runs under its own numbered scenario subfolder within the
+    # temp folder so scenarios are fully isolated and never read each other's
+    # leftovers.
+    - name: Test | Create temporary log directory
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: leapp-log
+      register: __test_log_dir
+
+    - name: Test | Run init_leapp_log scenarios
+      block:
+
+        - name: Test | Scenario 1 - a fresh run records all sections in the log
+          vars:
+            leapp_reports_dir: "{{ __test_log_dir.path }}/scenario1"
+            leapp_log_file: "{{ __test_log_dir.path }}/scenario1/ansible_leapp.log"
+            __leapp_facts_dir: "{{ __test_log_dir.path }}/scenario1/facts.d"
+          block:
+            - name: Test | Scenario 1 | Include init_leapp_log
+              ansible.builtin.include_role:
+                name: infra.leapp.common
+                tasks_from: init_leapp_log.yml
+
+            - name: Test | Scenario 1 | Slurp log file
+              ansible.builtin.slurp:
+                src: "{{ leapp_log_file }}"
+              register: log_content_slurp
+
+            - name: Test | Scenario 1 | Decode log content
+              ansible.builtin.set_fact:
+                log_content: "{{ log_content_slurp.content | b64decode }}"
+
+            - name: Test | Scenario 1 | Slurp pre_ipu fact file
+              ansible.builtin.slurp:
+                src: "{{ __leapp_facts_dir }}/pre_ipu.fact"
+              register: pre_ipu_slurp
+
+            - name: Test | Scenario 1 | Slurp non_rhel_packages fact file
+              ansible.builtin.slurp:
+                src: "{{ __leapp_facts_dir }}/non_rhel_packages.fact"
+              register: non_rhel_packages_slurp
+
+            - name: Test | Scenario 1 | Decode fact files into the log's string form
+              ansible.builtin.set_fact:
+                pre_ipu_raw: "{{ pre_ipu_slurp.content | b64decode | from_json | string }}"
+                non_rhel_packages_raw: "{{ non_rhel_packages_slurp.content | b64decode | from_json | string }}"
+
+            - name: Test | Scenario 1 | Assert log content, labels and ordering
+              ansible.builtin.assert:
+                that:
+                  - "'test_init_leapp_log' in log_content"  # the current job name
+                  - "'Job started at' in log_content"
+                  - "'Ansible facts:' in log_content"
+                  - "'Non-RHEL packages:' in log_content"
+                  - pre_ipu_raw in log_content
+                  - non_rhel_packages_raw in log_content
+                  - log_content.find('Job started at') < log_content.find(pre_ipu_raw)
+                  - log_content.find(pre_ipu_raw) < log_content.find(non_rhel_packages_raw)
+                  - log_content.rstrip().endswith(non_rhel_packages_raw)
+                fail_msg: >-
+                  A fresh run must record the job header, both section labels, and
+                  the facts and non-RHEL package sections in order, with the
+                  package section last.
+
+            - name: Test | Scenario 1 | Assert fact files exist independently
+              ansible.builtin.stat:
+                path: "{{ item }}"
+              register: fact_file_stat
+              failed_when: not fact_file_stat.stat.exists
+              loop:
+                - "{{ __leapp_facts_dir }}/pre_ipu.fact"
+                - "{{ __leapp_facts_dir }}/non_rhel_packages.fact"
+
+        # Inject a known list via the __leapp_non_rhel_packages seam to cover a
+        # nonempty list
+        - name: Test | Scenario 2 - injected non-RHEL packages reach the log and fact file
+          vars:
+            leapp_reports_dir: "{{ __test_log_dir.path }}/scenario2"
+            leapp_log_file: "{{ __test_log_dir.path }}/scenario2/ansible_leapp.log"
+            __leapp_facts_dir: "{{ __test_log_dir.path }}/scenario2/facts.d"
+            __leapp_non_rhel_packages:
+              - fake-pkg-1.2-3.el8
+              - other-pkg-4.5-6.el8
+          block:
+            - name: Test | Scenario 2 | Include init_leapp_log
+              ansible.builtin.include_role:
+                name: infra.leapp.common
+                tasks_from: init_leapp_log.yml
+
+            - name: Test | Scenario 2 | Slurp log file
+              ansible.builtin.slurp:
+                src: "{{ leapp_log_file }}"
+              register: packages_log_slurp
+
+            - name: Test | Scenario 2 | Slurp non_rhel_packages fact file
+              ansible.builtin.slurp:
+                src: "{{ __leapp_facts_dir }}/non_rhel_packages.fact"
+              register: packages_fact_slurp
+
+            - name: Test | Scenario 2 | Assert the injected packages are serialized correctly
+              vars:
+                packages_log: "{{ packages_log_slurp.content | b64decode }}"
+              ansible.builtin.assert:
+                that:
+                  - (packages_fact_slurp.content | b64decode | from_json) == __leapp_non_rhel_packages
+                  - (__leapp_non_rhel_packages | string) in packages_log
+                  - packages_log.rstrip().endswith(__leapp_non_rhel_packages | string)
+                fail_msg: >-
+                  A nonempty non-RHEL package list must be stored as JSON in the
+                  fact file and appear in string form at the end of the log.
+
+        # Failure scenario: init_leapp_log must refuse to run when a log file
+        # already exists and must leave it untouched.
+        - name: Test | Scenario 3 - an existing log file is preserved, not overwritten
+          vars:
+            leapp_reports_dir: "{{ __test_log_dir.path }}/scenario3"
+            leapp_log_file: "{{ __test_log_dir.path }}/scenario3/ansible_leapp.log"
+            __leapp_facts_dir: "{{ __test_log_dir.path }}/scenario3/facts.d"
+            __existing_log_content: "Existing job log - must not be overwritten\n"
+          block:
+            # In this scenario the directory needs to be pre-created along with the log file
+            - name: Test | Scenario 3 | Ensure the scenario log directory exists
+              ansible.builtin.file:
+                path: "{{ leapp_reports_dir }}"
+                state: directory
+                mode: "0755"
+
+            - name: Test | Scenario 3 | Pre-create the log file to simulate a running job
+              ansible.builtin.copy:
+                content: "{{ __existing_log_content }}"
+                dest: "{{ leapp_log_file }}"
+                mode: "0644"
+
+            - name: Test | Scenario 3 | Attempt init_leapp_log (expected to fail on existing log)
+              block:
+                - name: Test | Scenario 3 | Include init_leapp_log
+                  ansible.builtin.include_role:
+                    name: infra.leapp.common
+                    tasks_from: init_leapp_log.yml
+
+                - name: Test | Scenario 3 | Fail if init unexpectedly succeeded
+                  ansible.builtin.fail:
+                    msg: Expected init_leapp_log to fail on the existing log file, but it did not.
+              rescue:
+                # Confirm it failed on the existing-log guard specifically, not on
+                # some unrelated init task that this rescue would also catch.
+                - name: Test | Scenario 3 | Assert the existing-log guard caused the failure
+                  ansible.builtin.assert:
+                    that:
+                      - "'Fail if log file already exists' in ansible_failed_task.name"
+                    fail_msg: >-
+                      Expected the existing-log guard to fail, but the failure came
+                      from a different task: {{ ansible_failed_task.name }}.
+
+            - name: Test | Scenario 3 | Slurp log file after the failed attempt
+              ansible.builtin.slurp:
+                src: "{{ leapp_log_file }}"
+              register: existing_log_slurp
+
+            - name: Test | Scenario 3 | Assert existing log file was left unchanged
+              ansible.builtin.assert:
+                that:
+                  - (existing_log_slurp.content | b64decode) == __existing_log_content
+                fail_msg: "init_leapp_log overwrote the existing log file"
+
+      always:
+        - name: Test | Cleanup temporary log directory
+          ansible.builtin.file:
+            path: "{{ __test_log_dir.path }}"
+            state: absent
+          tags: tests::cleanup
+
+...
