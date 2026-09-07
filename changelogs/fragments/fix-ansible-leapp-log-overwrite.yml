@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Fix ``/var/log/leapp/ansible_leapp_*`` logs to retain the full initialization record (job header, system facts, and non-RHEL packages)"
