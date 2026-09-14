@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Backup all repositories
 if ls /etc/yum.repos.d/*.repo 1>/dev/null 2>&1; then
 for file in /etc/yum.repos.d/*.repo; do
@@ -8,7 +10,7 @@ fi
 # Add beaker-harness repository to install beakerlib
 source /etc/os-release
 OS_MAJOR_VERSION=${VERSION_ID/%[.]*/}
-OS_VERSION_UNDERSCORE=$(echo ${VERSION_ID} | sed 's/\./_/g')
+OS_VERSION_UNDERSCORE=${VERSION_ID//./_}
 {
 echo "[beaker-harness]"
 echo "baseurl = ${BEAKERLIB_HARNESS_URL_NO_VER}${OS_MAJOR_VERSION}/"
@@ -33,7 +35,7 @@ if [ -n "${OS_MAJOR_VERSION}" ] && [ "${OS_MAJOR_VERSION}" -eq 7 ]; then
     echo "baseurl=${RHEL_7_9_SERVER_REPO_URL}"
     echo "enabled = 1"
     echo "gpgcheck=0"
-} > /etc/yum.repos.d/rhel${OS_MAJOR_VERSION}.repo
+} > "/etc/yum.repos.d/rhel${OS_MAJOR_VERSION}.repo"
 exit
 fi
 
@@ -65,4 +67,4 @@ echo "name=AppStream for x86_64"
 echo "baseurl=${!APPSTREAM_VAR}"
 echo "enabled = 1"
 echo "gpgcheck=0"
-} > /etc/yum.repos.d/rhel${OS_MAJOR_VERSION}.repo
+} > "/etc/yum.repos.d/rhel${OS_MAJOR_VERSION}.repo"
