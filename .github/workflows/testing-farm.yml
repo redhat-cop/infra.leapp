@@ -229,7 +229,7 @@ jobs:
 
       - name: Set commit status as pending
         if: steps.platform_check.outputs.is_supported == 'true'
-        uses: myrotvorets/set-commit-status-action@f7319757cba2a18a329dd5f95622ff6b1e8b052d # master
+        uses: myrotvorets/set-commit-status-action@c0f880c99d91381c6fdb97726f03feb8004409b4 # master
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: pending
@@ -239,7 +239,7 @@ jobs:
 
       - name: Set commit status as success with a description that platform is skipped
         if: steps.platform_check.outputs.is_supported == 'false'
-        uses: myrotvorets/set-commit-status-action@f7319757cba2a18a329dd5f95622ff6b1e8b052d # master
+        uses: myrotvorets/set-commit-status-action@c0f880c99d91381c6fdb97726f03feb8004409b4 # master
         with:
           sha: ${{ needs.prepare_vars.outputs.head_sha }}
           status: success
@@ -300,7 +300,7 @@ jobs:
           update_pull_request_status: false
 
       - name: Set final commit status
-        uses: myrotvorets/set-commit-status-action@f7319757cba2a18a329dd5f95622ff6b1e8b052d # master
+        uses: myrotvorets/set-commit-status-action@c0f880c99d91381c6fdb97726f03feb8004409b4 # master
         # always() is to run the step even if the previous step failed
         if: always() && steps.platform_check.outputs.is_supported == 'true'
         with:
