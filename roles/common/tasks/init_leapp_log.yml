@@ -5,6 +5,11 @@
 # job_name: init_leapp_log | Ansible Leapp preupgrade analysis
 # leapp_reports_dir: "{{ __leapp_reports_dir }}"
 # leapp_log_file: "{{ __leapp_log_file }}"
+#
+# Optional variables (tests redirect these to a temporary location):
+#   __leapp_facts_dir (optional, default: '/etc/ansible/facts.d')
+#   __leapp_non_rhel_packages (optional, test seam: inject a package list
+#     instead of collecting it via rpm)
 
 - name: init_leapp_log | Ensure ansible_facts used by role
   ansible.builtin.include_tasks: set_facts.yml
@@ -16,6 +21,33 @@
     owner: root
     group: root
     mode: "0755"
+
+- name: init_leapp_log | Record start time
+  ansible.builtin.set_fact:
+    leapp_start_time: "{{ now(fmt='%Y-%m-%dT%H:%M:%SZ', utc=true) }}"
+
+# Gather everything the log needs before the existence check so the slow rpm
+# query stays out of the check -> create window. This keeps the gap between the
+# mutex check and log creation as small as possible
+# TODO: introduce a proper atomic lock
+- name: init_leapp_log | Capture a list of non-rhel versioned packages
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail;
+      export PATH={{ leapp_os_path }};
+      rpm -qa | grep -ve '[\.|+]el{{ ansible_facts['distribution_major_version'] }}' |
+      grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
+      sort
+  register: unsigned_packages_pre
+  changed_when: false
+  failed_when:
+    - unsigned_packages_pre.rc != 0
+    - unsigned_packages_pre.stderr != ""
+  when: __leapp_non_rhel_packages is not defined
+
+- name: init_leapp_log | Create fact with the non-rhel versioned packages list
+  ansible.builtin.set_fact:
+    non_rhel_packages: "{{ __leapp_non_rhel_packages | default(unsigned_packages_pre.stdout_lines) }}"
 
 - name: init_leapp_log | Check for existing log file
   ansible.builtin.stat:
@@ -30,63 +62,51 @@
       rename the log file to clear this failure and try again.
   when: log_file_stat.stat.exists
 
-# Don't forget to archive the log file at the end of the parent role
-- name: init_leapp_log | Create new log file
+# Created immediately after the existence check to keep the window between the
+# check and the creation as small as possible. Don't forget to archive the log
+# file at the end of the parent role.
+- name: init_leapp_log | Create new log file with complete initialization details
   ansible.builtin.copy:
     content: |
       {{ job_name }}
-      Job started at {{ now(fmt='%Y-%m-%dT%H:%M:%SZ', utc=true) }}
+      Job started at {{ leapp_start_time }}
+
+      Ansible facts:
+      {{ (ansible_facts | ansible.builtin.combine({'ansible_local': {}})) | string }}
+
+      Non-RHEL packages:
+      {{ non_rhel_packages | string }}
     dest: "{{ leapp_log_file }}"
     owner: root
     group: root
     mode: "0644"
 
-- name: init_leapp_log | /etc/ansible/facts.d directory exists
+- name: init_leapp_log | Ensure facts.d directory exists
   ansible.builtin.file:
-    path: /etc/ansible/facts.d
+    path: "{{ __leapp_facts_dir | default('/etc/ansible/facts.d') }}"
     state: directory
     mode: "0755"
     owner: root
     group: root
 
+# Store facts in facts.d so they persist across the reboot/upgrade and are
+# re-read as ansible_local facts on later runs for post-upgrade validation.
 - name: init_leapp_log | Capture current ansible_facts for validation after upgrade
   ansible.builtin.copy:
-    content: "{{ ansible_facts | ansible.builtin.combine({'ansible_local': {}}) }}"
-    dest: "{{ item }}"
+    content: "{{ (ansible_facts | ansible.builtin.combine({'ansible_local': {}})) | to_json }}"
+    dest: "{{ __leapp_facts_dir | default('/etc/ansible/facts.d') }}/pre_ipu.fact"
     mode: "0644"
     owner: root
     group: root
-  loop:
-    - /etc/ansible/facts.d/pre_ipu.fact
-    - "{{ leapp_log_file }}"
 
-- name: init_leapp_log | Capture a list of non-rhel versioned packages
-  ansible.builtin.shell:
-    cmd: >-
-      set -o pipefail;
-      export PATH={{ leapp_os_path }};
-      rpm -qa | grep -ve '[\.|+]el{{ ansible_facts['distribution_major_version'] }}' |
-      grep -vE '^(gpg-pubkey|libmodulemd|katello-ca-consumer)' |
-      sort
-  register: unsigned_packages_pre
-  changed_when: false
-  failed_when:
-    - unsigned_packages_pre.rc != 0
-    - unsigned_packages_pre.stderr != ""
-
-- name: init_leapp_log | Create fact with the non-rhel versioned packages list
-  ansible.builtin.set_fact:
-    non_rhel_packages: "{{ unsigned_packages_pre.stdout_lines }}"
-
+# Persisted to facts.d for the same reason: available as an ansible_local fact
+# after the upgrade to diff against the post-upgrade package list.
 - name: init_leapp_log | Capture the list of non-rhel versioned packages in a separate fact file
   ansible.builtin.copy:
-    content: "{{ non_rhel_packages }}"
-    dest: "{{ item }}"
+    content: "{{ non_rhel_packages | to_json }}"
+    dest: "{{ __leapp_facts_dir | default('/etc/ansible/facts.d') }}/non_rhel_packages.fact"
     mode: "0644"
     owner: root
     group: root
-  loop:
-    - /etc/ansible/facts.d/non_rhel_packages.fact
-    - "{{ leapp_log_file }}"
 
 ...

@@ -1,0 +1,9 @@
+summary: Test init_leapp_log preserves all log sections
+duration: 1h
+tag:
+  - role_test
+  - common
+environment:
+  TEST_NAME: "Role test: common init_leapp_log"
+  PLAYBOOK: "roles/common/tests/tests_init_leapp_log.yml"
+  LOGFILE_PREFIX: "role-common_init_leapp_log"
