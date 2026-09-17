@@ -165,7 +165,9 @@ rlJournalStart
         rlRun "cat $repo_vars_file"
         leappDebugRepos
 
-        rlWaitForCmd "ansible-galaxy collection install -r $coll_path/meta/collection-requirements.yml -vv" -m 5
+        if ! lsrAnsibleGalaxy collection install -vv -r "$coll_path/meta/collection-requirements.yml"; then
+            rlDie "Failed to install dependencies from $req_file"
+        fi
 
         lsrSetAnsibleInjectFactVars "$SR_ANSIBLE_INJECT_FACT_VARS"
         lsrPrepareNodesInventories
