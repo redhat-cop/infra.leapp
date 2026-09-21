@@ -263,6 +263,7 @@ jobs:
         if: steps.platform_check.outputs.is_supported == 'true'
         with:
           git_ref: ${{ needs.prepare_vars.outputs.head_sha }}
+          tmt_path: "./tmt"
           tmt_plan_filter: "tag:${{ matrix.test_scope }}_tests"
           pipeline_settings: '{ "type": "tmt-multihost" }'
           environment_settings: '{ "provisioning": { "tags": { "BusinessUnit": "ansible_collection_leapp" } } }'
