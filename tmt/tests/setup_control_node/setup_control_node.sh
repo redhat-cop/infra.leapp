@@ -165,7 +165,7 @@ rlJournalStart
         rlRun "cat $repo_vars_file"
         leappDebugRepos
 
-        if ! rlWaitForCmd "ansible-galaxy collection install -vv -r $coll_path/meta/collection-requirements.yml --timeout 600"; then
+        if ! rlRun "ansible-galaxy collection install -vv -r $coll_path/meta/collection-requirements.yml --timeout 600"; then
             rlDie "Failed to install Ansible dependencies"
         fi
 
