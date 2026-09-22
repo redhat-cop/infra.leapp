@@ -145,7 +145,7 @@ environment:
 prepare:
   - name: Replaces repositories with custom repos
     order: 10
-    script: ./tmt/plans/scripts/replace_repos_with_custom_repos.sh
+    script: $TMT_TREE/tmt/scripts/replace_repos_with_custom_repos.sh
 discover:
   - name: Prepare managed node
     how: fmf
