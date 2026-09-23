@@ -19,10 +19,10 @@ discover:
     how: fmf
     where: managed_node
     filter: tag:prep_managed_node
-  - name: Setup control node
+  - name: Prepare control node
     how: fmf
     where: control_node
-    filter: tag:setup_control_node
+    filter: tag:prep_control_node
 
 adjust:
   # File that provides URLs for images and repositories
