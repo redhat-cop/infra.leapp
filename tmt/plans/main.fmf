@@ -36,22 +36,30 @@ adjust:
     environment+:
       SR_ANSIBLE_VER: "2.14"
       COMPOSE_MANAGED_NODE: "RHEL-7-LatestUpdated"
+      MINUTETIP_MANAGED_NODE_IMAGE: RHEL-7.9
+      LOCALVM_IMAGE: ${RHEL_7_9_image}
   - when: managed_node == rhel8
     environment+:
       SR_ANSIBLE_VER: "2.16"
       COMPOSE_MANAGED_NODE: "RHEL-8.10.0-Nightly"
+      MINUTETIP_MANAGED_NODE_IMAGE: RHEL-8.10.0
+      LOCALVM_IMAGE: ${RHEL_8_10_image}
   - when: managed_node == rhel9
     environment+:
       SR_ANSIBLE_VER: "2.17"
       COMPOSE_MANAGED_NODE: "RHEL-9.9.0-Nightly"
+      MINUTETIP_MANAGED_NODE_IMAGE: RHEL-9.9.0
+      LOCALVM_IMAGE: ${RHEL_9_9_image}
 
   # Per-version mappings for control node.
   - when: control_node == rhel9
     environment+:
       COMPOSE_CONTROLLER_NODE: "RHEL-9-Nightly"
+      MINUTETIP_CONTROL_NODE_IMAGE: $@{control_node}
   - when: control_node == rhel10
     environment+:
       COMPOSE_CONTROLLER_NODE: "RHEL-10-Nightly"
+      MINUTETIP_CONTROL_NODE_IMAGE: $@{control_node}
 
   # ---- Testing Farm (CI) ----
   - when: initiator == github-ci or initiator == rhel-ci
@@ -76,34 +84,12 @@ adjust:
       - name: control-node01
         role: control_node
         how: minute
-        image: rhel9
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
-      and managed_node == rhel7
-    provision+:
+        image: ${MINUTETIP_CONTROL_NODE_IMAGE}
       - name: managed-node01
         role: managed_node
         how: minute
-        image: RHEL-7.9
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
-      and managed_node == rhel8
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: minute
-        image: RHEL-8.10.0
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
-      and managed_node == rhel9
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: minute
-        image: RHEL-9.9.0
+        image: ${MINUTETIP_MANAGED_NODE_IMAGE}
+
 
   # ---- Local VMs (virtual) ----
   # Example: tmt -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
