@@ -1,4 +1,29 @@
 summary: Base plan for infra.leapp tests
+
+environment:
+  SR_ANSIBLE_VER: ""
+  SR_REPO_NAME: ""
+  SR_PYTHON_VERSION: 3.12
+  SR_ONLY_TESTS: ""
+  SR_TEST_LOCAL_CHANGES: true
+  SR_PR_NUM: ""
+  SR_LSR_USER: ""
+  SR_LSR_DOMAIN: ""
+  SR_LSR_SSH_KEY: ""
+  SR_ARTIFACTS_DIR: ""
+  SR_ARTIFACTS_URL: ""
+  SR_TFT_DEBUG: false
+
+discover:
+  - name: Prepare managed node
+    how: fmf
+    where: managed_node
+    filter: tag:prep_managed_node
+  - name: Setup control node
+    how: fmf
+    where: control_node
+    filter: tag:setup_control_node
+
 adjust:
   # File that provides URLs for images and repositories
   - when: initiator is not defined
@@ -80,13 +105,6 @@ adjust:
         how: minute
         image: RHEL-9.9.0
 
-  # ---- Local reporting ----
-  - when: initiator is not defined
-    report:
-      - how: display
-      - how: html
-        open: false
-
   # ---- Local VMs (virtual) ----
   # Example: tmt -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
   - when: >-
@@ -129,31 +147,17 @@ adjust:
         connection: system
         image: ${RHEL_9_9_image}
 
-environment:
-    SR_ANSIBLE_VER: ""
-    SR_REPO_NAME: ""
-    SR_PYTHON_VERSION: 3.12
-    SR_ONLY_TESTS: ""
-    SR_TEST_LOCAL_CHANGES: true
-    SR_PR_NUM: ""
-    SR_LSR_USER: ""
-    SR_LSR_DOMAIN: ""
-    SR_LSR_SSH_KEY: ""
-    SR_ARTIFACTS_DIR: ""
-    SR_ARTIFACTS_URL: ""
-    SR_TFT_DEBUG: false
 prepare:
   - name: Replaces repositories with custom repos
     order: 10
     script: $TMT_TREE/tmt/scripts/replace_repos_with_custom_repos.sh
-discover:
-  - name: Prepare managed node
-    how: fmf
-    where: managed_node
-    filter: tag:prep_managed_node
-  - name: Setup control node
-    how: fmf
-    where: control_node
-    filter: tag:setup_control_node
+
 execute:
-    how: tmt
+  how: tmt
+
+report:
+  # ---- Local reporting ----
+  - when: initiator is not defined
+  - how: display
+  - how: html
+    open: false
