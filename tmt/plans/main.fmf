@@ -54,7 +54,7 @@ adjust:
       COMPOSE_CONTROLLER_NODE: "RHEL-10-Nightly"
 
   # ---- Testing Farm (CI) ----
-  - when: initiator == testing-farm
+  - when: initiator == github-ci or initiator == rhel-ci
     provision+:
       - name: control-node01
         role: control_node
