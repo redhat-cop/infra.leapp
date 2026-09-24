@@ -13,6 +13,8 @@ environment:
   SR_ARTIFACTS_DIR: ""
   SR_ARTIFACTS_URL: ""
   SR_TFT_DEBUG: false
+  TMT_CONTEXT_INITIATOR: $@{initiator}
+  TMT_CONTEXT_INFRA: $@{infra}
 
 discover:
   - name: Prepare managed node

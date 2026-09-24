@@ -119,7 +119,7 @@ env | grep -E '^SR_'
 echo "~~~ Environment Variables Definition - END"
 
 rlJournalStart
-    rlPhaseStartSetup "Setup control node"
+    rlPhaseStart FAIL "Prepare control node"
         rlRun "rlImport /library/upstream_library"
         rlRun "rlImport leapp_lib"
 
@@ -129,30 +129,42 @@ rlJournalStart
             fi
         done
 
-        leappInstallAnsible "$SR_ANSIBLE_VER"
-        coll_path=~/.ansible/collections/ansible_collections/infra/leapp
-        mkdir -p "$coll_path"
-        if [ -d "$coll_path" ]; then
-            rlRun "rm -rf $coll_path"
-        fi
-        if [ "$SR_TEST_LOCAL_CHANGES" == true ]; then
-            # TMT_TREE points to the repo root
-            if [ ! -f "$TMT_TREE/galaxy.yml" ]; then
-                rlDie "Could not find galaxy.yml at TMT_TREE=$TMT_TREE"
-            fi
-            rlRun "cp -r $TMT_TREE/. $coll_path/"
-        else
-            rlRun "git clone -q https://github.com/$SR_GITHUB_ORG/$SR_REPO_NAME.git $coll_path --depth 1"
-            if [ -n "$SR_PR_NUM" ]; then
-                pushd "$coll_path" || exit
-                rlRun "git fetch origin pull/$SR_PR_NUM/head"
-                rlRun "git checkout FETCH_HEAD"
-                popd || exit
-                rlLog "Test from the pull request $SR_PR_NUM"
-            else
-                rlLog "Test from the main branch"
-            fi
-        fi
+        case ${TMT_CONTEXT_INITIATOR} in
+            'github-ci')
+                rlLogInfo ""
+                leappInstallAnsible "$SR_ANSIBLE_VER"
+                coll_path=~/.ansible/collections/ansible_collections/infra/leapp
+                mkdir -p "$coll_path"
+                if [ -d "$coll_path" ]; then
+                    rlRun "rm -rf $coll_path"
+                fi
+                if [ "$SR_TEST_LOCAL_CHANGES" == true ]; then
+                    # TMT_TREE points to the repo root
+                    if [ ! -f "$TMT_TREE/galaxy.yml" ]; then
+                        rlDie "Could not find galaxy.yml at TMT_TREE=$TMT_TREE"
+                    fi
+                    rlRun "cp -r $TMT_TREE/. $coll_path/"
+                else
+                    rlRun "git clone -q https://github.com/$SR_GITHUB_ORG/$SR_REPO_NAME.git $coll_path --depth 1"
+                    if [ -n "$SR_PR_NUM" ]; then
+                        pushd "$coll_path" || exit
+                        rlRun "git fetch origin pull/$SR_PR_NUM/head"
+                        rlRun "git checkout FETCH_HEAD"
+                        popd || exit
+                        rlLog "Test from the pull request $SR_PR_NUM"
+                    else
+                        rlLog "Test from the main branch"
+                    fi
+                fi
+                if ! rlRun "ansible-galaxy collection install -vv -r $coll_path/meta/collection-requirements.yml --timeout 600"; then
+                    rlDie "Failed to install Ansible dependencies"
+                fi
+            ;;
+            *)
+                rlLogInfo "Installing redhat.leapp collection & dependencies from rpm"
+                coll_path='/usr/share/ansible/collections/ansible_collections/redhat/leapp'
+                rlRun "rpm -q --whatprovides ansible-collection-redhat-leapp || dnf install ansible-collection-redhat-leapp -y"
+        esac
 
         repo_vars_file="$coll_path/tests/vars/repo_urls.yml"
         [ -n "$RHEL_7_9_EXTRAS_REPO_URL" ] && sed -i "s|__RHEL_7_9_EXTRAS_REPO_URL__|$RHEL_7_9_EXTRAS_REPO_URL|g" "$repo_vars_file"
@@ -164,10 +176,6 @@ rlJournalStart
         [ -n "$RHEL_10_3_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_3_APPSTREAM_REPO_URL__|$RHEL_10_3_APPSTREAM_REPO_URL|g" "$repo_vars_file"
         rlRun "cat $repo_vars_file"
         leappDebugRepos
-
-        if ! rlRun "ansible-galaxy collection install -vv -r $coll_path/meta/collection-requirements.yml --timeout 600"; then
-            rlDie "Failed to install Ansible dependencies"
-        fi
 
         lsrSetAnsibleInjectFactVars "$SR_ANSIBLE_INJECT_FACT_VARS"
         lsrPrepareNodesInventories
