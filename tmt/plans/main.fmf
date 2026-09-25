@@ -35,31 +35,31 @@ adjust:
   - when: managed_node == rhel7
     environment+:
       SR_ANSIBLE_VER: "2.14"
-      COMPOSE_MANAGED_NODE: "RHEL-7-LatestUpdated"
+      TF_MANAGED_NODE_COMPOSE: "RHEL-7-LatestUpdated"
       MINUTETIP_MANAGED_NODE_IMAGE: RHEL-7.9
       LOCALVM_MANAGED_NODE_IMAGE: ${RHEL_7_9_image}
   - when: managed_node == rhel8
     environment+:
       SR_ANSIBLE_VER: "2.16"
-      COMPOSE_MANAGED_NODE: "RHEL-8.10.0-Nightly"
+      TF_MANAGED_NODE_COMPOSE: "RHEL-8.10.0-Nightly"
       MINUTETIP_MANAGED_NODE_IMAGE: RHEL-8.10.0
       LOCALVM_MANAGED_NODE_IMAGE: ${RHEL_8_10_image}
   - when: managed_node == rhel9
     environment+:
       SR_ANSIBLE_VER: "2.17"
-      COMPOSE_MANAGED_NODE: "RHEL-9.9.0-Nightly"
+      TF_MANAGED_NODE_COMPOSE: "RHEL-9.9.0-Nightly"
       MINUTETIP_MANAGED_NODE_IMAGE: RHEL-9.9.0
       LOCALVM_MANAGED_NODE_IMAGE: ${RHEL_9_9_image}
 
   # Per-version mappings for control node.
   - when: control_node == rhel9
     environment+:
-      COMPOSE_CONTROLLER_NODE: "RHEL-9-Nightly"
+      TF_CONTROL_NODE_COMPOSE: "RHEL-9-Nightly"
       MINUTETIP_CONTROL_NODE_IMAGE: $@{control_node}
       LOCALVM_CONTROL_NODE_IMAGE: ${RHEL_9_latest_image}
   - when: control_node == rhel10
     environment+:
-      COMPOSE_CONTROLLER_NODE: "RHEL-10-Nightly"
+      TF_CONTROL_NODE_COMPOSE: "RHEL-10-Nightly"
       MINUTETIP_CONTROL_NODE_IMAGE: $@{control_node}
       LOCALVM_CONTROL_NODE_IMAGE: ${RHEL_10_latest_image}
 
@@ -69,12 +69,12 @@ adjust:
       - name: control-node01
         role: control_node
         how: artemis
-        image: ${COMPOSE_CONTROLLER_NODE}
+        image: ${TF_CONTROL_NODE_COMPOSE}
         arch: x86_64
       - name: managed-node01
         role: managed_node
         how: artemis
-        image: ${COMPOSE_MANAGED_NODE}
+        image: ${TF_MANAGED_NODE_COMPOSE}
         arch: x86_64
 
   # ---- 1minutetip VMs ----
