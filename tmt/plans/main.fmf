@@ -64,7 +64,7 @@ adjust:
       LOCALVM_CONTROL_NODE_IMAGE: ${RHEL_10_latest_image}
 
   # ---- Testing Farm (CI) ----
-  - when: initiator == github-ci or initiator == rhel-ci
+  - when: initiator == github-ci and infra == testing-farm or initiator == rhel-ci
     provision+:
       - name: control-node01
         role: control_node
@@ -78,10 +78,8 @@ adjust:
         arch: x86_64
 
   # ---- 1minutetip VMs ----
-  # Example: tmt -c 1minutetip=true -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
+  # Example: tmt -c infra=minutetip -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
+  - when: infra == minutetip
     provision+:
       - name: control-node01
         role: control_node
@@ -94,9 +92,7 @@ adjust:
 
   # ---- Local VMs (virtual) ----
   # Example: tmt -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
-  - when: >-
-      initiator is not defined
-      and 1minutetip is not defined
+  - when: infra is not defined
     provision+:
       - name: control-node01
         role: control_node
