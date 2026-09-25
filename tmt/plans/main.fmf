@@ -64,7 +64,8 @@ adjust:
       LOCALVM_CONTROL_NODE_IMAGE: ${RHEL_10_latest_image}
 
   # ---- Testing Farm (CI) ----
-  - when: initiator == github-ci or initiator == rhel-ci
+  # osci/rhel-ci does not allow to set own context for infra (yet) so if the initiator is rhel-ci, we want to use testing-farm/artemis always
+  - when: initiator == rhel-ci or infra == testing-farm
     provision+:
       - name: control-node01
         role: control_node
@@ -78,10 +79,8 @@ adjust:
         arch: x86_64
 
   # ---- 1minutetip VMs ----
-  # Example: tmt -c 1minutetip=true -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
+  # Example: tmt -c infra=minutetip -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
+  - when: infra == minutetip
     provision+:
       - name: control-node01
         role: control_node
@@ -94,9 +93,9 @@ adjust:
 
   # ---- Local VMs (virtual) ----
   # Example: tmt -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
-  - when: >-
-      initiator is not defined
-      and 1minutetip is not defined
+  # initiator rhel-ci is excluded as we want to always use testing-farm/artemis with rhel-ci.
+  # Not excluding the provision+ block here leads to tmt error (duplicate phase name)
+  - when: infra is not defined and initiator != rhel-ci
     provision+:
       - name: control-node01
         role: control_node
