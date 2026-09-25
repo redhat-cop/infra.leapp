@@ -1,4 +1,31 @@
 summary: Base plan for infra.leapp tests
+
+environment:
+  SR_ANSIBLE_VER: ""
+  SR_REPO_NAME: ""
+  SR_PYTHON_VERSION: 3.12
+  SR_ONLY_TESTS: ""
+  SR_TEST_LOCAL_CHANGES: true
+  SR_PR_NUM: ""
+  SR_LSR_USER: ""
+  SR_LSR_DOMAIN: ""
+  SR_LSR_SSH_KEY: ""
+  SR_ARTIFACTS_DIR: ""
+  SR_ARTIFACTS_URL: ""
+  SR_TFT_DEBUG: false
+  TMT_CONTEXT_INITIATOR: $@{initiator}
+  TMT_CONTEXT_INFRA: $@{infra}
+
+discover:
+  - name: Prepare managed node
+    how: fmf
+    where: managed_node
+    filter: tag:prep_managed_node
+  - name: Prepare control node
+    how: fmf
+    where: control_node
+    filter: tag:prep_control_node
+
 adjust:
   # File that provides URLs for images and repositories
   - when: initiator is not defined
@@ -10,150 +37,87 @@ adjust:
   - when: managed_node == rhel7
     environment+:
       SR_ANSIBLE_VER: "2.14"
-      COMPOSE_MANAGED_NODE: "RHEL-7-LatestUpdated"
+      TF_MANAGED_NODE_COMPOSE: "RHEL-7-LatestUpdated"
+      MINUTETIP_MANAGED_NODE_IMAGE: RHEL-7.9
+      LOCALVM_MANAGED_NODE_IMAGE: ${RHEL_7_9_image}
   - when: managed_node == rhel8
     environment+:
       SR_ANSIBLE_VER: "2.16"
-      COMPOSE_MANAGED_NODE: "RHEL-8.10.0-Nightly"
+      TF_MANAGED_NODE_COMPOSE: "RHEL-8.10.0-Nightly"
+      MINUTETIP_MANAGED_NODE_IMAGE: RHEL-8.10.0
+      LOCALVM_MANAGED_NODE_IMAGE: ${RHEL_8_10_image}
   - when: managed_node == rhel9
     environment+:
       SR_ANSIBLE_VER: "2.17"
-      COMPOSE_MANAGED_NODE: "RHEL-9.9.0-Nightly"
+      TF_MANAGED_NODE_COMPOSE: "RHEL-9.9.0-Nightly"
+      MINUTETIP_MANAGED_NODE_IMAGE: RHEL-9.9.0
+      LOCALVM_MANAGED_NODE_IMAGE: ${RHEL_9_9_image}
 
   # Per-version mappings for control node.
   - when: control_node == rhel9
     environment+:
-      COMPOSE_CONTROLLER_NODE: "RHEL-9-Nightly"
+      TF_CONTROL_NODE_COMPOSE: "RHEL-9-Nightly"
+      MINUTETIP_CONTROL_NODE_IMAGE: $@{control_node}
+      LOCALVM_CONTROL_NODE_IMAGE: ${RHEL_9_latest_image}
   - when: control_node == rhel10
     environment+:
-      COMPOSE_CONTROLLER_NODE: "RHEL-10-Nightly"
+      TF_CONTROL_NODE_COMPOSE: "RHEL-10-Nightly"
+      MINUTETIP_CONTROL_NODE_IMAGE: $@{control_node}
+      LOCALVM_CONTROL_NODE_IMAGE: ${RHEL_10_latest_image}
 
   # ---- Testing Farm (CI) ----
-  - when: initiator == testing-farm
+  - when: initiator == github-ci and infra == testing-farm or initiator == rhel-ci
     provision+:
       - name: control-node01
         role: control_node
         how: artemis
-        image: ${COMPOSE_CONTROLLER_NODE}
+        image: ${TF_CONTROL_NODE_COMPOSE}
         arch: x86_64
       - name: managed-node01
         role: managed_node
         how: artemis
-        image: ${COMPOSE_MANAGED_NODE}
+        image: ${TF_MANAGED_NODE_COMPOSE}
         arch: x86_64
 
   # ---- 1minutetip VMs ----
-  # Example: tmt -c 1minutetip=true -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
+  # Example: tmt -c infra=minutetip -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
+  - when: infra == minutetip
     provision+:
       - name: control-node01
         role: control_node
         how: minute
-        image: rhel9
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
-      and managed_node == rhel7
-    provision+:
+        image: ${MINUTETIP_CONTROL_NODE_IMAGE}
       - name: managed-node01
         role: managed_node
         how: minute
-        image: RHEL-7.9
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
-      and managed_node == rhel8
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: minute
-        image: RHEL-8.10.0
-  - when: >-
-      initiator is not defined
-      and 1minutetip == true
-      and managed_node == rhel9
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: minute
-        image: RHEL-9.9.0
-
-  # ---- Local reporting ----
-  - when: initiator is not defined
-    report:
-      - how: display
-      - how: html
-        open: false
+        image: ${MINUTETIP_MANAGED_NODE_IMAGE}
 
   # ---- Local VMs (virtual) ----
   # Example: tmt -c managed_node=rhel8 -c control_node=rhel9 try -p /plans/integration
-  - when: >-
-      initiator is not defined
-      and 1minutetip is not defined
+  - when: infra is not defined
     provision+:
       - name: control-node01
         role: control_node
         how: virtual
         connection: system
-        image: ${RHEL_9_latest_image}
-  - when: >-
-      initiator is not defined
-      and 1minutetip is not defined
-      and managed_node == rhel7
-    provision+:
+        image: ${LOCALVM_CONTROL_NODE_IMAGE}
       - name: managed-node01
         role: managed_node
         how: virtual
         connection: system
-        image: ${RHEL_7_9_image}
-  - when: >-
-      initiator is not defined
-      and 1minutetip is not defined
-      and managed_node == rhel8
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: virtual
-        connection: system
-        image: ${RHEL_8_10_image}
-  - when: >-
-      initiator is not defined
-      and 1minutetip is not defined
-      and managed_node == rhel9
-    provision+:
-      - name: managed-node01
-        role: managed_node
-        how: virtual
-        connection: system
-        image: ${RHEL_9_9_image}
+        image: ${LOCALVM_MANAGED_NODE_IMAGE}
 
-environment:
-    SR_ANSIBLE_VER: ""
-    SR_REPO_NAME: ""
-    SR_PYTHON_VERSION: 3.12
-    SR_ONLY_TESTS: ""
-    SR_TEST_LOCAL_CHANGES: true
-    SR_PR_NUM: ""
-    SR_LSR_USER: ""
-    SR_LSR_DOMAIN: ""
-    SR_LSR_SSH_KEY: ""
-    SR_ARTIFACTS_DIR: ""
-    SR_ARTIFACTS_URL: ""
-    SR_TFT_DEBUG: false
 prepare:
   - name: Replaces repositories with custom repos
     order: 10
-    script: ./tmt/plans/scripts/replace_repos_with_custom_repos.sh
-discover:
-  - name: Prepare managed node
-    how: fmf
-    where: managed_node
-    filter: tag:prep_managed_node
-  - name: Setup control node
-    how: fmf
-    where: control_node
-    filter: tag:setup_control_node
+    script: $TMT_TREE/tmt/scripts/replace_repos_with_custom_repos.sh
+
 execute:
-    how: tmt
+  how: tmt
+
+report:
+  # ---- Local reporting ----
+  - when: initiator is not defined
+  - how: display
+  - how: html
+    open: false
