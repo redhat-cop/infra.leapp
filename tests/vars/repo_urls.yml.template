@@ -1,7 +1,8 @@
 ---
 # Repository URL templates
 # Note: These placeholders are replaced by environment variables
-# See tests/tmt/setup_control_node/setup_control_node.sh for the substitution logic
+# and stored in TMT_PLAN_DATA/vars from where it's loaded during runtime.
+# See tests/tmt/prep_control_node/prep_control_node.sh for the substitution logic
 repo_urls:
   rhel7:
     extras:

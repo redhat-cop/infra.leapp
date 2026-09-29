@@ -3,7 +3,7 @@
   hosts: all
   vars_files:
     - ../../../tests/vars/common_upgrade_vars.yml
-    - ../../../tests/vars/repo_urls.yml
+    - "{{ lookup('env', 'TMT_PLAN_DATA') }}/vars/repo_urls.yml"
   vars:
     remediation_name: "{{ lookup('env', 'REMEDIATION_NAME') }}"
     expected_inhibitor: "{{ lookup('env', 'INHIBITOR_NAME') | default(remediation_name, true) }}"

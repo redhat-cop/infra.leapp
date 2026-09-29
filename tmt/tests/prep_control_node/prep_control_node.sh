@@ -109,6 +109,17 @@ SR_ANSIBLE_INJECT_FACT_VARS="${SR_ANSIBLE_INJECT_FACT_VARS:-false}"
 [ "$SR_ANSIBLE_INJECT_FACT_VARS" = True ] && export SR_ANSIBLE_INJECT_FACT_VARS=true
 [ "$SR_ANSIBLE_INJECT_FACT_VARS" = False ] && export SR_ANSIBLE_INJECT_FACT_VARS=false
 
+replace_repo_urls_vars() {
+    local repo_vars_file="$1"
+    [ -n "$RHEL_7_9_EXTRAS_REPO_URL" ] && sed -i "s|__RHEL_7_9_EXTRAS_REPO_URL__|$RHEL_7_9_EXTRAS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_8_10_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_8_10_BASEOS_REPO_URL__|$RHEL_8_10_BASEOS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_8_10_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_8_10_APPSTREAM_REPO_URL__|$RHEL_8_10_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_9_9_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_9_9_BASEOS_REPO_URL__|$RHEL_9_9_BASEOS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_9_9_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_9_9_APPSTREAM_REPO_URL__|$RHEL_9_9_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_10_3_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_10_3_BASEOS_REPO_URL__|$RHEL_10_3_BASEOS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_10_3_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_3_APPSTREAM_REPO_URL__|$RHEL_10_3_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+}
+
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "~~~ Environment Variables Definition - BEGIN"
 echo "ARCH_CONTROLLER=${ARCH_CONTROLLER}"
@@ -162,19 +173,16 @@ rlJournalStart
             ;;
             *)
                 rlLogInfo "Installing redhat.leapp collection & dependencies from rpm"
-                coll_path='/usr/share/ansible/collections/ansible_collections/redhat/leapp'
                 rlRun "rpm -q --whatprovides ansible-collection-redhat-leapp || dnf install ansible-collection-redhat-leapp -y"
+                coll_path=${TMT_TREE}
         esac
 
-        repo_vars_file="$coll_path/tests/vars/repo_urls.yml"
-        [ -n "$RHEL_7_9_EXTRAS_REPO_URL" ] && sed -i "s|__RHEL_7_9_EXTRAS_REPO_URL__|$RHEL_7_9_EXTRAS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_8_10_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_8_10_BASEOS_REPO_URL__|$RHEL_8_10_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_8_10_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_8_10_APPSTREAM_REPO_URL__|$RHEL_8_10_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_9_9_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_9_9_BASEOS_REPO_URL__|$RHEL_9_9_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_9_9_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_9_9_APPSTREAM_REPO_URL__|$RHEL_9_9_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_10_3_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_10_3_BASEOS_REPO_URL__|$RHEL_10_3_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_10_3_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_3_APPSTREAM_REPO_URL__|$RHEL_10_3_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        rlRun "cat $repo_vars_file"
+        repo_vars_template="$coll_path/tests/vars/repo_urls.yml.template"
+        repo_vars_file="$TMT_PLAN_DATA/vars/repo_urls.yml"
+        mkdir -p "$(dirname "$repo_vars_file")"
+        rlRun "cp '$repo_vars_template' '$repo_vars_file'"
+        replace_repo_urls_vars "${repo_vars_file}"
+
         leappDebugRepos
 
         lsrSetAnsibleInjectFactVars "$SR_ANSIBLE_INJECT_FACT_VARS"
