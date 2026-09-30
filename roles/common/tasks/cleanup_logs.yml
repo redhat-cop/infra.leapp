@@ -3,11 +3,28 @@
   ansible.builtin.include_tasks: set_facts.yml
   tags: tests::cleanup
 
+- name: cleanup_logs | Cleanup | Check if the leapp log directory exists
+  ansible.builtin.stat:
+    path: /var/log/leapp
+  register: leapp_log_dir
+  tags: tests::cleanup
+
+- name: cleanup_logs | Cleanup | Find log files inside leapp log directory
+  ansible.builtin.find:
+    paths: /var/log/leapp
+    patterns:
+      - "*.log"
+      - "*.json"
+      - "*.txt"
+  register: leapp_log_files
+  when: leapp_log_dir.stat.exists and leapp_log_dir.stat.isdir
+  tags: tests::cleanup
+
 - name: cleanup_logs | Cleanup | Remove log files
-  ansible.builtin.shell: |
-    set -euxo pipefail
-    rm -f /var/log/leapp/*.log
-    rm -f /var/log/leapp/*.json
-    rm -f /var/log/leapp/*.txt
-  changed_when: true
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ leapp_log_files.files | default([]) }}"
+  loop_control:
+    label: "{{ item.path }}"
   tags: tests::cleanup
