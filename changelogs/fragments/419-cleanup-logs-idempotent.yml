@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Make sure the ``cleanup_logs`` tasks are idempotent so they no longer report ``changed`` when there are no Leapp log files to remove (https://github.com/redhat-cop/infra.leapp/issues/419)."
