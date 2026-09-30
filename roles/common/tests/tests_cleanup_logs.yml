@@ -1,0 +1,112 @@
+---
+## Tests roles/common/tasks/cleanup_logs.yml.
+#
+## It exercises the real task file against a temporary log directory
+## (__leapp_cleanup_log_dir seam) so the path /var/log/leapp is never touched
+## during the test.
+#
+
+- name: Test cleanup_logs
+  hosts: all
+  vars:
+    job_name: test_cleanup_logs
+  tasks:
+    - name: Test | Create temporary directory
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: leapp-cleanup
+      register: __test_tmp_dir
+
+    - name: Test | Run cleanup_logs scenarios
+      block:
+        - name: Test | Scenario 1 - a missing log directory is skipped without changes
+          vars:
+            __leapp_cleanup_log_dir: "{{ __test_tmp_dir.path }}/scenario1"
+          block:
+            - name: Test | Scenario 1 | Include cleanup_logs
+              ansible.builtin.include_role:
+                name: infra.leapp.common
+                tasks_from: cleanup_logs.yml
+
+            - name: Test | Scenario 1 | Assert nothing was searched or removed
+              ansible.builtin.assert:
+                that:
+                  - not leapp_log_dir.stat.exists
+                  - leapp_log_files is skipped
+                  - leapp_log_files_removed is not changed
+                fail_msg: >-
+                  A missing log directory must be skipped without searching it and without reporting a change.
+
+        - name: Test | Scenario 2 - matching log files are removed and other content is kept
+          vars:
+            __leapp_cleanup_log_dir: "{{ __test_tmp_dir.path }}/scenario2"
+            __test_log_files:
+              - leapp-report.txt
+              - leapp-report.json
+              - leapp-preupgrade.log
+            __test_kept_files:
+              - keep.conf
+              - archive/nested.log
+          block:
+            - name: Test | Scenario 2 | Create the log directory and a subdirectory
+              ansible.builtin.file:
+                path: "{{ __leapp_cleanup_log_dir }}/archive"
+                state: directory
+                mode: "0755"
+
+            - name: Test | Scenario 2 | Create matching and non-matching files
+              ansible.builtin.copy:
+                content: "test\n"
+                dest: "{{ __leapp_cleanup_log_dir }}/{{ item }}"
+                mode: "0644"
+              loop: "{{ __test_log_files + __test_kept_files }}"
+
+            - name: Test | Scenario 2 | Include cleanup_logs
+              ansible.builtin.include_role:
+                name: infra.leapp.common
+                tasks_from: cleanup_logs.yml
+
+            - name: Test | Scenario 2 | Assert the matching files were found and removed
+              ansible.builtin.assert:
+                that:
+                  - leapp_log_files.matched == __test_log_files | length
+                  - leapp_log_files_removed is changed
+                fail_msg: >-
+                  cleanup_logs must find and remove every matching log file and
+                  report a change.
+
+            - name: Test | Scenario 2 | Check the matching files are gone
+              ansible.builtin.stat:
+                path: "{{ __leapp_cleanup_log_dir }}/{{ item }}"
+              register: __test_removed_stat
+              failed_when: __test_removed_stat.stat.exists
+              loop: "{{ __test_log_files }}"
+
+            - name: Test | Scenario 2 | Check the other files and subdirectories are kept
+              ansible.builtin.stat:
+                path: "{{ __leapp_cleanup_log_dir }}/{{ item }}"
+              register: __test_kept_stat
+              failed_when: not __test_kept_stat.stat.exists
+              loop: "{{ __test_kept_files }}"
+
+            # Idempotency: the same directory now has no matching files left
+            - name: Test | Scenario 2 | Include cleanup_logs a second time
+              ansible.builtin.include_role:
+                name: infra.leapp.common
+                tasks_from: cleanup_logs.yml
+
+            - name: Test | Scenario 2 | Assert the second run reports no change
+              ansible.builtin.assert:
+                that:
+                  - leapp_log_files.matched == 0
+                  - leapp_log_files_removed is not changed
+                fail_msg: >-
+                  A second run with no matching log files left must not report
+                  a change.
+
+      always:
+        - name: Test | Cleanup temporary directory
+          ansible.builtin.file:
+            path: "{{ __test_tmp_dir.path }}"
+            state: absent
+          tags: tests::cleanup

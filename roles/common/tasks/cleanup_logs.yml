@@ -1,17 +1,24 @@
 ---
+# Remove the Leapp log files (*.log, *.json, *.txt) from the Leapp log directory.
+#
+# Reports changed only when at least one file is removed.
+#
+# Optional variables (tests redirect this to a temporary location):
+#   __leapp_cleanup_log_dir (optional, default: '/var/log/leapp')
+
 - name: cleanup_logs | Ensure ansible_facts used by role
   ansible.builtin.include_tasks: set_facts.yml
   tags: tests::cleanup
 
 - name: cleanup_logs | Cleanup | Check if the leapp log directory exists
   ansible.builtin.stat:
-    path: /var/log/leapp
+    path: "{{ __leapp_cleanup_log_dir | default('/var/log/leapp') }}"
   register: leapp_log_dir
   tags: tests::cleanup
 
 - name: cleanup_logs | Cleanup | Find log files inside leapp log directory
   ansible.builtin.find:
-    paths: /var/log/leapp
+    paths: "{{ __leapp_cleanup_log_dir | default('/var/log/leapp') }}"
     patterns:
       - "*.log"
       - "*.json"
@@ -27,4 +34,5 @@
   loop: "{{ leapp_log_files.files | default([]) }}"
   loop_control:
     label: "{{ item.path }}"
+  register: leapp_log_files_removed
   tags: tests::cleanup
