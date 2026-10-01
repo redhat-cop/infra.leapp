@@ -28,7 +28,7 @@ jobs:
     # with:
     #   working_directory: /home/runner/collections
   sanity:
-    uses: ansible/ansible-content-actions/.github/workflows/sanity.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
+    uses: ansible/ansible-content-actions/.github/workflows/sanity.yaml@cbdec1f72eeee38b7e60d0f2346c66e622eea02a # main
     with:
       extra_matrix_entries: '[{"name": "sanity-py3.12-2.16"}]'
   build-import:
