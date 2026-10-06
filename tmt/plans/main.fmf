@@ -112,7 +112,7 @@ adjust:
 
 prepare:
   - name: Replaces repositories with custom repos
-    order: 10
+    order: 40
     script: $TMT_TREE/tmt/scripts/replace_repos_with_custom_repos.sh
 
 execute:
