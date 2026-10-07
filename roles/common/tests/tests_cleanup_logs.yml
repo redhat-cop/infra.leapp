@@ -31,9 +31,9 @@
             - name: Test | Scenario 1 | Assert nothing was searched or removed
               ansible.builtin.assert:
                 that:
-                  - not leapp_log_dir.stat.exists
-                  - leapp_log_files is skipped
-                  - leapp_log_files_removed is not changed
+                  - not __leapp_log_dir.stat.exists
+                  - __leapp_log_files is skipped
+                  - __leapp_log_files_removed is not changed
                 fail_msg: >-
                   A missing log directory must be skipped without searching it and without reporting a change.
 
@@ -69,8 +69,8 @@
             - name: Test | Scenario 2 | Assert the matching files were found and removed
               ansible.builtin.assert:
                 that:
-                  - leapp_log_files.matched == __test_log_files | length
-                  - leapp_log_files_removed is changed
+                  - __leapp_log_files.matched == __test_log_files | length
+                  - __leapp_log_files_removed is changed
                 fail_msg: >-
                   cleanup_logs must find and remove every matching log file and
                   report a change.
@@ -98,8 +98,8 @@
             - name: Test | Scenario 2 | Assert the second run reports no change
               ansible.builtin.assert:
                 that:
-                  - leapp_log_files.matched == 0
-                  - leapp_log_files_removed is not changed
+                  - __leapp_log_files.matched == 0
+                  - __leapp_log_files_removed is not changed
                 fail_msg: >-
                   A second run with no matching log files left must not report
                   a change.
