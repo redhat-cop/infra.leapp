@@ -39,14 +39,15 @@ The workflow parses the scope and optional subtype from the comment, builds a ma
 
     ```bash
     # Provision local VMs — all integration tests
-    $ tmt -c managed_node=<platform> try -p /plans/integration
+    $ tmt -c control_node=<platform> -c managed_node=<platform> try -p /plans/integration
     # Only custom upgrade type
-    $ tmt -c managed_node=<platform> -c upgrade_type=custom try -p /plans/integration
+    $ tmt -c control_node=<platform> -c managed_node=<platform> -c upgrade_type=custom try -p /plans/integration
     # Provision VMs in 1minutetip
-    $ tmt -c 1minutetip=true -c managed_node=<platform> try -p /plans/integration
+    $ tmt -c infra=minutetip -c control_node=<platform> -c managed_node=<platform> try -p /plans/integration
     ```
 
-    `<platform>` can be `rhel7`, `rhel8`, or `rhel9`.
+     `control_node` `<platform>` can be `rhel9` or `rhel10`.
+     `managed_node` `<platform>` can be `rhel7`, `rhel8`, or `rhel9`.
 
 ### Running in Testing Farm
 
@@ -67,7 +68,8 @@ The workflow parses the scope and optional subtype from the comment, builds a ma
         -e SR_GITHUB_ORG=redhat-cop \
         -e SR_PR_NUM=303 \
         -e SR_TEST_LOCAL_CHANGES=false \
-        -c initiator=testing-farm \
+        -c initiator=github-ci \
+        -c infra=testing-farm \
         -c managed_node=rhel8 \
         -c control_node=rhel9 \
         -c upgrade_type=custom \
