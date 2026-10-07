@@ -13,7 +13,7 @@
 - name: cleanup_logs | Cleanup | Check if the leapp log directory exists
   ansible.builtin.stat:
     path: "{{ __leapp_cleanup_log_dir | default('/var/log/leapp') }}"
-  register: leapp_log_dir
+  register: __leapp_log_dir
   tags: tests::cleanup
 
 - name: cleanup_logs | Cleanup | Find log files inside leapp log directory
@@ -23,16 +23,16 @@
       - "*.log"
       - "*.json"
       - "*.txt"
-  register: leapp_log_files
-  when: leapp_log_dir.stat.exists and leapp_log_dir.stat.isdir
+  register: __leapp_log_files
+  when: __leapp_log_dir.stat.exists and __leapp_log_dir.stat.isdir
   tags: tests::cleanup
 
 - name: cleanup_logs | Cleanup | Remove log files
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
-  loop: "{{ leapp_log_files.files | default([]) }}"
+  loop: "{{ __leapp_log_files.files | default([]) }}"
   loop_control:
     label: "{{ item.path }}"
-  register: leapp_log_files_removed
+  register: __leapp_log_files_removed
   tags: tests::cleanup
