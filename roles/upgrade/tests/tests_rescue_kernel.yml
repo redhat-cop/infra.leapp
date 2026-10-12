@@ -188,6 +188,69 @@
                   boot files (regular kernel or initramfs) must never be
                   matched and must remain on disk.
 
+        # The recreation command is replaced with `false`, so it fails after the
+        # old rescue files were removed; the role must put them back and fail.
+        - name: Test | Scenario 5 - recreation fails, original rescue files are restored
+          block:
+            - name: Test | Scenario 5 | Empty the boot directory
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}"
+                state: "{{ item }}"
+                mode: "0755"
+              loop:
+                - absent
+                - directory
+
+            - name: Test | Scenario 5 | Create fake rescue kernel files with known content
+              ansible.builtin.copy:
+                content: "original {{ item }}\n"
+                dest: "{{ __test_boot_dir.path }}/{{ item }}"
+                mode: "0644"
+              loop: "{{ __test_rescue_files }}"
+
+            - name: Test | Scenario 5 | Run recreate-rescue-kernel with a failing recreation command
+              ansible.builtin.include_role:
+                name: infra.leapp.upgrade
+                tasks_from: recreate-rescue-kernel.yml
+              vars:
+                __leapp_rescue_boot_path: "{{ __test_boot_dir.path }}"
+                __leapp_rescue_install_script: "false"
+
+            - name: Test | Scenario 5 | Fail if the failing recreation unexpectedly succeeded
+              ansible.builtin.fail:
+                msg: Expected the recreation command to fail, but it did not.
+          rescue:
+            - name: Test | Scenario 5 | Assert the role failed after restoring the files
+              ansible.builtin.assert:
+                that:
+                  - "'Fail after restoring the old rescue kernel files' in ansible_failed_task.name"
+                fail_msg: >-
+                  Expected the role to fail after restoring the rescue files,
+                  but the failure came from a different task:
+                  {{ ansible_failed_task.name }}.
+
+            - name: Test | Scenario 5 | Read the rescue files after the failed recreation
+              ansible.builtin.slurp:
+                src: "{{ __test_boot_dir.path }}/{{ item }}"
+              loop: "{{ __test_rescue_files }}"
+              register: __test_scenario5_content
+
+            - name: Test | Scenario 5 | Stat the staging directory
+              ansible.builtin.stat:
+                path: "{{ __rescue_kernel_staging.path }}"
+              register: __test_scenario5_staging
+
+            - name: Test | Scenario 5 | Assert the original files are back and the staging directory is gone
+              ansible.builtin.assert:
+                that:
+                  - __test_scenario5_content.results | map(attribute='content') | map('b64decode') | list
+                    == __test_rescue_files | map('regex_replace', '^(.*)$', 'original \\1\n') | list
+                  - not __test_scenario5_staging.stat.exists
+                fail_msg: >-
+                  When the recreation fails, the original rescue kernel files
+                  must be restored with their content and the staging
+                  directory must be removed.
+
       always:
         - name: Test | Cleanup temporary boot directory
           ansible.builtin.file:
