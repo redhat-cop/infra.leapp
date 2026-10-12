@@ -45,6 +45,7 @@
         path: /var/tmp
         suffix: leapp-rescue
       register: __rescue_kernel_staging
+      check_mode: false
 
     - name: recreate-rescue-kernel | Stage the old rescue kernel files
       ansible.builtin.copy:
@@ -98,3 +99,4 @@
         path: "{{ __rescue_kernel_staging.path }}"
         state: absent
       when: __rescue_kernel_staging.path is defined
+      check_mode: false
