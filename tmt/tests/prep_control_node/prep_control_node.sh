@@ -174,7 +174,7 @@ rlJournalStart
             *)
                 rlLogInfo "Installing redhat.leapp collection & dependencies from rpm"
                 rlRun "rpm -q --whatprovides ansible-collection-redhat-leapp || dnf install ansible-collection-redhat-leapp -y"
-                coll_path=${TMT_TREE}
+                coll_path='/usr/share/ansible/collections/ansible_collections/redhat/leapp'
         esac
 
         repo_vars_template="$coll_path/tests/vars/repo_urls.yml.template"
