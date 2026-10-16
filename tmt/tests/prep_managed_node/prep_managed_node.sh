@@ -15,7 +15,7 @@ SR_GITHUB_ORG="${SR_GITHUB_ORG:-linux-system-roles}"
 #   Python version to install ansible-core with (EL 8, 9, 10 only).
 
 rlJournalStart
-    rlPhaseStartSetup
+    rlPhaseStart FAIL "Prepare managed node"
         rlRun "rlImport /library/upstream_library"
         rlRun "rlImport leapp_lib"
 
