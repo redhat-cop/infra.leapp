@@ -175,6 +175,23 @@ rlJournalStart
                 rlLogInfo "Installing redhat.leapp collection & dependencies from rpm"
                 rlRun "rpm -q --whatprovides ansible-collection-redhat-leapp || dnf install ansible-collection-redhat-leapp -y"
                 coll_path='/usr/share/ansible/collections/ansible_collections/redhat/leapp'
+                if [ "$SR_TEST_LOCAL_CHANGES" == true ]; then
+                    # TMT_TREE points to the repo root
+                    rlLogInfo "Replace rpm content with content from TMT_TREE"
+                    rlRun "rm -rv $coll_path/*"
+                    rlRun "cp -r $TMT_TREE/. $coll_path/"
+                    # when copying over the local TMT_TREE content we need to fix namespace references to redhat.leapp
+                    rlRun "find '$coll_path' -type f ! -name galaxy.yml -exec sed \
+                        -e \"s/infra\.leapp/redhat.leapp/g\" \
+                        -e \"s/leapp_system_roles_collection: fedora.linux_system_roles/leapp_system_roles_collection: redhat.rhel_system_roles/g\" \
+                        -e \"s/default('fedora.linux_system_roles')/default('redhat.rhel_system_roles')/g\" \
+                        -e \"s/| fedora.linux_system_roles |/| redhat.rhel_system_roles |/g\" -i {} \;"
+                    rlRun "sed -i -e 's/namespace: infra/namespace: redhat/g' \
+                        -e 's/version: .*/version: %{version}/g' \
+                        -e 's|^homepage: .*|homepage: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/upgrading_from_rhel_8_to_rhel_9/upgrading-large-deployments-by-using-ansible-roles_upgrading-from-rhel-8-to-rhel-9|g' \
+                        -e 's/\"fedora\.linux_system_roles\": \"\*\"/\"redhat.rhel_system_roles\": \"*\"/g' \
+                        $coll_path/galaxy.yml"
+                fi
         esac
 
         repo_vars_template="$coll_path/tests/vars/repo_urls.yml.template"
