@@ -2,7 +2,11 @@ framework: beakerlib
 test: ../../run_test.sh
 order: 20
 require:
-    - beakerlib
-    - type: library
-      url: https://github.com/linux-system-roles/tft-tests
-      name: /library/upstream_library
+  - beakerlib
+  - type: library
+    url: https://github.com/linux-system-roles/tft-tests
+    name: /library/upstream_library
+
+adjust:
+  - when: initiator == rhel-ci, downstream
+    test: '/usr/share/ansible/collections/ansible_collections/redhat/leapp/tmt/tests/run_test.sh'
