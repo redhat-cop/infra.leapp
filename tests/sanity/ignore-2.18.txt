@@ -1,1 +1,0 @@
-plugins/modules/sr_fingerprint.py validate-modules:missing-gplv3-license
