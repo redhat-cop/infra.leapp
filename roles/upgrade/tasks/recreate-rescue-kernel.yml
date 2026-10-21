@@ -70,6 +70,12 @@
       changed_when: true
       register: __rescue_kernel_reinstall
 
+    - name: recreate-rescue-kernel | Remove the staging directory after a successful recreation
+      ansible.builtin.file:
+        path: "{{ __rescue_kernel_staging.path }}"
+        state: absent
+      check_mode: false
+
   rescue:
     - name: recreate-rescue-kernel | Find the staged rescue kernel files
       ansible.builtin.find:
@@ -86,17 +92,16 @@
       loop: "{{ __rescue_kernel_staged.files | default([]) }}"
       when: __rescue_kernel_staging.path is defined
 
+    - name: recreate-rescue-kernel | Remove the staging directory after a successful restore
+      ansible.builtin.file:
+        path: "{{ __rescue_kernel_staging.path }}"
+        state: absent
+      when: __rescue_kernel_staging.path is defined
+      check_mode: false
+
     - name: recreate-rescue-kernel | Fail after restoring the old rescue kernel files
       ansible.builtin.fail:
         msg: >-
           Recreating the rescue kernel failed in task
           '{{ ansible_failed_task.name }}'; the original rescue kernel files
           were restored. Error: {{ ansible_failed_result.msg | default('') }}
-
-  always:
-    - name: recreate-rescue-kernel | Remove the staging directory
-      ansible.builtin.file:
-        path: "{{ __rescue_kernel_staging.path }}"
-        state: absent
-      when: __rescue_kernel_staging.path is defined
-      check_mode: false
