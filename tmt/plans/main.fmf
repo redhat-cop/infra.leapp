@@ -121,6 +121,7 @@ execute:
 report:
   # ---- Local reporting ----
   - when: initiator is not defined
-  - how: display
-  - how: html
+    how: display
+  - when: initiator is not defined
+    how: html
     open: false
