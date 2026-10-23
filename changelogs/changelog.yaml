@@ -528,3 +528,29 @@ releases:
     - ci-add-coderabbit-config.yml
     - secure_logging.yml
     release_date: '2026-08-04'
+  1.7.7:
+    changes:
+      bugfixes:
+      - Call 'zipl' after boot loader changes on s390x architecture.
+      - Fix ``/var/log/leapp/ansible_leapp_*`` logs to retain the full initialization
+        record (job header, system facts, and non-RHEL packages)
+      - Fix latest-kernel remediation to select the newest installed kernel and remove
+        older kernels using RPM version ordering.
+      - Install the required ``dracut-config-rescue`` package to ensure the rescue
+        kernel is recreated correctly after the upgrade.
+      minor_changes:
+      - Add GPLv3 license header for sr_fingerprint module.
+      - Change structure of tmt plans, add new context dimension and parametrize tests
+        to be able to run tests in downstream.
+    fragments:
+    - 256-current-kernel-remediation.yml
+    - 412-rework-ci-test-pipeline.yml
+    - 420-install-dracut-config-rescue.yml
+    - 421-call-zipl-on-s390x.yml
+    - 437-parametrize-tests-for-downstream.yml
+    - 448-sr-fingerprint-gplv3-license.yml
+    - ci-fix-ansible-certification-failures.yml
+    - ci-use-commit-hash-add-permissions.yml
+    - ci-use-login-eq-systemroller.yml
+    - fix-ansible-leapp-log-overwrite.yml
+    release_date: '2026-10-23'

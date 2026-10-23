@@ -1,3 +1,0 @@
----
-minor_changes:
-  - "Change structure of tmt plans, add new context dimension and parametrize tests to be able to run tests in downstream."
