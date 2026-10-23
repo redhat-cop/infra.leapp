@@ -288,7 +288,7 @@ jobs:
             BEAKERLIB_HARNESS_URL_NO_VER=${{ secrets.BEAKERLIB_HARNESS_URL_NO_VER }};\
             SR_ANSIBLE_INJECT_FACT_VARS=false;\
             SR_ARTIFACTS_URL=${{ steps.set_vars.outputs.ARTIFACTS_URL }}"
-          tmt_context: "initiator=testing-farm;managed_node=${{ matrix.managed_node }};control_node=${{ matrix.control_node }}${{ matrix.upgrade_type && format(';upgrade_type={0}', matrix.upgrade_type) || '' }}"
+          tmt_context: "initiator=github-ci;infra=testing-farm;managed_node=${{ matrix.managed_node }};control_node=${{ matrix.control_node }}${{ matrix.upgrade_type && format(';upgrade_type={0}', matrix.upgrade_type) || '' }}"
           # Note that SR_LSR_SSH_KEY must be single-line, TF doesn't read multi-line variables fine.
           secrets: "SR_LSR_DOMAIN=${{ secrets.SR_LSR_DOMAIN }};\
             SR_LSR_SSH_KEY=${{ secrets.SR_LSR_SSH_KEY }}"

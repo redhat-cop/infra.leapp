@@ -1,0 +1,7 @@
+summary: Prepare control node for all tests
+test: ./prep_control_node.sh
+duration: 30m
+tag: prep_control_node
+order: 10
+require+:
+    - git

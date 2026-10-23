@@ -3,7 +3,7 @@
   hosts: all
   vars_files:
     - vars/common_upgrade_vars.yml
-    - vars/repo_urls.yml
+    - "{{ lookup('env', 'TMT_PLAN_DATA') }}/vars/repo_urls.yml"
   tasks:
     - name: Determine upgrade path from current RHEL version
       ansible.builtin.set_fact:

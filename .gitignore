@@ -113,6 +113,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+leapp_coll_env_file.yml
 
 # Spyder project settings
 .spyderproject

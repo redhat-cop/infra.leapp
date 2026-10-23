@@ -109,6 +109,17 @@ SR_ANSIBLE_INJECT_FACT_VARS="${SR_ANSIBLE_INJECT_FACT_VARS:-false}"
 [ "$SR_ANSIBLE_INJECT_FACT_VARS" = True ] && export SR_ANSIBLE_INJECT_FACT_VARS=true
 [ "$SR_ANSIBLE_INJECT_FACT_VARS" = False ] && export SR_ANSIBLE_INJECT_FACT_VARS=false
 
+replace_repo_urls_vars() {
+    local repo_vars_file="$1"
+    [ -n "$RHEL_7_9_EXTRAS_REPO_URL" ] && sed -i "s|__RHEL_7_9_EXTRAS_REPO_URL__|$RHEL_7_9_EXTRAS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_8_10_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_8_10_BASEOS_REPO_URL__|$RHEL_8_10_BASEOS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_8_10_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_8_10_APPSTREAM_REPO_URL__|$RHEL_8_10_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_9_9_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_9_9_BASEOS_REPO_URL__|$RHEL_9_9_BASEOS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_9_9_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_9_9_APPSTREAM_REPO_URL__|$RHEL_9_9_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_10_3_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_10_3_BASEOS_REPO_URL__|$RHEL_10_3_BASEOS_REPO_URL|g" "$repo_vars_file"
+    [ -n "$RHEL_10_3_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_3_APPSTREAM_REPO_URL__|$RHEL_10_3_APPSTREAM_REPO_URL|g" "$repo_vars_file"
+}
+
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "~~~ Environment Variables Definition - BEGIN"
 echo "ARCH_CONTROLLER=${ARCH_CONTROLLER}"
@@ -119,7 +130,7 @@ env | grep -E '^SR_'
 echo "~~~ Environment Variables Definition - END"
 
 rlJournalStart
-    rlPhaseStartSetup "Setup control node"
+    rlPhaseStart FAIL "Prepare control node"
         rlRun "rlImport /library/upstream_library"
         rlRun "rlImport leapp_lib"
 
@@ -129,45 +140,67 @@ rlJournalStart
             fi
         done
 
-        leappInstallAnsible "$SR_ANSIBLE_VER"
-        coll_path=~/.ansible/collections/ansible_collections/infra/leapp
-        mkdir -p "$coll_path"
-        if [ -d "$coll_path" ]; then
-            rlRun "rm -rf $coll_path"
-        fi
-        if [ "$SR_TEST_LOCAL_CHANGES" == true ]; then
-            # TMT_TREE points to the repo root
-            if [ ! -f "$TMT_TREE/galaxy.yml" ]; then
-                rlDie "Could not find galaxy.yml at TMT_TREE=$TMT_TREE"
-            fi
-            rlRun "cp -r $TMT_TREE/. $coll_path/"
-        else
-            rlRun "git clone -q https://github.com/$SR_GITHUB_ORG/$SR_REPO_NAME.git $coll_path --depth 1"
-            if [ -n "$SR_PR_NUM" ]; then
-                pushd "$coll_path" || exit
-                rlRun "git fetch origin pull/$SR_PR_NUM/head"
-                rlRun "git checkout FETCH_HEAD"
-                popd || exit
-                rlLog "Test from the pull request $SR_PR_NUM"
-            else
-                rlLog "Test from the main branch"
-            fi
-        fi
+        case ${TMT_CONTEXT_INITIATOR} in
+            'github-ci')
+                rlLogInfo "Installing infra.leapp collection & dependencies from upstream"
+                leappInstallAnsible "$SR_ANSIBLE_VER"
+                coll_path=~/.ansible/collections/ansible_collections/infra/leapp
+                mkdir -p "$coll_path"
+                if [ -d "$coll_path" ]; then
+                    rlRun "rm -rf $coll_path"
+                fi
+                if [ "$SR_TEST_LOCAL_CHANGES" == true ]; then
+                    # TMT_TREE points to the repo root
+                    if [ ! -f "$TMT_TREE/galaxy.yml" ]; then
+                        rlDie "Could not find galaxy.yml at TMT_TREE=$TMT_TREE"
+                    fi
+                    rlRun "cp -r $TMT_TREE/. $coll_path/"
+                else
+                    rlRun "git clone -q https://github.com/$SR_GITHUB_ORG/$SR_REPO_NAME.git $coll_path --depth 1"
+                    if [ -n "$SR_PR_NUM" ]; then
+                        pushd "$coll_path" || exit
+                        rlRun "git fetch origin pull/$SR_PR_NUM/head"
+                        rlRun "git checkout FETCH_HEAD"
+                        popd || exit
+                        rlLog "Test from the pull request $SR_PR_NUM"
+                    else
+                        rlLog "Test from the main branch"
+                    fi
+                fi
+                if ! rlRun "ansible-galaxy collection install -vv -r $coll_path/meta/collection-requirements.yml --timeout 600"; then
+                    rlDie "Failed to install Ansible dependencies"
+                fi
+            ;;
+            *)
+                rlLogInfo "Installing redhat.leapp collection & dependencies from rpm"
+                rlRun "rpm -q --whatprovides ansible-collection-redhat-leapp || dnf install ansible-collection-redhat-leapp -y"
+                coll_path='/usr/share/ansible/collections/ansible_collections/redhat/leapp'
+                if [ "$SR_TEST_LOCAL_CHANGES" == true ]; then
+                    # TMT_TREE points to the repo root
+                    rlLogInfo "Replace rpm content with content from TMT_TREE"
+                    rlRun "rm -rv $coll_path/*"
+                    rlRun "cp -r $TMT_TREE/. $coll_path/"
+                    # when copying over the local TMT_TREE content we need to fix namespace references to redhat.leapp
+                    rlRun "find '$coll_path' -type f ! -name galaxy.yml -exec sed \
+                        -e \"s/infra\.leapp/redhat.leapp/g\" \
+                        -e \"s/leapp_system_roles_collection: fedora.linux_system_roles/leapp_system_roles_collection: redhat.rhel_system_roles/g\" \
+                        -e \"s/default('fedora.linux_system_roles')/default('redhat.rhel_system_roles')/g\" \
+                        -e \"s/| fedora.linux_system_roles |/| redhat.rhel_system_roles |/g\" -i {} \;"
+                    rlRun "sed -i -e 's/namespace: infra/namespace: redhat/g' \
+                        -e 's/version: .*/version: %{version}/g' \
+                        -e 's|^homepage: .*|homepage: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/upgrading_from_rhel_8_to_rhel_9/upgrading-large-deployments-by-using-ansible-roles_upgrading-from-rhel-8-to-rhel-9|g' \
+                        -e 's/\"fedora\.linux_system_roles\": \"\*\"/\"redhat.rhel_system_roles\": \"*\"/g' \
+                        $coll_path/galaxy.yml"
+                fi
+        esac
 
-        repo_vars_file="$coll_path/tests/vars/repo_urls.yml"
-        [ -n "$RHEL_7_9_EXTRAS_REPO_URL" ] && sed -i "s|__RHEL_7_9_EXTRAS_REPO_URL__|$RHEL_7_9_EXTRAS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_8_10_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_8_10_BASEOS_REPO_URL__|$RHEL_8_10_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_8_10_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_8_10_APPSTREAM_REPO_URL__|$RHEL_8_10_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_9_9_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_9_9_BASEOS_REPO_URL__|$RHEL_9_9_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_9_9_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_9_9_APPSTREAM_REPO_URL__|$RHEL_9_9_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_10_3_BASEOS_REPO_URL" ] && sed -i "s|__RHEL_10_3_BASEOS_REPO_URL__|$RHEL_10_3_BASEOS_REPO_URL|g" "$repo_vars_file"
-        [ -n "$RHEL_10_3_APPSTREAM_REPO_URL" ] && sed -i "s|__RHEL_10_3_APPSTREAM_REPO_URL__|$RHEL_10_3_APPSTREAM_REPO_URL|g" "$repo_vars_file"
-        rlRun "cat $repo_vars_file"
+        repo_vars_template="$coll_path/tests/vars/repo_urls.yml.template"
+        repo_vars_file="$TMT_PLAN_DATA/vars/repo_urls.yml"
+        mkdir -p "$(dirname "$repo_vars_file")"
+        rlRun "cp '$repo_vars_template' '$repo_vars_file'"
+        replace_repo_urls_vars "${repo_vars_file}"
+
         leappDebugRepos
-
-        if ! rlRun "ansible-galaxy collection install -vv -r $coll_path/meta/collection-requirements.yml --timeout 600"; then
-            rlDie "Failed to install Ansible dependencies"
-        fi
 
         lsrSetAnsibleInjectFactVars "$SR_ANSIBLE_INJECT_FACT_VARS"
         lsrPrepareNodesInventories
