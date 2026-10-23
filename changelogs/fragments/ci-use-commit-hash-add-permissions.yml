@@ -1,5 +1,0 @@
----
-trivial:
-  - "CI - use commit hash with github actions"
-  - "CI - add persist-credentials: false where needed"
-  - "CI - add permissions contents: read where needed"
