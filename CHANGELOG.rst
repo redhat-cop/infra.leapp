@@ -4,6 +4,23 @@ Ansible Leapp Collection Release Notes
 
 .. contents:: Topics
 
+v1.7.7
+======
+
+Minor Changes
+-------------
+
+- Add GPLv3 license header for sr_fingerprint module.
+- Change structure of tmt plans, add new context dimension and parametrize tests to be able to run tests in downstream.
+
+Bugfixes
+--------
+
+- Call 'zipl' after boot loader changes on s390x architecture.
+- Fix ``/var/log/leapp/ansible_leapp_*`` logs to retain the full initialization record (job header, system facts, and non-RHEL packages)
+- Fix latest-kernel remediation to select the newest installed kernel and remove older kernels using RPM version ordering.
+- Install the required ``dracut-config-rescue`` package to ensure the rescue kernel is recreated correctly after the upgrade.
+
 v1.7.6
 ======
 

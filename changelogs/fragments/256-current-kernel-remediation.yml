@@ -1,3 +1,0 @@
----
-bugfixes:
-  - "Fix latest-kernel remediation to select the newest installed kernel and remove older kernels using RPM version ordering."
