@@ -1,0 +1,9 @@
+summary: Test cleanup_logs removes only Leapp log files and is idempotent
+duration: 1h
+tag:
+  - role_test
+  - common
+environment:
+  TEST_NAME: "Role test: common cleanup_logs"
+  PLAYBOOK: "roles/common/tests/tests_cleanup_logs.yml"
+  LOGFILE_PREFIX: "role-common_cleanup_logs"
