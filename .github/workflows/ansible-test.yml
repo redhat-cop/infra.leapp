@@ -24,7 +24,7 @@ jobs:
     if: github.event_name == 'pull_request'
   ansible-lint:
     # uses: ansible/ansible-content-actions/.github/workflows/ansible_lint.yaml@dc47efd46c312b6ffaf10c274825707a65ac1d86 # main
-    uses: redhat-cop/infra.leapp/.github/workflows/ansible-lint.yml@ac6d732c4a6c7b9c6480f864e0c9876053589cfd # main
+    uses: redhat-cop/infra.leapp/.github/workflows/ansible-lint.yml@3679b7b5d2775c96e90287acb055d08605ca697b # main
     # with:
     #   working_directory: /home/runner/collections
   sanity:
