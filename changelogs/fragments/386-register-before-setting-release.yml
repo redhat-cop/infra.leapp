@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Re-register with the post-upgrade Satellite activation key before setting or unsetting the subscription-manager release, so a release such as ``9`` that is only available in the post-upgrade content view can be set (https://github.com/redhat-cop/infra.leapp/issues/386)."
