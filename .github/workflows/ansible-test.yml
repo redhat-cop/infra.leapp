@@ -30,7 +30,7 @@ jobs:
   sanity:
     uses: ansible/ansible-content-actions/.github/workflows/sanity.yaml@cbdec1f72eeee38b7e60d0f2346c66e622eea02a # main
     with:
-      extra_matrix_entries: '[{"name": "sanity-py3.12-2.16"}]'
+      extra_matrix_entries: '[{"name": "sanity-py3.12-2.16", "python": "3.12"}]'
   build-import:
     uses: ansible/ansible-content-actions/.github/workflows/build_import.yaml@cbdec1f72eeee38b7e60d0f2346c66e622eea02a # main
   # unit-galaxy:
