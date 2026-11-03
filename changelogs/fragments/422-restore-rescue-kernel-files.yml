@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Restore the original rescue kernel files if recreating the rescue kernel after the upgrade fails, instead of leaving the system without rescue kernel files (https://github.com/redhat-cop/infra.leapp/issues/422)."
