@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Make cleanup of Leapp log files idempotent."
