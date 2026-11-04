@@ -26,6 +26,7 @@ discover:
     where: control_node
     filter: tag:prep_control_node
 
+# pointless comment
 adjust:
   # File that provides URLs for images and repositories
   - when: initiator is not defined
