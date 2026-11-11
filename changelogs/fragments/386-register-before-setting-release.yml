@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Re-register with the post-upgrade Satellite activation key before changing the subscription-manager release, so the post-upgrade content view is available for it."
