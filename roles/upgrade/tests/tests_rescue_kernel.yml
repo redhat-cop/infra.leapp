@@ -56,6 +56,11 @@
                   - initramfs-*rescue*
               register: __test_scenario1_files
 
+            - name: Test | Scenario 1 | Stat the staging directory
+              ansible.builtin.stat:
+                path: "{{ __rescue_kernel_staging.path }}"
+              register: __test_scenario1_staging
+
             - name: Test | Scenario 1 | Assert files found, install triggered, recreation ran with correct args
               vars:
                 __stdout: "{{ __rescue_kernel_reinstall.stdout }}"
@@ -68,10 +73,12 @@
                   - "'add ' in __stdout"
                   - __test_boot_dir.path in __stdout
                   - "'/vmlinuz-' in __stdout"
+                  - not __test_scenario1_staging.stat.exists
                 fail_msg: >-
                   With rescue files present, dracut-config-rescue must be
-                  installed, the old rescue files removed, and the recreation
-                  command must run with the expected arguments.
+                  installed, the old rescue files removed, the recreation
+                  command must run with the expected arguments, and the
+                  staging directory must be removed.
 
         - name: Test | Scenario 2 - no rescue files, install and recreation are skipped
           block:
@@ -97,10 +104,11 @@
                 that:
                   - __rescue_kernel_files.files | length == 0
                   - __rescue_config_package_install.skipped | default(false)
+                  - __rescue_kernel_staging.skipped | default(false)
                   - __rescue_kernel_reinstall.skipped | default(false)
                 fail_msg: >-
-                  With no rescue files, the package install and the recreation
-                  command must be skipped.
+                  With no rescue files, the package install, the staging and
+                  the recreation command must be skipped.
 
         # A bogus package name forces a real install failure; the rescue section
         # catches it and verifies removal did not run (fail-fast ordering).
@@ -187,6 +195,138 @@
                   The find step must match only rescue kernel files; non-rescue
                   boot files (regular kernel or initramfs) must never be
                   matched and must remain on disk.
+
+        # The recreation command leaves a partial rescue file and fails after the
+        # old rescue files were removed; the role must remove the leftover, put
+        # the old files back and fail.
+        - name: Test | Scenario 5 - recreation fails, original rescue files are restored
+          block:
+            - name: Test | Scenario 5 | Empty the boot directory
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}"
+                state: "{{ item }}"
+                mode: "0755"
+              loop:
+                - absent
+                - directory
+
+            - name: Test | Scenario 5 | Create fake rescue kernel files with known content
+              ansible.builtin.copy:
+                content: "original {{ item }}\n"
+                dest: "{{ __test_boot_dir.path }}/{{ item }}"
+                mode: "0644"
+              loop: "{{ __test_rescue_files }}"
+
+            - name: Test | Scenario 5 | Run recreate-rescue-kernel with a failing recreation command
+              ansible.builtin.include_role:
+                name: infra.leapp.upgrade
+                tasks_from: recreate-rescue-kernel.yml
+              vars:
+                __leapp_rescue_boot_path: "{{ __test_boot_dir.path }}"
+                __leapp_rescue_install_script: "touch {{ __test_boot_dir.path }}/vmlinuz-0.0.0-leftover-rescue; false"
+
+            - name: Test | Scenario 5 | Fail if the failing recreation unexpectedly succeeded
+              ansible.builtin.fail:
+                msg: Expected the recreation command to fail, but it did not.
+          rescue:
+            - name: Test | Scenario 5 | Assert the role failed after restoring the files
+              ansible.builtin.assert:
+                that:
+                  - "'Fail after restoring the old rescue kernel files' in ansible_failed_task.name"
+                fail_msg: >-
+                  Expected the role to fail after restoring the rescue files,
+                  but the failure came from a different task:
+                  {{ ansible_failed_task.name }}.
+
+            - name: Test | Scenario 5 | Read the rescue files after the failed recreation
+              ansible.builtin.slurp:
+                src: "{{ __test_boot_dir.path }}/{{ item }}"
+              loop: "{{ __test_rescue_files }}"
+              register: __test_scenario5_content
+
+            - name: Test | Scenario 5 | Find rescue files after the failed recreation
+              ansible.builtin.find:
+                paths:
+                  - "{{ __test_boot_dir.path }}"
+                patterns:
+                  - vmlinuz-*rescue*
+                  - initramfs-*rescue*
+              register: __test_scenario5_files
+
+            - name: Test | Scenario 5 | Stat the staging directory
+              ansible.builtin.stat:
+                path: "{{ __rescue_kernel_staging.path }}"
+              register: __test_scenario5_staging
+
+            - name: Test | Scenario 5 | Assert the original files are back and the staging directory is gone
+              ansible.builtin.assert:
+                that:
+                  - __test_scenario5_content.results | map(attribute='content') | map('b64decode') | list
+                    == __test_rescue_files | map('regex_replace', '^(.*)$', 'original \\1\n') | list
+                  - __test_scenario5_files.files | length == __test_rescue_files | length
+                  - not __test_scenario5_staging.stat.exists
+                fail_msg: >-
+                  When the recreation fails, the leftover rescue file must be
+                  removed, the original rescue kernel files must be restored
+                  with their content and the staging directory must be removed.
+
+        # The recreation command deletes one staged file and fails, so the
+        # restore fails too; the staging directory must be kept.
+        - name: Test | Scenario 6 - restore fails, staging directory is kept
+          block:
+            - name: Test | Scenario 6 | Empty the boot directory
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}"
+                state: "{{ item }}"
+                mode: "0755"
+              loop:
+                - absent
+                - directory
+
+            - name: Test | Scenario 6 | Create fake rescue kernel files
+              ansible.builtin.file:
+                path: "{{ __test_boot_dir.path }}/{{ item }}"
+                state: touch
+                mode: "0644"
+              loop: "{{ __test_rescue_files }}"
+
+            - name: Test | Scenario 6 | Run recreate-rescue-kernel with a recreation that breaks the staging
+              ansible.builtin.include_role:
+                name: infra.leapp.upgrade
+                tasks_from: recreate-rescue-kernel.yml
+              vars:
+                __leapp_rescue_boot_path: "{{ __test_boot_dir.path }}"
+                __leapp_rescue_install_script: "rm -f {{ __rescue_kernel_staging.path }}/{{ __test_rescue_files[0] }}; false"
+
+            - name: Test | Scenario 6 | Fail if the restore unexpectedly succeeded
+              ansible.builtin.fail:
+                msg: Expected the restore to fail, but it did not.
+          rescue:
+            - name: Test | Scenario 6 | Assert the restore caused the failure
+              ansible.builtin.assert:
+                that:
+                  - "'Restore the old rescue kernel files' in ansible_failed_task.name"
+                fail_msg: >-
+                  Expected the restore to fail, but the failure came from a
+                  different task: {{ ansible_failed_task.name }}.
+
+            - name: Test | Scenario 6 | Stat the staging directory
+              ansible.builtin.stat:
+                path: "{{ __rescue_kernel_staging.path }}"
+              register: __test_scenario7_staging
+
+            - name: Test | Scenario 6 | Assert the staging directory was kept
+              ansible.builtin.assert:
+                that:
+                  - __test_scenario7_staging.stat.exists
+                fail_msg: >-
+                  When the restore fails, the staging directory must be kept
+                  so the old files can be copied back by hand.
+
+            - name: Test | Scenario 6 | Remove the staging directory
+              ansible.builtin.file:
+                path: "{{ __rescue_kernel_staging.path }}"
+                state: absent
 
       always:
         - name: Test | Cleanup temporary boot directory

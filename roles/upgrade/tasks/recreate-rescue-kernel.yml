@@ -36,18 +36,102 @@
   when: __rescue_kernel_files.files | length > 0
   register: __rescue_config_package_install
 
-- name: recreate-rescue-kernel | Remove old rescue kernel files
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    state: absent
-  loop: "{{ __rescue_kernel_files.files }}"
-
-- name: recreate-rescue-kernel | Reinstall the rescue kernel files when old ones were found
-  ansible.builtin.shell: >
-    export PATH={{ leapp_os_path }};
-    {{ __leapp_rescue_install_script | default('/usr/lib/kernel/install.d/51-dracut-rescue.install') }} add "$(uname -r)"
-    {{ __leapp_rescue_boot_path | default('/boot') }}
-    "{{ __leapp_rescue_boot_path | default('/boot') }}/vmlinuz-$(uname -r)"
+# Stage the old files outside /boot first; /boot is often too small to keep
+# two copies.
+- name: recreate-rescue-kernel | Stage the old rescue kernel files
   when: __rescue_kernel_files.files | length > 0
-  changed_when: true
-  register: __rescue_kernel_reinstall
+  block:
+    - name: recreate-rescue-kernel | Create a staging directory for the old rescue kernel files
+      ansible.builtin.tempfile:
+        state: directory
+        path: /var/tmp
+        suffix: leapp-rescue
+      register: __rescue_kernel_staging
+      check_mode: false
+
+    - name: recreate-rescue-kernel | Copy the old rescue kernel files to the staging directory
+      ansible.builtin.copy:
+        src: "{{ item.path }}"
+        dest: "{{ __rescue_kernel_staging.path }}/{{ item.path | basename }}"
+        remote_src: true
+        mode: preserve
+      loop: "{{ __rescue_kernel_files.files }}"
+
+  rescue:
+    - name: recreate-rescue-kernel | Remove the partial staging directory
+      ansible.builtin.file:
+        path: "{{ __rescue_kernel_staging.path }}"
+        state: absent
+      when: __rescue_kernel_staging.path is defined
+      check_mode: false
+
+    - name: recreate-rescue-kernel | Fail because the old rescue kernel files could not be staged
+      ansible.builtin.fail:
+        msg: >-
+          Could not stage the old rescue kernel files. They were not changed.
+          Error: {{ ansible_failed_result.msg | default('') }}
+
+- name: recreate-rescue-kernel | Remove and recreate the rescue kernel files
+  when: __rescue_kernel_files.files | length > 0
+  block:
+    - name: recreate-rescue-kernel | Remove old rescue kernel files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ __rescue_kernel_files.files }}"
+
+    - name: recreate-rescue-kernel | Reinstall the rescue kernel files when old ones were found
+      ansible.builtin.shell: >
+        export PATH={{ leapp_os_path }};
+        {{ __leapp_rescue_install_script | default('/usr/lib/kernel/install.d/51-dracut-rescue.install') }} add "$(uname -r)"
+        {{ __leapp_rescue_boot_path | default('/boot') }}
+        "{{ __leapp_rescue_boot_path | default('/boot') }}/vmlinuz-$(uname -r)"
+      changed_when: true
+      register: __rescue_kernel_reinstall
+
+  # If a restore task fails, the play stops here and the staging directory is
+  # kept, so the old files can still be copied back by hand.
+  rescue:
+    - name: recreate-rescue-kernel | Find rescue kernel files left by the failed recreation
+      ansible.builtin.find:
+        paths: "{{ [__leapp_rescue_boot_path | default('/boot')] }}"
+        patterns:
+          - vmlinuz-*rescue*
+          - initramfs-*rescue*
+      register: __rescue_kernel_leftovers
+
+    - name: recreate-rescue-kernel | Remove rescue kernel files left by the failed recreation
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ __rescue_kernel_leftovers.files }}"
+
+    - name: recreate-rescue-kernel | Restore the old rescue kernel files
+      ansible.builtin.copy:
+        src: "{{ __rescue_kernel_staging.path }}/{{ item.path | basename }}"
+        dest: "{{ item.path }}"
+        remote_src: true
+        mode: preserve
+      loop: "{{ __rescue_kernel_files.files }}"
+
+    - name: recreate-rescue-kernel | Remove the staging directory after the restore
+      ansible.builtin.file:
+        path: "{{ __rescue_kernel_staging.path }}"
+        state: absent
+      check_mode: false
+
+    - name: recreate-rescue-kernel | Fail after restoring the old rescue kernel files
+      ansible.builtin.fail:
+        msg: >-
+          Recreating the rescue kernel failed in task
+          '{{ ansible_failed_task.name }}'; the original rescue kernel files
+          were restored. Error: {{ ansible_failed_result.msg | default('') }}
+
+- name: recreate-rescue-kernel | Remove the staging directory after a successful recreation
+  ansible.builtin.file:
+    path: "{{ __rescue_kernel_staging.path }}"
+    state: absent
+  when:
+    - __rescue_kernel_files.files | length > 0
+    - __rescue_kernel_staging.path is defined
+  check_mode: false

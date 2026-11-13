@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - "Restore the original rescue kernel files if creation of new rescue kernel files after the upgrade fails, instead of leaving the system without rescue kernel files."
