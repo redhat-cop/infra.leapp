@@ -12,6 +12,9 @@ __leapp_reports_dir: /var/log/leapp
 __leapp_log_file_basename: "{{ __leapp_logs_name }}.log"
 __leapp_log_file: "{{ __leapp_reports_dir }}/{{ __leapp_log_file_basename }}"
 __leapp_report_json: "{{ __leapp_reports_dir }}/leapp-report.json"
+# Consolidated report generated on the controller from all fetched leapp reports
+__leapp_consolidated_json_basename: consolidated-analysis.json
+__leapp_consolidated_html_basename: consolidated-analysis.html
 __leapp_report_txt: "{{ __leapp_reports_dir }}/leapp-report.txt"
 __leapp_preupgrade_log: "{{ __leapp_reports_dir }}/leapp-preupgrade.log"
 __leapp_packages:

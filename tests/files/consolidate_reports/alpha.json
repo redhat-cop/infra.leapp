@@ -1,0 +1,43 @@
+{
+  "leapp_run_id": "00000000-0000-0000-0000-00000000alpha",
+  "entries": [
+    {
+      "title": "cgroups-v1 enabled on the system",
+      "hostname": "alpha.example.com",
+      "severity": "high",
+      "groups": ["inhibitor", "boot"],
+      "key": "4d9174ec75e27f2713b672d8932a06ebaa84dfb3",
+      "summary": "The system is configured to use cgroups-v1.",
+      "detail": {
+        "remediations": [
+          {
+            "type": "hint",
+            "context": "Remove systemd.unified_cgroup_hierarchy=0 from the kernel command line"
+          }
+        ]
+      }
+    },
+    {
+      "title": "Difference in Python versions and support in RHEL 8",
+      "hostname": "alpha.example.com",
+      "severity": "info",
+      "groups": ["python"],
+      "key": "0e5c6b4d2f1a4d9f8b7c6a5e4d3c2b1a0f9e8d7c"
+    },
+    {
+      "title": "Firewalld Configuration AllowZoneDrifting Is Unsupported",
+      "hostname": "alpha.example.com",
+      "severity": "medium",
+      "groups": ["firewall"],
+      "key": "5b1cf050e1a877b0358b6e8c612277c591d40c13",
+      "detail": {
+        "remediations": [
+          {
+            "type": "command",
+            "context": ["sed", "-i", "s/^AllowZoneDrifting=.*/AllowZoneDrifting=no/", "/etc/firewalld/firewalld.conf"]
+          }
+        ]
+      }
+    }
+  ]
+}

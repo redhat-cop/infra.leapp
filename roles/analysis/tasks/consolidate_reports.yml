@@ -1,0 +1,44 @@
+---
+# Consolidate the leapp reports fetched from all analyzed hosts into a single
+# JSON and HTML report on the controller.
+#
+# This task file requires the following variables to be set:
+# __leapp_reports_controller_dir - controller directory holding <hostname>/leapp-report.json
+# __leapp_consolidated_json_basename
+# __leapp_consolidated_html_basename
+#
+# NOTE: any "when" used here, and on any enclosing block, must evaluate
+# identically on every host. Ansible evaluates the condition against the single
+# host elected for "run_once", and if that host is skipped the task runs on no
+# host at all. The condition below is derived from a run_once register, whose
+# value Ansible copies to every host in the play, so it is host independent.
+# Host dependent gating (for example on leapp_copy_reports) belongs on the
+# include_tasks in main.yml. See the same warning in
+# create_remediation_hostvars.yml.
+
+- name: consolidate_reports | Consolidate the fetched leapp reports
+  infra.leapp.leapp_consolidated_report:
+    src: "{{ __leapp_reports_controller_dir }}"
+    dest_json: "{{ __leapp_reports_controller_dir }}/{{ __leapp_consolidated_json_basename }}"
+    dest_html: "{{ __leapp_reports_controller_dir }}/{{ __leapp_consolidated_html_basename }}"
+  delegate_to: localhost
+  # Do not run as root on the controller node
+  become: false
+  run_once: true
+  register: __leapp_consolidated_report
+  # Consolidating reports is a reporting convenience. It must never fail an
+  # analysis run that otherwise succeeded. Unparsable reports are reported by
+  # the module as Ansible warnings and recorded in the report itself, so a
+  # failure here only happens if the controller cannot read or write at all.
+  failed_when: false
+
+- name: consolidate_reports | Display consolidated report location
+  ansible.builtin.debug:
+    msg: |
+      Consolidated leapp analysis report for {{ __leapp_consolidated_report.hosts | length }} host(s):
+        JSON: {{ __leapp_consolidated_report.dest_json }}
+        HTML: {{ __leapp_consolidated_report.dest_html }}
+  run_once: true
+  when: __leapp_consolidated_report.dest_json | default(none, true) is not none
+
+...

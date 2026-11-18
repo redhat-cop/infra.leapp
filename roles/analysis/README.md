@@ -64,6 +64,61 @@ See comments in defaults/main.yml for additional details.
 | leapp_copy_reports                          | Boolean           | true                        | Copy leapp report files (JSON and text) from managed nodes to the controller. Reports are stored in the directory defined by the `leapp_workdir_controller` variable in a timestamped directory |
 | leapp_create_remediation_hostvars           | Boolean           | true                        | Create host_vars files and a remediation playbook on the controller in a directory defined by the `leapp_workdir_controller` variable. Each host gets its own host_vars file with `leapp_remediation_todo` variable. A `remediate.yml` playbook is created that uses these host variables. |
 | leapp_secure_logging                        | Boolean           | true                        | When `true`, tasks that handle sensitive data (such as Satellite credentials) have logging suppressed. Set to `false` to allow logging of these tasks for debugging. |
+| leapp_consolidate_reports                   | Boolean           | true                        | Combine the leapp reports of all analyzed hosts into a single `consolidated-analysis.json` and `consolidated-analysis.html`, written next to the per-host reports on the controller. Requires `leapp_copy_reports` to be `true`. Set to `false` to opt out and skip generating these files. See [Consolidated analysis report](#consolidated-analysis-report). |
+
+## Consolidated analysis report
+
+By default (`leapp_consolidate_reports: true`), the role merges the leapp reports fetched from
+every analyzed host into two files in the timestamped report directory on the controller:
+
+- `consolidated-analysis.json` - a `findings` object grouping entries by severity and then by
+  leapp entry key, each listing the affected hostnames and the suggested remediations, plus a
+  `metadata` object recording how many reports were analyzed, which ones were skipped, and
+  whether the report is complete.
+- `consolidated-analysis.html` - the same data rendered as a browsable table with a severity
+  legend, and a banner at the top if the report is incomplete.
+
+Entries that leapp flags as inhibitors are promoted to the `inhibitor` severity, so the most
+urgent findings are listed first regardless of the severity leapp recorded for them.
+
+Each host is identified by its inventory hostname. If a report's own `hostname` field differs
+from it (for example the inventory uses short names but leapp recorded the FQDN), both are shown
+as `inventory_hostname (report_hostname)`, since operators act on the inventory name but the
+report's own hostname is what support cases and leapp logs reference.
+
+```yaml
+- name: Run leapp analysis and consolidate the reports
+  hosts: leapp_hosts
+  become: true
+  tasks:
+    - name: Analyze hosts
+      ansible.builtin.include_role:
+        name: infra.leapp.analysis
+      vars:
+        leapp_copy_reports: true
+        # leapp_consolidate_reports: true  # enabled by default, no need to set it
+```
+
+To opt out and skip generating the consolidated report:
+
+```yaml
+        leapp_consolidate_reports: false
+```
+
+Notes and limitations:
+
+- Consolidation runs once per play on the controller, via the role-internal
+  `infra.leapp.leapp_consolidated_report` module, and covers the hosts whose reports were
+  successfully fetched. Hosts that failed before their report was written are not represented.
+- If a fetched report cannot be parsed, the run emits an Ansible warning naming the affected
+  files, and both generated reports record that they are incomplete. Consolidation never fails
+  the play, so never treat an empty or incomplete consolidated report as "no findings".
+- If no report is found at all, nothing is written, rather than leaving behind an empty report
+  that reads like a clean bill of health.
+- The reports carry no generation timestamp, so that re-running an unchanged analysis reports no
+  change. The containing directory name is timestamped instead.
+- All hosts write into the same timestamped directory, including under `serial` and
+  `strategy: free`, so a single consolidated report always covers the whole run.
 
 ## Example playbook
 

@@ -1,0 +1,222 @@
+---
+# Integration test for roles/analysis/tasks/consolidate_reports.yml. No managed
+# nodes are needed: the directory layout that ansible.builtin.fetch produces
+# during the analysis role is built from the fixtures in
+# tests/files/consolidate_reports.
+#
+# The report parsing and rendering itself is covered by the unit tests in
+# tests/unit/plugins/modules/test_leapp_consolidated_report.py. This playbook
+# covers the wiring: that the task file passes the right paths, tolerates bad
+# input, and is idempotent.
+#
+# Run with: ansible-playbook tests/tests_consolidate_reports.yml
+#
+# This test builds real fixture files, so it cannot run under --check. The
+# behavior of consolidate_reports.yml itself under --check is to report what
+# would change without writing anything.
+- name: Test leapp report consolidation
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    __leapp_fixtures_dir: "{{ playbook_dir }}/files/consolidate_reports"
+    __leapp_consolidated_json_basename: consolidated-analysis.json
+    __leapp_consolidated_html_basename: consolidated-analysis.html
+
+  tasks:
+    - name: Run the consolidation tests
+      block:
+        - name: Create a temporary working directory
+          ansible.builtin.tempfile:
+            state: directory
+            suffix: leapp_consolidate_test
+          register: __leapp_test_workdir
+
+        # ------------------------------------------------------------------
+        # Scenario 1: every fetched report is valid
+        # ------------------------------------------------------------------
+        - name: Scenario 1 | Create the per-host report directories
+          ansible.builtin.file:
+            path: "{{ __leapp_test_workdir.path }}/valid/{{ item }}.example.com"
+            state: directory
+            mode: "0755"
+          loop:
+            - alpha
+            - beta
+            - gamma
+
+        - name: Scenario 1 | Build the fetched report layout
+          ansible.builtin.copy:
+            src: "{{ __leapp_fixtures_dir }}/{{ item }}.json"
+            dest: "{{ __leapp_test_workdir.path }}/valid/{{ item }}.example.com/leapp-report.json"
+            mode: "0644"
+          loop:
+            - alpha
+            - beta
+            - gamma
+
+        - name: Scenario 1 | Consolidate the reports
+          ansible.builtin.include_tasks: ../roles/analysis/tasks/consolidate_reports.yml
+          vars:
+            __leapp_reports_controller_dir: "{{ __leapp_test_workdir.path }}/valid"
+
+        - name: Scenario 1 | Keep the first result for the idempotency check
+          ansible.builtin.set_fact:
+            __leapp_first_run: "{{ __leapp_consolidated_report }}"
+
+        - name: Scenario 1 | Read the generated reports
+          ansible.builtin.slurp:
+            src: "{{ __leapp_test_workdir.path }}/valid/{{ item }}"
+          loop:
+            - "{{ __leapp_consolidated_json_basename }}"
+            - "{{ __leapp_consolidated_html_basename }}"
+          register: __leapp_valid_output
+
+        - name: Scenario 1 | Assert the consolidated report is complete and correct
+          vars:
+            __json: "{{ __leapp_valid_output.results[0].content | b64decode | from_json }}"
+            __html: "{{ __leapp_valid_output.results[1].content | b64decode }}"
+            __cgroups: "{{ __json.findings.inhibitor['4d9174ec75e27f2713b672d8932a06ebaa84dfb3'] }}"
+          ansible.builtin.assert:
+            that:
+              # The module reports full coverage and wrote both artifacts
+              - __leapp_consolidated_report.complete
+              - __leapp_consolidated_report.changed
+              - __leapp_consolidated_report.reports_found == 3
+              - __leapp_consolidated_report.skipped_reports == []
+              - __leapp_consolidated_report.hosts | length == 3
+              - __leapp_consolidated_report.severity_counts.inhibitor == 2
+              # Entries flagged as inhibitors are promoted out of their severity
+              - "'inhibitor' in __json.findings"
+              - "'info' in __json.findings"
+              - "'medium' in __json.findings"
+              - "'high' not in __json.findings"
+              # Coverage metadata travels with the artifact
+              - __json.metadata.complete
+              - __json.metadata.reports_analyzed == 3
+              # All three hosts are grouped under the shared entry, de-duplicated and sorted
+              - __cgroups.hostnames | length == 3
+              - __cgroups.hostnames == __cgroups.hostnames | sort | unique
+              - "'alpha.example.com' in __cgroups.hostnames"
+              - "'beta.example.com' in __cgroups.hostnames"
+              # gamma's report hostname differs from its inventory/directory hostname, so both
+              # are shown as "inventory_hostname (report_hostname)"
+              - "'gamma.example.com (gamma<img src=x onerror=alert(1)>.example.com)' in __cgroups.hostnames"
+              - "'gamma.example.com (gamma&lt;img src=x onerror=alert(1)&gt;.example.com)' in __html"
+              # Remediations differing between hosts are merged, not overwritten
+              - __cgroups.remediations | length == 2
+              - __cgroups.remediations | selectattr('type', 'eq', 'hint') | list | length == 1
+              - __cgroups.remediations | selectattr('type', 'eq', 'command') | list | length == 1
+              # Hostnames and titles from the managed nodes are HTML escaped
+              - "'<img src=x onerror=alert(1)>' not in __html"
+              - "'&lt;img src=x onerror=alert(1)&gt;' in __html"
+              - "'Use of <NFS> detected' not in __html"
+              - "'Use of &lt;NFS&gt; detected' in __html"
+            success_msg: Consolidated report is complete, merged and escaped
+            fail_msg: Consolidated report content is wrong
+
+        - name: Scenario 1 | Consolidate the reports again
+          ansible.builtin.include_tasks: ../roles/analysis/tasks/consolidate_reports.yml
+          vars:
+            __leapp_reports_controller_dir: "{{ __leapp_test_workdir.path }}/valid"
+
+        - name: Scenario 1 | Assert re-running does not report a change
+          ansible.builtin.assert:
+            that:
+              - not __leapp_consolidated_report.changed
+              - __leapp_consolidated_report.hosts == __leapp_first_run.hosts
+            success_msg: Consolidation is idempotent
+            fail_msg: Consolidation reported a change on an unchanged input set
+
+        # ------------------------------------------------------------------
+        # Scenario 2: one fetched report cannot be parsed
+        # ------------------------------------------------------------------
+        - name: Scenario 2 | Create the per-host report directories
+          ansible.builtin.file:
+            path: "{{ __leapp_test_workdir.path }}/partial/{{ item }}.example.com"
+            state: directory
+            mode: "0755"
+          loop:
+            - alpha
+            - malformed
+
+        - name: Scenario 2 | Build a layout containing a malformed report
+          ansible.builtin.copy:
+            src: "{{ __leapp_fixtures_dir }}/{{ item }}.json"
+            dest: "{{ __leapp_test_workdir.path }}/partial/{{ item }}.example.com/leapp-report.json"
+            mode: "0644"
+          loop:
+            - alpha
+            - malformed
+
+        - name: Scenario 2 | Consolidate the reports
+          ansible.builtin.include_tasks: ../roles/analysis/tasks/consolidate_reports.yml
+          vars:
+            __leapp_reports_controller_dir: "{{ __leapp_test_workdir.path }}/partial"
+
+        - name: Scenario 2 | Read the generated reports
+          ansible.builtin.slurp:
+            src: "{{ __leapp_test_workdir.path }}/partial/{{ item }}"
+          loop:
+            - "{{ __leapp_consolidated_json_basename }}"
+            - "{{ __leapp_consolidated_html_basename }}"
+          register: __leapp_partial_output
+
+        - name: Scenario 2 | Assert the incomplete report is flagged but does not fail the play
+          vars:
+            __json: "{{ __leapp_partial_output.results[0].content | b64decode | from_json }}"
+            __html: "{{ __leapp_partial_output.results[1].content | b64decode }}"
+          ansible.builtin.assert:
+            that:
+              # The play kept going and the parsable host is still represented
+              - not __leapp_consolidated_report.complete
+              - __leapp_consolidated_report.reports_found == 2
+              - __leapp_consolidated_report.skipped_reports | length == 1
+              - "'malformed.example.com' in __leapp_consolidated_report.skipped_reports[0].path"
+              - __leapp_consolidated_report.hosts == ['alpha.example.com']
+              # The artifacts say so themselves, for whoever opens them later
+              - not __json.metadata.complete
+              - __json.metadata.reports_skipped == 1
+              - "'This report is incomplete.' in __html"
+              - "'malformed.example.com' in __html"
+            success_msg: Unparsable reports are reported as an incomplete run
+            fail_msg: Unparsable reports were not handled correctly
+
+        # ------------------------------------------------------------------
+        # Scenario 3: nothing was fetched at all
+        # ------------------------------------------------------------------
+        - name: Scenario 3 | Create an empty report directory
+          ansible.builtin.file:
+            path: "{{ __leapp_test_workdir.path }}/empty"
+            state: directory
+            mode: "0755"
+
+        - name: Scenario 3 | Consolidate the reports
+          ansible.builtin.include_tasks: ../roles/analysis/tasks/consolidate_reports.yml
+          vars:
+            __leapp_reports_controller_dir: "{{ __leapp_test_workdir.path }}/empty"
+
+        - name: Scenario 3 | Stat the output that must not have been written
+          ansible.builtin.stat:
+            path: "{{ __leapp_test_workdir.path }}/empty/{{ __leapp_consolidated_json_basename }}"
+          register: __leapp_empty_stat
+
+        - name: Scenario 3 | Assert no misleading empty report is produced
+          ansible.builtin.assert:
+            that:
+              - __leapp_consolidated_report.reports_found == 0
+              - not __leapp_consolidated_report.changed
+              - __leapp_consolidated_report.dest_json is none
+              - not __leapp_empty_stat.stat.exists
+            success_msg: An empty input set produces no misleading report
+            fail_msg: An empty input set produced a report that could be read as "no findings"
+
+      always:
+        - name: Remove the temporary working directory
+          ansible.builtin.file:
+            path: "{{ __leapp_test_workdir.path }}"
+            state: absent
+          when: __leapp_test_workdir.path is defined
+
+...

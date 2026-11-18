@@ -50,6 +50,15 @@
   changed_when: true
   notify: Preupgrade analysis report is done
 
+# Gating happens here rather than inside consolidate_reports.yml, because that
+# file runs its tasks with run_once and a host dependent "when" on a run_once
+# task can skip it for the whole play. See the note in consolidate_reports.yml.
+- name: Consolidate leapp reports from all hosts
+  ansible.builtin.include_tasks: consolidate_reports.yml
+  when:
+    - leapp_copy_reports | bool
+    - leapp_consolidate_reports | bool
+
 - name: Record role success fingerprint
   infra.leapp.sr_fingerprint:
     sr_message: >-

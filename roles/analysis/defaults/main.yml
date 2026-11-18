@@ -150,6 +150,13 @@ leapp_copy_reports: true
 # A remediate.yml playbook is created that uses these host variables
 leapp_create_remediation_hostvars: true
 
+# Consolidate the leapp reports of all analyzed hosts into a single JSON and HTML
+# report, written next to the per-host reports on the controller.
+# Requires leapp_copy_reports to be enabled and Python 3 on the controller.
+# Generated files: consolidated-analysis.json and consolidated-analysis.html
+# Set to false to opt out and skip generating the consolidated report.
+leapp_consolidate_reports: true
+
 # Set which Ansible Collection to use for System Roles.
 # For community/upstream, use 'fedora.linux_system_roles'.
 # For the RHEL, AAP, use 'redhat.rhel_system_roles'
