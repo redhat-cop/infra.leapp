@@ -65,6 +65,10 @@ See comments in defaults/main.yml for additional details.
 | leapp_create_remediation_hostvars           | Boolean           | true                        | Create host_vars files and a remediation playbook on the controller in a directory defined by the `leapp_workdir_controller` variable. Each host gets its own host_vars file with `leapp_remediation_todo` variable. A `remediate.yml` playbook is created that uses these host variables. |
 | leapp_secure_logging                        | Boolean           | true                        | When `true`, tasks that handle sensitive data (such as Satellite credentials) have logging suppressed. Set to `false` to allow logging of these tasks for debugging. |
 
+All hosts write into the same timestamped report directory on the controller, including under
+`serial` and `strategy: free`. See the comments in `roles/common/tasks/lock_timestamp.yml` for how
+that is guaranteed.
+
 ## Example playbook
 
 See [`analysis.yml`](https://github.com/redhat-cop/infra.leapp/tree/main/playbooks/analysis.yml)

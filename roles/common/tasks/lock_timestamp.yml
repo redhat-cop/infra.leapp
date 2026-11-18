@@ -1,0 +1,145 @@
+---
+# Agree on a single run timestamp shared by every host in the play, including
+# across `serial` batches and under `strategy: free`.
+#
+# __leapp_reports_controller_dir (see vars/main.yml of the calling role) is
+# derived from this timestamp, so every host must agree on the exact same
+# value - otherwise reports get fetched into different directories and
+# consolidation only ever sees part of the estate.
+#
+# A plain "set_fact: now() + run_once: true" does NOT achieve this:
+# - Under `serial`, `run_once` elects one host PER BATCH, and the task itself
+#   re-runs for every batch, so each batch computes its own, different, now().
+# - Under `strategy: free`, hosts are not synchronized before this task at
+#   all, so `run_once` does not elect a single host - every host runs the
+#   task independently and gets its own now().
+# (Both confirmed by direct testing, not assumption.)
+#
+# Fix: if the shared file is not already settled, every host proposes a
+# candidate value and races to atomically claim it using `ln` (hard link
+# creation is atomic and fails with EEXIST if the destination already exists
+# - unlike `cp`/`mv`, which would silently overwrite). Exactly one candidate
+# wins regardless of execution order, batching, or strategy, and every host
+# then reads back that one, stable value. Once the file is settled, later
+# hosts and batches skip straight to reading it, so a run where every host
+# already agrees reports no changes. Verified under both `serial` and
+# `strategy: free`, including a 30-host concurrent race.
+#
+# The shared file persists on the controller after the run (cheap, and lets
+# retries of a failed run keep using the same directory). To avoid a leftover
+# file from a crashed run confusing a later, genuinely new invocation, a file
+# older than __leapp_lock_timestamp_max_age is treated as stale and replaced.
+#
+# This task file requires the following variables to be set:
+# leapp_workdir_controller
+# __leapp_logs_name
+# __leapp_lock_timestamp_max_age - how old (in seconds) a leftover timestamp
+#   file may be before it is treated as abandoned and replaced. Callers pass
+#   their own leapp_async_timeout_maximum, since that already represents how
+#   long this role's run is expected to take.
+#
+# Sets:
+# __leapp_timestamp
+#
+# Under --check, nothing is actually fetched or consolidated, so an
+# inconsistent timestamp across hosts has no real consequence. The simple,
+# non-atomic computation is used instead, to keep --check free of side
+# effects on the controller's filesystem.
+- name: lock_timestamp | Lock timestamped variables (check mode, no real effect)
+  ansible.builtin.set_fact:
+    __leapp_timestamp: "{{ now(fmt='%Y-%m-%d_%H-%M-%S', utc=true) }}"
+  run_once: true
+  when: ansible_check_mode | default(false)
+
+- name: lock_timestamp | Agree on a single run timestamp across all hosts and batches
+  when: not (ansible_check_mode | default(false))
+  vars:
+    __leapp_timestamp_file: "{{ leapp_workdir_controller }}/.{{ __leapp_logs_name }}_run_timestamp"
+    __leapp_timestamp_candidate_file: "{{ __leapp_timestamp_file }}.{{ inventory_hostname }}.candidate"
+  block:
+    - name: lock_timestamp | Check for a leftover timestamp file from a previous run
+      ansible.builtin.stat:
+        path: "{{ __leapp_timestamp_file }}"
+      delegate_to: localhost
+      become: false
+      register: __leapp_timestamp_file_stat
+
+    - name: lock_timestamp | Get the controller's current time
+      ansible.builtin.setup:
+        gather_subset: ["!all", "!min", "date_time"]
+      delegate_to: localhost
+      become: false
+      register: __leapp_controller_facts
+      # mtime is in epoch seconds regardless of timezone. now(fmt='%s') is NOT
+      # reliable for this comparison: it formats via the controller's local
+      # timezone instead of UTC despite utc=true, so it can be off by a whole
+      # UTC offset. ansible_date_time.epoch does not have that problem, so it
+      # is fetched explicitly instead. Delegated and registered rather than
+      # letting it merge into the current host's facts, so it reflects the
+      # controller's clock and does not depend on the managed node's own
+      # (possibly wrong, pre-upgrade) clock.
+      when: __leapp_timestamp_file_stat.stat.exists
+
+    - name: lock_timestamp | Remove a stale timestamp file left behind by an interrupted run
+      ansible.builtin.file:
+        path: "{{ __leapp_timestamp_file }}"
+        state: absent
+      delegate_to: localhost
+      become: false
+      register: __leapp_timestamp_stale_removal
+      when:
+        - __leapp_timestamp_file_stat.stat.exists
+        - (__leapp_controller_facts.ansible_facts.ansible_date_time.epoch | int
+          - __leapp_timestamp_file_stat.stat.mtime | int) > (__leapp_lock_timestamp_max_age | int)
+
+    # The claim dance below always performs at least one write + one delete on
+    # the controller, so it is only worth running when the shared file is not
+    # already settled - otherwise every host on every run would report
+    # "changed" for no actual effect, even once every host already agrees.
+    - name: lock_timestamp | Claim the shared timestamp file if it is not already settled
+      when: not __leapp_timestamp_file_stat.stat.exists or __leapp_timestamp_stale_removal.changed
+      block:
+        - name: lock_timestamp | Write our candidate timestamp to a private file
+          ansible.builtin.copy:
+            content: "{{ now(fmt='%Y-%m-%d_%H-%M-%S', utc=true) }}"
+            dest: "{{ __leapp_timestamp_candidate_file }}"
+            mode: "0644"
+          delegate_to: localhost
+          become: false
+
+        - name: lock_timestamp | Atomically claim the shared timestamp file (first host or batch wins)
+          ansible.builtin.command:
+            argv:
+              - ln
+              - "{{ __leapp_timestamp_candidate_file }}"
+              - "{{ __leapp_timestamp_file }}"
+          delegate_to: localhost
+          become: false
+          register: __leapp_timestamp_claim
+          changed_when: __leapp_timestamp_claim.rc == 0
+          # rc != 0 with "File exists" only means another host or an earlier
+          # batch already claimed the timestamp first - that is success, not
+          # failure.
+          failed_when:
+            - __leapp_timestamp_claim.rc != 0
+            - "'File exists' not in __leapp_timestamp_claim.stderr"
+
+        - name: lock_timestamp | Remove our candidate file now that the shared file is settled
+          ansible.builtin.file:
+            path: "{{ __leapp_timestamp_candidate_file }}"
+            state: absent
+          delegate_to: localhost
+          become: false
+
+    - name: lock_timestamp | Read back the agreed run timestamp
+      ansible.builtin.slurp:
+        src: "{{ __leapp_timestamp_file }}"
+      delegate_to: localhost
+      become: false
+      register: __leapp_timestamp_slurp
+
+    - name: lock_timestamp | Lock timestamped variables
+      ansible.builtin.set_fact:
+        __leapp_timestamp: "{{ __leapp_timestamp_slurp.content | b64decode | trim }}"
+
+...

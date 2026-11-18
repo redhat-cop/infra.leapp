@@ -1,0 +1,7 @@
+---
+bugfixes:
+  - analysis, upgrade - Make the timestamped report directory identical for every host in a play,
+    including across ``serial`` batches and under the ``free`` strategy. Each host, or each batch,
+    previously computed its own timestamp independently, so fetched reports could be split across
+    several directories, and a consolidated analysis report could silently cover only part of the
+    inventory.
