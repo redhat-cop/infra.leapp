@@ -1,0 +1,28 @@
+{
+  "leapp_run_id": "00000000-0000-0000-0000-000000gamma",
+  "entries": [
+    {
+      "title": "cgroups-v1 enabled on the system",
+      "hostname": "gamma<img src=x onerror=alert(1)>.example.com",
+      "severity": "high",
+      "groups": ["inhibitor", "boot"],
+      "key": "4d9174ec75e27f2713b672d8932a06ebaa84dfb3",
+      "summary": "The system is configured to use cgroups-v1.",
+      "detail": {
+        "remediations": [
+          {
+            "type": "hint",
+            "context": "Remove systemd.unified_cgroup_hierarchy=0 from the kernel command line"
+          }
+        ]
+      }
+    },
+    {
+      "title": "Use of <NFS> detected. Upgrade can't proceed",
+      "hostname": "gamma<img src=x onerror=alert(1)>.example.com",
+      "severity": "high",
+      "groups": ["inhibitor", "filesystem"],
+      "key": "9881b25faceeeaa7a6478bcdac29afd7f6baaaed"
+    }
+  ]
+}

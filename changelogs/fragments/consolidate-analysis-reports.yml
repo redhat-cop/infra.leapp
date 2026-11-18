@@ -1,0 +1,10 @@
+---
+minor_changes:
+  - analysis - Add ``leapp_consolidate_reports`` to combine the leapp reports of all analyzed
+    hosts into a single ``consolidated-analysis.json`` and ``consolidated-analysis.html`` on the
+    controller. Enabled by default; set ``leapp_consolidate_reports`` to ``false`` to opt out.
+  - leapp_consolidated_report - New role-internal module that builds the consolidated JSON and
+    HTML reports. Reports that cannot be parsed are skipped with a warning and recorded in the
+    generated reports, so an incomplete report is never mistaken for an absence of findings. Each
+    host is shown as its inventory hostname, paired with the report's own hostname when the two
+    differ.
