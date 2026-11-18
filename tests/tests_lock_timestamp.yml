@@ -1,0 +1,275 @@
+---
+# Regression test for roles/common/tasks/lock_timestamp.yml.
+#
+# Every host in a play must agree on the exact same timestamp, including
+# across `serial` batches and under `strategy: free`, where a plain
+# "set_fact: now() + run_once: true" does not (see the comments in that task
+# file for the mechanism and why it matters - __leapp_reports_controller_dir
+# is derived from this value).
+#
+# No managed nodes are needed: this test registers throwaway virtual hosts,
+# all using the local connection, via add_host.
+#
+# Run with: ansible-playbook tests/tests_lock_timestamp.yml
+#
+# Not covered here: behavior under --check (the task file falls back to a
+# simple, non-atomic computation under check mode, since nothing is actually
+# written or fetched in a dry run anyway). That fallback was verified by hand
+# rather than in this automated suite, since forcing check mode for only part
+# of a playbook run is not straightforward to do from within a single
+# ansible-playbook invocation.
+- name: Register temporary virtual hosts for the test scenarios
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    __leapp_lock_test_workdir: /tmp/test_leapp_lock_timestamp
+  tasks:
+    - name: Clean up previous test runs
+      ansible.builtin.file:
+        path: "{{ __leapp_lock_test_workdir }}"
+        state: absent
+
+    - name: Create the test working directory
+      ansible.builtin.file:
+        path: "{{ __leapp_lock_test_workdir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Register 4 virtual hosts, all backed by the local connection
+      ansible.builtin.add_host:
+        name: "leapp_lock_test_{{ item }}"
+        groups: leapp_lock_test_hosts
+        ansible_connection: local
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"
+      loop: [1, 2, 3, 4]
+
+# ----------------------------------------------------------------------------
+# Scenario 1: serial batches must not each compute their own timestamp
+# ----------------------------------------------------------------------------
+- name: Scenario 1 - serial batches
+  hosts: leapp_lock_test_hosts
+  gather_facts: false
+  serial: 2
+  vars:
+    leapp_workdir_controller: /tmp/test_leapp_lock_timestamp
+    __leapp_logs_name: scenario1
+
+  tasks:
+    - name: Lock the timestamp
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: lock_timestamp.yml
+      vars:
+        __leapp_lock_timestamp_max_age: 7200
+
+    - name: Record the timestamp this host observed
+      ansible.builtin.copy:
+        content: "{{ __leapp_timestamp }}"
+        dest: /tmp/test_leapp_lock_timestamp/scenario1-{{ inventory_hostname }}.observed
+        mode: "0644"
+      delegate_to: localhost
+      become: false
+
+    # Force the two batches to land in different wall-clock seconds, so a
+    # naive per-batch now() would be caught diverging between batches.
+    - name: Pause between batches
+      ansible.builtin.command: sleep 1.1
+      changed_when: false
+      run_once: true
+
+# ----------------------------------------------------------------------------
+# Scenario 2: strategy free must not let each host compute its own timestamp
+# ----------------------------------------------------------------------------
+- name: Scenario 2 - strategy free
+  hosts: leapp_lock_test_hosts
+  gather_facts: false
+  strategy: free
+  vars:
+    leapp_workdir_controller: /tmp/test_leapp_lock_timestamp
+    __leapp_logs_name: scenario2
+
+  tasks:
+    # Stagger hosts so they are not synchronized before locking. Under free
+    # strategy there is no barrier before this task to begin with, but the
+    # stagger makes the race window large enough to reliably exercise it.
+    - name: Stagger hosts before locking
+      ansible.builtin.command: "sleep {{ (inventory_hostname[-1] | int) * 0.4 }}"
+      changed_when: false
+
+    - name: Lock the timestamp
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: lock_timestamp.yml
+      vars:
+        __leapp_lock_timestamp_max_age: 7200
+
+    - name: Record the timestamp this host observed
+      ansible.builtin.copy:
+        content: "{{ __leapp_timestamp }}"
+        dest: /tmp/test_leapp_lock_timestamp/scenario2-{{ inventory_hostname }}.observed
+        mode: "0644"
+      delegate_to: localhost
+      become: false
+
+# ----------------------------------------------------------------------------
+# Scenario 3: a stale leftover timestamp file is replaced, not reused
+# ----------------------------------------------------------------------------
+- name: Scenario 3 - stale timestamp file is replaced
+  hosts: leapp_lock_test_hosts[0]
+  gather_facts: false
+  vars:
+    leapp_workdir_controller: /tmp/test_leapp_lock_timestamp
+    __leapp_logs_name: scenario3
+
+  tasks:
+    - name: Seed an aged (stale) timestamp file
+      ansible.builtin.copy:
+        content: "1999-01-01_00-00-00"
+        dest: /tmp/test_leapp_lock_timestamp/.scenario3_run_timestamp
+        mode: "0644"
+      delegate_to: localhost
+      become: false
+
+    - name: Age the file well past the max age used below
+      ansible.builtin.command:
+        argv: [touch, -d, 2 hours ago, /tmp/test_leapp_lock_timestamp/.scenario3_run_timestamp]
+      changed_when: false
+      delegate_to: localhost
+      become: false
+
+    - name: Lock the timestamp with a short max age
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: lock_timestamp.yml
+      vars:
+        __leapp_lock_timestamp_max_age: 60
+
+    - name: Record the timestamp this host observed
+      ansible.builtin.copy:
+        content: "{{ __leapp_timestamp }}"
+        dest: /tmp/test_leapp_lock_timestamp/scenario3.observed
+        mode: "0644"
+      delegate_to: localhost
+      become: false
+
+# ----------------------------------------------------------------------------
+# Scenario 4: a fresh timestamp file is reused, not regenerated
+# ----------------------------------------------------------------------------
+- name: Scenario 4 - fresh timestamp file is reused
+  hosts: leapp_lock_test_hosts[0]
+  gather_facts: false
+  vars:
+    leapp_workdir_controller: /tmp/test_leapp_lock_timestamp
+    __leapp_logs_name: scenario4
+
+  tasks:
+    - name: Lock the timestamp (first run, creates the shared file)
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: lock_timestamp.yml
+      vars:
+        __leapp_lock_timestamp_max_age: 7200
+
+    - name: Record the first observed timestamp
+      ansible.builtin.copy:
+        content: "{{ __leapp_timestamp }}"
+        dest: /tmp/test_leapp_lock_timestamp/scenario4-first.observed
+        mode: "0644"
+      delegate_to: localhost
+      become: false
+
+    - name: Lock the timestamp again (second run, must reuse the same file)
+      ansible.builtin.include_role:
+        name: infra.leapp.common
+        tasks_from: lock_timestamp.yml
+      vars:
+        __leapp_lock_timestamp_max_age: 7200
+
+    - name: Record the second observed timestamp
+      ansible.builtin.copy:
+        content: "{{ __leapp_timestamp }}"
+        dest: /tmp/test_leapp_lock_timestamp/scenario4-second.observed
+        mode: "0644"
+      delegate_to: localhost
+      become: false
+
+# ----------------------------------------------------------------------------
+# Assertions
+# ----------------------------------------------------------------------------
+- name: Verify all scenarios
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    __leapp_lock_test_workdir: /tmp/test_leapp_lock_timestamp
+
+  tasks:
+    - name: Read back every observed timestamp
+      ansible.builtin.slurp:
+        src: "{{ __leapp_lock_test_workdir }}/{{ item }}"
+      loop:
+        - scenario1-leapp_lock_test_1.observed
+        - scenario1-leapp_lock_test_2.observed
+        - scenario1-leapp_lock_test_3.observed
+        - scenario1-leapp_lock_test_4.observed
+        - scenario2-leapp_lock_test_1.observed
+        - scenario2-leapp_lock_test_2.observed
+        - scenario2-leapp_lock_test_3.observed
+        - scenario2-leapp_lock_test_4.observed
+        - scenario3.observed
+        - scenario4-first.observed
+        - scenario4-second.observed
+      register: __leapp_lock_observed
+
+    - name: Decode the observed timestamps into a name to value map
+      ansible.builtin.set_fact:
+        __leapp_lock_values: "{{ dict(__leapp_lock_observed.results
+          | map(attribute='item')
+          | zip(__leapp_lock_observed.results | map(attribute='content') | map('b64decode'))) }}"
+
+    - name: Assert every host in scenario 1 (serial) agreed on one timestamp
+      ansible.builtin.assert:
+        that:
+          - __leapp_lock_values['scenario1-leapp_lock_test_1.observed']
+            == __leapp_lock_values['scenario1-leapp_lock_test_2.observed']
+          - __leapp_lock_values['scenario1-leapp_lock_test_2.observed']
+            == __leapp_lock_values['scenario1-leapp_lock_test_3.observed']
+          - __leapp_lock_values['scenario1-leapp_lock_test_3.observed']
+            == __leapp_lock_values['scenario1-leapp_lock_test_4.observed']
+        success_msg: All 4 hosts across 2 serial batches agreed on one timestamp
+        fail_msg: Serial batches computed different timestamps
+
+    - name: Assert every host in scenario 2 (free strategy) agreed on one timestamp
+      ansible.builtin.assert:
+        that:
+          - __leapp_lock_values['scenario2-leapp_lock_test_1.observed']
+            == __leapp_lock_values['scenario2-leapp_lock_test_2.observed']
+          - __leapp_lock_values['scenario2-leapp_lock_test_2.observed']
+            == __leapp_lock_values['scenario2-leapp_lock_test_3.observed']
+          - __leapp_lock_values['scenario2-leapp_lock_test_3.observed']
+            == __leapp_lock_values['scenario2-leapp_lock_test_4.observed']
+        success_msg: All 4 staggered hosts under strategy free agreed on one timestamp
+        fail_msg: strategy free hosts computed different timestamps
+
+    - name: Assert the stale timestamp file was replaced, not reused
+      ansible.builtin.assert:
+        that:
+          - __leapp_lock_values['scenario3.observed'] != "1999-01-01_00-00-00"
+        success_msg: A stale leftover timestamp file was correctly replaced
+        fail_msg: A stale leftover timestamp file was incorrectly reused
+
+    - name: Assert a fresh timestamp file was reused, not regenerated
+      ansible.builtin.assert:
+        that:
+          - __leapp_lock_values['scenario4-first.observed']
+            == __leapp_lock_values['scenario4-second.observed']
+        success_msg: A fresh timestamp file was correctly reused on the second run
+        fail_msg: A fresh timestamp file was regenerated instead of reused
+
+    - name: Clean up the test working directory
+      ansible.builtin.file:
+        path: "{{ __leapp_lock_test_workdir }}"
+        state: absent
+
+...
